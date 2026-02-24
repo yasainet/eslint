@@ -88,9 +88,17 @@ Each `{prefix}.repo.ts` can only import its corresponding lib (auto-generated fr
 - `server.repo.ts` → `@/lib/supabase/server`
 - `client.repo.ts` → `@/lib/supabase/client`
 
+## Release
+
 1. Update `version` in `package.json`
 2. Commit and push to `main`
-3. Create a GitHub Release with a tag (e.g. `v0.2.0`)
+3. Create and push a tag:
+
+```sh
+git tag v0.2.0
+git push --tags
+```
+
 4. GitHub Actions will automatically publish to npm
 
 ## License
