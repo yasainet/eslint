@@ -34,16 +34,16 @@ Next.js recommended presets (core-web-vitals + typescript) with additional rules
 
 Enforces file naming conventions inside `features/`:
 
-| Directory | Pattern | Example |
-| --- | --- | --- |
-| `domains/` | `{prefix}.domain.ts` | `server.domain.ts` |
-| `repositories/` | `{prefix}.repo.ts` | `server.repo.ts` |
-| `actions/` | `{prefix}.action.ts` | `server.action.ts` |
-| `hooks/` | `use{Name}.ts` | `useAuth.ts` |
-| `types/` | `{name}.type.ts` | `comic.type.ts` |
-| `schemas/` | `{name}.schema.ts` | `comic.schema.ts` |
-| `util/` | `{name}.util.ts` | `format.util.ts` |
-| `constants/` | `{name}.constant.ts` | `api.constant.ts` |
+| Directory       | Pattern              | Example            |
+| --------------- | -------------------- | ------------------ |
+| `domains/`      | `{prefix}.domain.ts` | `server.domain.ts` |
+| `repositories/` | `{prefix}.repo.ts`   | `server.repo.ts`   |
+| `actions/`      | `{prefix}.action.ts` | `server.action.ts` |
+| `hooks/`        | `use{Name}.ts`       | `useAuth.ts`       |
+| `types/`        | `{name}.type.ts`     | `comic.type.ts`    |
+| `schemas/`      | `{name}.schema.ts`   | `comic.schema.ts`  |
+| `util/`         | `{name}.util.ts`     | `format.util.ts`   |
+| `constants/`    | `{name}.constant.ts` | `api.constant.ts`  |
 
 Additionally:
 
@@ -87,8 +87,6 @@ Each `{prefix}.repo.ts` can only import its corresponding lib (auto-generated fr
 
 - `server.repo.ts` → `@/lib/supabase/server`
 - `client.repo.ts` → `@/lib/supabase/client`
-
-## Release
 
 1. Update `version` in `package.json`
 2. Commit and push to `main`
