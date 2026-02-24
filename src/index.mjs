@@ -8,12 +8,14 @@
  * - cardinality: Action-domain relationships
  * - directives: "use server" / "use client" requirements
  * - imports: Repository import restrictions (prefix → lib mapping)
+ * - jsdoc: JSDoc description requirements for exported functions
  */
 
 import { baseConfigs, ignoresConfig, sharedRulesConfig } from "./base.mjs";
 import { cardinalityConfigs } from "./cardinality.mjs";
 import { directivesConfigs } from "./directives.mjs";
 import { importsConfigs } from "./imports.mjs";
+import { jsdocConfigs } from "./jsdoc.mjs";
 import { layersConfigs } from "./layers.mjs";
 import { namingConfigs } from "./naming.mjs";
 
@@ -30,4 +32,5 @@ export const eslintConfig = [
   ...cardinalityConfigs,
   ...directivesConfigs,
   ...importsConfigs,
+  ...jsdocConfigs,
 ];
