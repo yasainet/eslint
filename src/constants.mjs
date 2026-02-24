@@ -4,9 +4,26 @@
 
 import fs from "fs";
 import path from "path";
+import { fileURLToPath } from "url";
 
-/** Project root directory (resolved from the consuming project's CWD) */
-const PROJECT_ROOT = process.cwd();
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+/** Find the project root by walking up from this package's location in node_modules */
+function findProjectRoot() {
+  let dir = __dirname;
+  while (dir !== path.dirname(dir)) {
+    if (
+      fs.existsSync(path.join(dir, "package.json")) &&
+      !dir.includes("/node_modules/")
+    ) {
+      return dir;
+    }
+    dir = path.dirname(dir);
+  }
+  return process.cwd();
+}
+
+const PROJECT_ROOT = findProjectRoot();
 
 /**
  * Root directories containing feature modules.
