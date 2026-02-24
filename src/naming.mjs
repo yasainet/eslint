@@ -15,6 +15,10 @@
  * - features/**: .ts only (no .tsx — components belong in src/components/)
  * - components/**:  .tsx only (no .ts — logic belongs in src/features/)
  *
+ * Component naming:
+ * - components/ *.tsx: PascalCase (e.g., Button.tsx, AlertDialog.tsx)
+ * - components/shared/ui/ : excluded (shadcn/ui uses kebab-case)
+ *
  * Valid prefixes are defined in PREFIX_LIB_MAPPING (constants.mjs).
  */
 
@@ -146,6 +150,18 @@ export const namingConfigs = [
           message:
             "components/ must only contain .tsx files. Logic belongs in src/features/.",
         },
+      ],
+    },
+  },
+  {
+    name: "naming/components-pascal-case",
+    files: ["src/components/**/*.tsx"],
+    ignores: ["src/components/shared/ui/**"],
+    plugins: { "check-file": checkFile },
+    rules: {
+      "check-file/filename-naming-convention": [
+        "error",
+        { "**/*.tsx": "PASCAL_CASE" },
       ],
     },
   },
