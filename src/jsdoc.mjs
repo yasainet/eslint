@@ -3,6 +3,9 @@
  *
  * Enforces a single rule: every exported function must have a description.
  * Types are handled by TypeScript (machine layer), not JSDoc.
+ *
+ * Targets: repositories, domains, utils.
+ * Excludes: actions, hooks, components, schemas, constants.
  */
 
 import jsdocPlugin from "eslint-plugin-jsdoc";
@@ -16,7 +19,11 @@ import { featuresGlob } from "./constants.mjs";
 export const jsdocConfigs = [
   {
     name: "jsdoc",
-    files: [...featuresGlob("**/*.ts"), "src/components/**/*.tsx"],
+    files: [
+      ...featuresGlob("**/repositories/*.ts"),
+      ...featuresGlob("**/domain*/*.ts"),
+      ...featuresGlob("**/util*/*.ts"),
+    ],
     plugins: {
       jsdoc: jsdocPlugin,
     },
