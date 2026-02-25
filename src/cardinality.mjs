@@ -23,7 +23,7 @@ export const cardinalityConfigs = [
         {
           patterns: [
             {
-              group: ["**/domains/client.domain*", "**/domains/admin.domain*"],
+              group: ["**/domain/client.domain*", "**/domain/admin.domain*"],
               message:
                 "server.action can only import server.domain (cardinality violation)",
             },
@@ -41,7 +41,7 @@ export const cardinalityConfigs = [
         {
           patterns: [
             {
-              group: ["**/domains/server.domain*", "**/domains/admin.domain*"],
+              group: ["**/domain/server.domain*", "**/domain/admin.domain*"],
               message:
                 "client.action can only import client.domain (cardinality violation)",
             },
@@ -59,7 +59,7 @@ export const cardinalityConfigs = [
         {
           patterns: [
             {
-              group: ["**/domains/server.domain*", "**/domains/client.domain*"],
+              group: ["**/domain/server.domain*", "**/domain/client.domain*"],
               message:
                 "admin.action can only import admin.domain (cardinality violation)",
             },

@@ -2,13 +2,13 @@
  * @fileoverview File naming conventions for feature modules.
  *
  * Enforces consistent naming patterns:
- * - domains: {prefix}.domain.ts (e.g., server.domain.ts, stripe.domain.ts)
+ * - domain: {prefix}.domain.ts (e.g., server.domain.ts, stripe.domain.ts)
  * - repositories: {prefix}.repo.ts (e.g., server.repo.ts, stripe.repo.ts)
  * - actions: {prefix}.action.ts (e.g., server.action.ts, stripe.action.ts)
  * - hooks: useXxx.ts (e.g., useAuth.ts)
  * - types: {feature}.type.ts (e.g., threads.type.ts) — shared: free naming
  * - schemas: xxx.schema.ts (e.g., comic.schema.ts)
- * - utils: {feature}.util.ts (e.g., threads.util.ts) — shared: free naming
+ * - util: {feature}.util.ts (e.g., threads.util.ts) — shared: free naming
  * - constants: xxx.constant.ts (e.g., api.constant.ts)
  *
  * Extension constraints:
@@ -37,8 +37,8 @@ const prefixPattern = `@(${Object.keys(PREFIX_LIB_MAPPING).join("|")})`;
  */
 export const namingConfigs = [
   {
-    name: "naming/domains",
-    files: featuresGlob("**/domains/*.ts"),
+    name: "naming/domain",
+    files: featuresGlob("**/domain/*.ts"),
     plugins: { "check-file": checkFile },
     rules: {
       "check-file/filename-naming-convention": [

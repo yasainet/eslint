@@ -4,7 +4,7 @@
  * Enforces a single rule: every exported function must have a description.
  * Types are handled by TypeScript (machine layer), not JSDoc.
  *
- * Targets: repositories, domains, utils.
+ * Targets: repositories, domain, util.
  * Excludes: actions, hooks, components, schemas, constants.
  */
 

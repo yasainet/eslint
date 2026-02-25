@@ -4,12 +4,12 @@
  * Enforces the following dependency rules:
  *
  * Layer hierarchy (top to bottom):
- *   hooks → actions → domains → repositories
+ *   hooks → actions → domain → repositories
  *
  * Rules:
- * - Repositories: Cannot import domains, actions, or hooks.
+ * - Repositories: Cannot import domain, actions, or hooks.
  *                 Cannot use try-catch or if statements.
- * - Domains: Cannot import actions or hooks.
+ * - Domain: Cannot import actions or hooks.
  *            Cannot use try-catch.
  * - Actions: Cannot import hooks.
  *            Exported functions must start with "handle".
@@ -47,8 +47,8 @@ export const layersConfigs = [
         {
           patterns: [
             {
-              group: ["*/domains/*", "*/domains"],
-              message: "repositories cannot import domains (layer violation)",
+              group: ["*/domain/*", "*/domain"],
+              message: "repositories cannot import domain (layer violation)",
             },
             {
               group: ["*/actions/*", "*/actions"],
@@ -72,8 +72,8 @@ export const layersConfigs = [
     },
   },
   {
-    name: "layers/domains",
-    files: ["**/domains/*.ts"],
+    name: "layers/domain",
+    files: ["**/domain/*.ts"],
     rules: {
       "no-restricted-syntax": [
         "error",
@@ -89,16 +89,16 @@ export const layersConfigs = [
           patterns: [
             {
               group: ["*/actions/*", "*/actions"],
-              message: "domains cannot import actions (layer violation)",
+              message: "domain cannot import actions (layer violation)",
             },
             {
               group: ["*/hooks/*", "*/hooks"],
-              message: "domains cannot import hooks (layer violation)",
+              message: "domain cannot import hooks (layer violation)",
             },
             {
-              group: ["@/features/*/domains/*", "@/features/*/domains"],
+              group: ["@/features/*/domain/*", "@/features/*/domain"],
               message:
-                "domains cannot import other feature's domains (cross-feature violation)",
+                "domain cannot import other feature's domain (cross-feature violation)",
             },
           ],
         },

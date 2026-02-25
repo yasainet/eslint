@@ -36,7 +36,7 @@ Enforces file naming conventions inside `features/`:
 
 | Directory       | Pattern              | Example            |
 | --------------- | -------------------- | ------------------ |
-| `domains/`      | `{prefix}.domain.ts` | `server.domain.ts` |
+| `domain/`       | `{prefix}.domain.ts` | `server.domain.ts` |
 | `repositories/` | `{prefix}.repo.ts`   | `server.repo.ts`   |
 | `actions/`      | `{prefix}.action.ts` | `server.action.ts` |
 | `hooks/`        | `use{Name}.ts`       | `useAuth.ts`       |
@@ -55,11 +55,11 @@ Additionally:
 Enforces dependency direction between layers:
 
 ```
-hooks → actions → domains → repositories
+hooks → actions → domain → repositories
 ```
 
-- **Repositories** — cannot import domains/actions/hooks, no `try-catch` or `if`
-- **Domains** — cannot import actions/hooks, no `try-catch`
+- **Repositories** — cannot import domain/actions/hooks, no `try-catch` or `if`
+- **Domain** — cannot import actions/hooks, no `try-catch`
 - **Actions** — cannot import hooks, exports must start with `handle`
 - **Hooks** — exports must start with `use`
 
