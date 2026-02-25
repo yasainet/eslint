@@ -6,9 +6,9 @@
  * - repositories: {prefix}.repo.ts (e.g., server.repo.ts, stripe.repo.ts)
  * - actions: {prefix}.action.ts (e.g., server.action.ts, stripe.action.ts)
  * - hooks: useXxx.ts (e.g., useAuth.ts)
- * - types: xxx.type.ts (e.g., comic.type.ts)
+ * - types: {feature}.type.ts (e.g., threads.type.ts) — shared: free naming
  * - schemas: xxx.schema.ts (e.g., comic.schema.ts)
- * - utils: xxx.util.ts (e.g., format.util.ts)
+ * - utils: {feature}.util.ts (e.g., threads.util.ts) — shared: free naming
  * - constants: xxx.constant.ts (e.g., api.constant.ts)
  *
  * Extension constraints:
@@ -72,12 +72,24 @@ export const namingConfigs = [
   },
   {
     name: "naming/types",
-    files: featuresGlob("**/types/*.ts"),
+    files: featuresGlob("*/types/*.ts"),
+    ignores: featuresGlob("shared/types/*.ts"),
     plugins: { "check-file": checkFile },
     rules: {
       "check-file/filename-naming-convention": [
         "error",
-        { "**/*.ts": "+([a-z0-9-]).type" },
+        { "**/*/types/*.ts": "<1>.type" },
+      ],
+    },
+  },
+  {
+    name: "naming/types-shared",
+    files: featuresGlob("shared/types/*.ts"),
+    plugins: { "check-file": checkFile },
+    rules: {
+      "check-file/filename-naming-convention": [
+        "error",
+        { "**/*.ts": "+([a-z0-9_-]).type" },
       ],
     },
   },
@@ -93,13 +105,25 @@ export const namingConfigs = [
     },
   },
   {
-    name: "naming/utils",
-    files: featuresGlob("**/util/*.ts"),
+    name: "naming/util",
+    files: featuresGlob("*/util/*.ts"),
+    ignores: featuresGlob("shared/util/*.ts"),
     plugins: { "check-file": checkFile },
     rules: {
       "check-file/filename-naming-convention": [
         "error",
-        { "**/*.ts": "+([a-z0-9-]).util" },
+        { "**/*/util/*.ts": "<1>.util" },
+      ],
+    },
+  },
+  {
+    name: "naming/util-shared",
+    files: featuresGlob("shared/util/*.ts"),
+    plugins: { "check-file": checkFile },
+    rules: {
+      "check-file/filename-naming-convention": [
+        "error",
+        { "**/*.ts": "+([a-z0-9_-]).util" },
       ],
     },
   },
