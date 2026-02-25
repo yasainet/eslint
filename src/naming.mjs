@@ -72,13 +72,14 @@ export const namingConfigs = [
   },
   {
     name: "naming/types",
-    files: featuresGlob("*/types/*.ts"),
+    files: featuresGlob("*/types/*.type.ts"),
     ignores: featuresGlob("shared/types/*.ts"),
     plugins: { "check-file": checkFile },
     rules: {
       "check-file/filename-naming-convention": [
         "error",
-        { "**/*/types/*.ts": "<1>.type" },
+        { "**/*/types/*.ts": "<1>" },
+        { ignoreMiddleExtensions: true },
       ],
     },
   },
@@ -106,13 +107,14 @@ export const namingConfigs = [
   },
   {
     name: "naming/util",
-    files: featuresGlob("*/util/*.ts"),
+    files: featuresGlob("*/util/*.util.ts"),
     ignores: featuresGlob("shared/util/*.ts"),
     plugins: { "check-file": checkFile },
     rules: {
       "check-file/filename-naming-convention": [
         "error",
-        { "**/*/util/*.ts": "<1>.util" },
+        { "**/*/util/*.ts": "<1>" },
+        { ignoreMiddleExtensions: true },
       ],
     },
   },

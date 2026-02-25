@@ -1,6 +1,6 @@
 {
   "name": "@yasainet/eslint",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Shared ESLint configuration for Next.js projects with feature-based architecture",
   "type": "module",
   "exports": {
