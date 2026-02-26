@@ -1,2 +1,6 @@
-.claude
+# Directories
 node_modules
+
+# Files
+*.local
+.DS_Store
