@@ -1,18 +1,18 @@
-# @yasainet/eslint
+# @yasainet/eslint-next
 
 Shared ESLint configuration for Next.js projects with feature-based architecture.
 
 ## Install
 
 ```sh
-npm install -D @yasainet/eslint eslint eslint-config-next
+npm install -D @yasainet/eslint-next eslint eslint-config-next
 ```
 
 ## Usage
 
 ```js
 // eslint.config.mjs
-import { eslintConfig } from "@yasainet/eslint";
+import { eslintConfig } from "@yasainet/eslint-next";
 
 export default eslintConfig;
 ```
@@ -95,7 +95,7 @@ Each `{prefix}.repo.ts` can only import its corresponding lib (auto-generated fr
 3. Create and push a tag:
 
 ```sh
-git tag v0.2.0
+git tag v0.1.0
 git push --tags
 ```
 
