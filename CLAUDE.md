@@ -33,11 +33,11 @@ src/
   constants.mjs   # FEATURE_ROOTS, PREFIX_LIB_MAPPING (auto-generated from src/lib/), featuresGlob()
   plugins.mjs     # Plugin imports and re-exports
   base.mjs        # Next.js presets (core-web-vitals + typescript) and shared rules
-  naming.mjs      # File naming conventions per directory (domain, repo, action, hook, etc.)
-  layers.mjs      # Layer dependency direction: hooks → actions → domain → repositories
+  naming.mjs      # File naming conventions per directory (services, repo, action, hook, etc.)
+  layers.mjs      # Layer dependency direction: hooks → actions → services → repositories
   directives.mjs  # "use server" / "use client" directive enforcement
   imports.mjs     # Consolidated import restrictions (layer, cross-feature, cardinality, prefix-lib, lib-boundary)
-  jsdoc.mjs       # JSDoc description requirements for repositories, domain, util
+  jsdoc.mjs       # JSDoc description requirements for repositories, services, util
 ```
 
 ## Commands

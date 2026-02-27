@@ -3,7 +3,7 @@
  *
  * Enforces syntax restrictions per layer:
  * - Repositories: No try-catch or if statements
- * - Domain: No try-catch
+ * - Services: No try-catch
  * - Actions: Exported functions must start with "handle"
  * - Hooks: Exported functions must start with "use"
  *
@@ -32,21 +32,21 @@ export const layersConfigs = [
         {
           selector: "IfStatement",
           message:
-            "if statements are not allowed in repositories. Conditional logic belongs in domain.",
+            "if statements are not allowed in repositories. Conditional logic belongs in services.",
         },
       ],
     },
   },
   {
-    name: "layers/domain",
-    files: ["**/domain/*.ts"],
+    name: "layers/services",
+    files: ["**/services/*.ts"],
     rules: {
       "no-restricted-syntax": [
         "error",
         {
           selector: "TryStatement",
           message:
-            "try-catch is not allowed in domain. Error handling belongs in actions.",
+            "try-catch is not allowed in services. Error handling belongs in actions.",
         },
       ],
     },

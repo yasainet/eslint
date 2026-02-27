@@ -1,6 +1,6 @@
 {
   "name": "@yasainet/eslint-next",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "ESLint for Next.js",
   "type": "module",
   "exports": {

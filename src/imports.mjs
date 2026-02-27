@@ -5,7 +5,7 @@
  * the ESLint flat-config "last wins" override bug.
  *
  * Pattern categories:
- * 1. Layer: upper-layer imports forbidden (repos < domain < actions < hooks)
+ * 1. Layer: upper-layer imports forbidden (repos < services < actions < hooks)
  * 2. Cross-feature: same-layer cross-feature imports forbidden
  * 3. Cardinality: action → domain 1:1 prefix match
  * 4. Prefix-lib: repo → lib 1:1 prefix match
@@ -21,8 +21,8 @@ import { PREFIX_LIB_MAPPING } from "./constants.mjs";
 const LAYER_PATTERNS = {
   repositories: [
     {
-      group: ["*/domain/*", "*/domain"],
-      message: "repositories cannot import domain (layer violation)",
+      group: ["*/services/*", "*/services"],
+      message: "repositories cannot import services (layer violation)",
     },
     {
       group: ["*/actions/*", "*/actions"],
@@ -33,14 +33,14 @@ const LAYER_PATTERNS = {
       message: "repositories cannot import hooks (layer violation)",
     },
   ],
-  domain: [
+  services: [
     {
       group: ["*/actions/*", "*/actions"],
-      message: "domain cannot import actions (layer violation)",
+      message: "services cannot import actions (layer violation)",
     },
     {
       group: ["*/hooks/*", "*/hooks"],
-      message: "domain cannot import hooks (layer violation)",
+      message: "services cannot import hooks (layer violation)",
     },
   ],
   actions: [
@@ -63,11 +63,11 @@ const CROSS_FEATURE_PATTERNS = {
         "repositories cannot import other feature's repositories (cross-feature violation)",
     },
   ],
-  domain: [
+  services: [
     {
-      group: ["@/features/*/domain/*", "@/features/*/domain"],
+      group: ["@/features/*/services/*", "@/features/*/services"],
       message:
-        "domain cannot import other feature's domain (cross-feature violation)",
+        "services cannot import other feature's services (cross-feature violation)",
     },
   ],
   actions: [
@@ -86,23 +86,23 @@ const CROSS_FEATURE_PATTERNS = {
 const CARDINALITY_PATTERNS = {
   server: [
     {
-      group: ["**/domain/client.domain*", "**/domain/admin.domain*"],
+      group: ["**/services/client.service*", "**/services/admin.service*"],
       message:
-        "server.action can only import server.domain (cardinality violation)",
+        "server.action can only import server.service (cardinality violation)",
     },
   ],
   client: [
     {
-      group: ["**/domain/server.domain*", "**/domain/admin.domain*"],
+      group: ["**/services/server.service*", "**/services/admin.service*"],
       message:
-        "client.action can only import client.domain (cardinality violation)",
+        "client.action can only import client.service (cardinality violation)",
     },
   ],
   admin: [
     {
-      group: ["**/domain/server.domain*", "**/domain/client.domain*"],
+      group: ["**/services/server.service*", "**/services/client.service*"],
       message:
-        "admin.action can only import admin.domain (cardinality violation)",
+        "admin.action can only import admin.service (cardinality violation)",
     },
   ],
 };
@@ -215,13 +215,13 @@ function generateImportConfigs() {
     );
   }
 
-  // Domain: layer + cross-feature + lib-boundary
+  // Services: layer + cross-feature + lib-boundary
   configs.push(
     makeConfig(
-      "domain",
-      ["**/domain/*.ts"],
-      LAYER_PATTERNS.domain,
-      CROSS_FEATURE_PATTERNS.domain,
+      "services",
+      ["**/services/*.ts"],
+      LAYER_PATTERNS.services,
+      CROSS_FEATURE_PATTERNS.services,
       LIB_BOUNDARY_PATTERNS,
     ),
   );
