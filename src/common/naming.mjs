@@ -108,6 +108,21 @@ export const namingConfigs = [
     },
   },
   {
+    name: "naming/actions-export",
+    files: featuresGlob("**/actions/*.ts"),
+    rules: {
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector:
+            "ExportNamedDeclaration > FunctionDeclaration[id.name!=/^handle[A-Z]/]",
+          message:
+            "Exported functions in actions must start with 'handle' (e.g., handleGetComics).",
+        },
+      ],
+    },
+  },
+  {
     name: "naming/features-ts-only",
     files: featuresGlob("**/*.tsx"),
     rules: {
