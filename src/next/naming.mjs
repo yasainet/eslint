@@ -15,6 +15,21 @@ export const namingConfigs = [
     },
   },
   {
+    name: "naming/hooks-export",
+    files: featuresGlob("**/hooks/*.ts"),
+    rules: {
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector:
+            "ExportNamedDeclaration > FunctionDeclaration[id.name!=/^use[A-Z]/]",
+          message:
+            "Exported functions in hooks must start with 'use' (e.g., useAuth).",
+        },
+      ],
+    },
+  },
+  {
     name: "naming/components-tsx-only",
     files: ["src/components/**/*.ts"],
     rules: {

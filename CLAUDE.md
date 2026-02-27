@@ -43,8 +43,7 @@ src/
 │   └── jsdoc.mjs        # JSDoc requirements
 ├── next/
 │   ├── index.mjs        # Entry: common + Next.js-specific rules
-│   ├── naming.mjs       # hooks, components naming
-│   ├── layers.mjs       # hooks layer constraint
+│   ├── naming.mjs       # hooks (filename + export), components naming
 │   └── directives.mjs   # "use server" / "use client"
 └── node/
     └── index.mjs        # Entry: common only
