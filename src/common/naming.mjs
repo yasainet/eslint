@@ -1,5 +1,6 @@
 import { featuresGlob, PREFIX_LIB_MAPPING } from "./constants.mjs";
 import { checkFile } from "./plugins.mjs";
+import { actionHandleServiceRule } from "./local-plugins/action-handle-service.mjs";
 
 const prefixPattern = `@(${Object.keys(PREFIX_LIB_MAPPING).join("|")})`;
 
@@ -120,6 +121,16 @@ export const namingConfigs = [
             "Exported functions in actions must start with 'handle' (e.g., handleGetComics).",
         },
       ],
+    },
+  },
+  {
+    name: "naming/actions-handle-service",
+    files: featuresGlob("**/actions/*.ts"),
+    plugins: {
+      local: { rules: { "action-handle-service": actionHandleServiceRule } },
+    },
+    rules: {
+      "local/action-handle-service": "error",
     },
   },
   {
