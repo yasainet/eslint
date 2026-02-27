@@ -9,15 +9,15 @@
 
 | ディレクトリ       | パターン                 | 例                  |
 | ------------------ | ------------------------ | ------------------- |
-| `domain/`          | `{prefix}.domain.ts`     | `server.domain.ts`  |
+| `services/`        | `{prefix}.service.ts`    | `server.service.ts` |
 | `repositories/`    | `{prefix}.repo.ts`       | `server.repo.ts`    |
 | `actions/`         | `{prefix}.action.ts`     | `server.action.ts`  |
 | `hooks/`           | `use{Name}.ts`           | `useAuth.ts`        |
 | `types/`           | `{feature-name}.type.ts` | `users.type.ts`     |
 | `types/`（shared） | `{name}.type.ts`         | `users.type.ts`     |
 | `schemas/`         | `{name}.schema.ts`       | `users.schema.ts`   |
-| `util/`            | `{feature-name}.util.ts` | `users.util.ts`     |
-| `util/`（shared）  | `{name}.util.ts`         | `format.util.ts`    |
+| `utils/`            | `{feature-name}.utils.ts` | `users.utils.ts`     |
+| `utils/`（shared）  | `{name}.utils.ts`         | `format.utils.ts`    |
 | `constants/`       | `{name}.constant.ts`     | `users.constant.ts` |
 
 - `{prefix}` は `PREFIX_LIB_MAPPING` のキー（後述）
@@ -66,16 +66,16 @@ src/lib/
 
 ## エラー例・OK 例
 
-### domain/
+### services/
 
 ```text
 # NG
-src/features/threads/domain/logic.ts
-src/features/threads/domain/threads.ts
+src/features/threads/services/logic.ts
+src/features/threads/services/threads.ts
 
 # OK
-src/features/threads/domain/server.domain.ts
-src/features/threads/domain/client.domain.ts
+src/features/threads/services/server.service.ts
+src/features/threads/services/client.service.ts
 ```
 
 ### hooks/

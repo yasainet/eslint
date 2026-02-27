@@ -1,6 +1,6 @@
 # JSDoc
 
-抽象度の高いレイヤー（repositories, domain, util）にドキュメントを強制する。
+抽象度の高いレイヤー（repositories, services, utils）にドキュメントを強制する。
 型情報は TypeScript が担うため、JSDoc では「なぜこの関数が存在するか」の説明のみを求める。
 
 ## ルール
@@ -15,8 +15,8 @@
 | レイヤー | JSDoc 必須 | 理由 |
 | --- | --- | --- |
 | repositories | 必須 | 外部システムとのインターフェースであり、何を取得・変更するか説明が必要 |
-| domain | 必須 | ビジネスロジックの意図を明示するため |
-| util | 必須 | 汎用関数の用途を明示するため |
+| services | 必須 | ビジネスロジックの意図を明示するため |
+| utils | 必須 | 汎用関数の用途を明示するため |
 | actions | 不要 | `handle` プレフィックスと引数型で意図が明確 |
 | hooks | 不要 | `use` プレフィックスと React の慣習で意図が明確 |
 | components | 不要 | Props 型と JSX で意図が明確 |
@@ -41,8 +41,8 @@ export function getUser(id: string) { ... }
 `FEATURE_ROOTS` 配下:
 
 - `**/repositories/*.ts`
-- `**/domain*/*.ts`
-- `**/util*/*.ts`
+- `**/services*/*.ts`
+- `**/utils*/*.ts`
 
 ## エラー例・OK 例
 

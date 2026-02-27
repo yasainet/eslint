@@ -37,7 +37,7 @@ src/
   layers.mjs      # Layer dependency direction: hooks → actions → services → repositories
   directives.mjs  # "use server" / "use client" directive enforcement
   imports.mjs     # Consolidated import restrictions (layer, cross-feature, cardinality, prefix-lib, lib-boundary)
-  jsdoc.mjs       # JSDoc description requirements for repositories, services, util
+  jsdoc.mjs       # JSDoc description requirements for repositories, services, utils
 ```
 
 ## Commands

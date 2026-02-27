@@ -12,13 +12,13 @@ ESLint flat config の「後勝ち」問題を回避するために、パター�
 下位レイヤーから上位レイヤーへのインポートを禁止する。
 
 ```text
-hooks → actions → domain → repositories
+hooks → actions → services → repositories
 ```
 
 | ファイルのレイヤー | インポート禁止 |
 | --- | --- |
-| repositories | `*/domain/*`, `*/actions/*`, `*/hooks/*` |
-| domain | `*/actions/*`, `*/hooks/*` |
+| repositories | `*/services/*`, `*/actions/*`, `*/hooks/*` |
+| services | `*/actions/*`, `*/hooks/*` |
 | actions | `*/hooks/*` |
 
 ### 2. Cross-feature（クロスフィーチャー制限）
@@ -28,20 +28,20 @@ hooks → actions → domain → repositories
 | ファイルのレイヤー | インポート禁止 |
 | --- | --- |
 | repositories | `@/features/*/repositories/*` |
-| domain | `@/features/*/domain/*` |
+| services | `@/features/*/services/*` |
 | actions | `@/features/*/actions/*` |
 
 フィーチャー間で共有が必要なロジックは `shared/` に配置する。
 
 ### 3. Cardinality（カーディナリティ制限）
 
-action から domain へのインポートを 1:1 のプレフィックスマッチに制限する。
+action から services へのインポートを 1:1 のプレフィックスマッチに制限する。
 
-| action ファイル | インポート可能な domain | インポート禁止 |
+| action ファイル | インポート可能な service | インポート禁止 |
 | --- | --- | --- |
-| `server.action.ts` | `server.domain.ts` | `client.domain.*`, `admin.domain.*` |
-| `client.action.ts` | `client.domain.ts` | `server.domain.*`, `admin.domain.*` |
-| `admin.action.ts` | `admin.domain.ts` | `server.domain.*`, `client.domain.*` |
+| `server.action.ts` | `server.service.ts` | `client.service.*`, `admin.service.*` |
+| `client.action.ts` | `client.service.ts` | `server.service.*`, `admin.service.*` |
+| `admin.action.ts` | `admin.service.ts` | `server.service.*`, `client.service.*` |
 
 ### 4. Prefix-lib（プレフィックス-ライブラリ制限）
 
@@ -62,7 +62,7 @@ action から domain へのインポートを 1:1 のプレフィックスマッ
 | ファイル | `@/lib/*` のインポート |
 | --- | --- |
 | `**/repositories/*.ts` | 許可 |
-| `**/domain/*.ts` | 禁止 |
+| `**/services/*.ts` | 禁止 |
 | `**/actions/*.ts` | 禁止 |
 | `**/hooks/*.ts` | 禁止 |
 | `src/components/**` | 禁止 |
@@ -76,7 +76,7 @@ action から domain へのインポートを 1:1 のプレフィックスマッ
 | `imports/lib-boundary` | `src/**/*.{ts,tsx}`（`src/lib/**` 等を除く） |
 | `imports/repositories` | `**/repositories/*.ts` |
 | `imports/repositories/{prefix}` | `**/repositories/{prefix}.repo.ts` |
-| `imports/domain` | `**/domain/*.ts` |
+| `imports/services` | `**/services/*.ts` |
 | `imports/actions` | `**/actions/*.ts` |
 | `imports/actions/{prefix}` | `**/actions/{prefix}.action.ts` |
 
@@ -85,14 +85,14 @@ action から domain へのインポートを 1:1 のプレフィックスマッ
 ### Layer
 
 ```ts
-// NG: repositories から domain をインポート
+// NG: repositories から services をインポート
 // 📁 src/features/threads/repositories/server.repo.ts
-import { validate } from "../domain/server.domain";
-// error: repositories cannot import domain (layer violation)
+import { validate } from "../services/server.service";
+// error: repositories cannot import services (layer violation)
 
-// OK: actions から domain をインポート
+// OK: actions から services をインポート
 // 📁 src/features/threads/actions/server.action.ts
-import { validate } from "../domain/server.domain";
+import { validate } from "../services/server.service";
 ```
 
 ### Cross-feature
@@ -107,13 +107,13 @@ import { handleGetUser } from "@/features/users/actions/server.action";
 ### Cardinality
 
 ```ts
-// NG: server.action から client.domain をインポート
+// NG: server.action から client.service をインポート
 // 📁 src/features/threads/actions/server.action.ts
-import { validate } from "../domain/client.domain";
-// error: server.action can only import server.domain (cardinality violation)
+import { validate } from "../services/client.service";
+// error: server.action can only import server.service (cardinality violation)
 
-// OK: server.action から server.domain をインポート
-import { validate } from "../domain/server.domain";
+// OK: server.action から server.service をインポート
+import { validate } from "../services/server.service";
 ```
 
 ### Prefix-lib
@@ -131,8 +131,8 @@ import { supabase } from "@/lib/supabase/server";
 ### Lib-boundary
 
 ```ts
-// NG: domain から直接 lib をインポート
-// 📁 src/features/threads/domain/server.domain.ts
+// NG: services から直接 lib をインポート
+// 📁 src/features/threads/services/server.service.ts
 import { supabase } from "@/lib/supabase/server";
 // error: @/lib/* can only be imported from repositories (lib-boundary violation)
 

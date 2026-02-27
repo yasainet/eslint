@@ -8,7 +8,7 @@
 ### レイヤー構造
 
 ```text
-hooks → actions → domain → repositories
+hooks → actions → services → repositories
 （上位）                        （下位）
 ```
 
@@ -19,8 +19,8 @@ hooks → actions → domain → repositories
 | レイヤー | 制約 | 理由 |
 | --- | --- | --- |
 | repositories | `try-catch` 禁止 | エラーハンドリングは actions の責務 |
-| repositories | `if` 文禁止 | 条件分岐は domain の責務 |
-| domain | `try-catch` 禁止 | エラーハンドリングは actions の責務 |
+| repositories | `if` 文禁止 | 条件分岐は services の責務 |
+| services | `try-catch` 禁止 | エラーハンドリングは actions の責務 |
 
 ### エクスポート命名規則
 
@@ -35,19 +35,19 @@ hooks → actions → domain → repositories
 
 | レイヤー | インポート禁止対象 |
 | --- | --- |
-| repositories | domain, actions, hooks |
-| domain | actions, hooks |
+| repositories | services, actions, hooks |
+| services | actions, hooks |
 | actions | hooks |
 
 同一レイヤーの別フィーチャーからのインポートも禁止:
 
 - `repositories` 同士のクロスフィーチャーインポート禁止
-- `domain` 同士のクロスフィーチャーインポート禁止
+- `services` 同士のクロスフィーチャーインポート禁止
 - `actions` 同士のクロスフィーチャーインポート禁止
 
 ## 対象ファイル
 
-- 構文制約: `**/repositories/*.ts`, `**/domain/*.ts`（全プロジェクト）
+- 構文制約: `**/repositories/*.ts`, `**/services/*.ts`（全プロジェクト）
 - エクスポート命名: `FEATURE_ROOTS` 配下の `**/actions/*.ts`, `**/hooks/*.ts`
 
 ## エラー例・OK 例
@@ -69,7 +69,7 @@ export function getUser(id: string) {
 export function getUser(id: string) {
   if (!id) {
     // error: if statements are not allowed in repositories.
-    //        Conditional logic belongs in domain.
+    //        Conditional logic belongs in services.
     return null;
   }
   return db.query("SELECT * FROM users WHERE id = ?", [id]);

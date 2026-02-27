@@ -34,7 +34,7 @@ Next.js の App Router では、デフォルトですべてのコンポーネン
 
 ```ts
 // NG: ディレクティブがない
-import { getUser } from "../domain/server.domain";
+import { getUser } from "../services/server.service";
 // error: server.action.ts must start with "use server" directive.
 
 export async function handleGetUser() { ... }
@@ -42,7 +42,7 @@ export async function handleGetUser() { ... }
 // OK
 "use server";
 
-import { getUser } from "../domain/server.domain";
+import { getUser } from "../services/server.service";
 
 export async function handleGetUser() { ... }
 ```
@@ -55,12 +55,12 @@ export async function handleGetUser() { ... }
 // error: client.action.ts must NOT have "use server" directive.
 //        It uses @/lib/supabase/client.
 
-import { getUser } from "../domain/client.domain";
+import { getUser } from "../services/client.service";
 
 export async function handleGetUser() { ... }
 
 // OK: ディレクティブなし
-import { getUser } from "../domain/client.domain";
+import { getUser } from "../services/client.service";
 
 export async function handleGetUser() { ... }
 ```

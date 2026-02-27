@@ -4,7 +4,7 @@
  * Enforces a single rule: every exported function must have a description.
  * Types are handled by TypeScript (machine layer), not JSDoc.
  *
- * Targets: repositories, services, util.
+ * Targets: repositories, services, utils.
  * Excludes: actions, hooks, components, schemas, constants.
  */
 
@@ -22,7 +22,7 @@ export const jsdocConfigs = [
     files: [
       ...featuresGlob("**/repositories/*.ts"),
       ...featuresGlob("**/services*/*.ts"),
-      ...featuresGlob("**/util*/*.ts"),
+      ...featuresGlob("**/utils*/*.ts"),
     ],
     plugins: {
       jsdoc: jsdocPlugin,
