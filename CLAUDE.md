@@ -5,7 +5,7 @@ Shared ESLint flat config that enforces feature-based architecture. Provides `./
 ## Project Overview
 
 `@yasainet/eslint` provides two entry points:
-- `@yasainet/eslint/next` — common rules + Next.js-specific rules (React effect linting, hooks/components naming, directives)
+- `@yasainet/eslint/next` — common rules + Next.js-specific rules (hooks/components naming, directives)
 - `@yasainet/eslint/node` — common rules only
 
 Key design points:
@@ -43,8 +43,6 @@ src/
 │   └── jsdoc.mjs        # JSDoc requirements
 ├── next/
 │   ├── index.mjs        # Entry: common + Next.js-specific rules
-│   ├── plugins.mjs      # reactYouMightNotNeedAnEffect
-│   ├── rules.mjs        # React-specific rules
 │   ├── naming.mjs       # hooks, components naming
 │   ├── layers.mjs       # hooks layer constraint
 │   └── directives.mjs   # "use server" / "use client"

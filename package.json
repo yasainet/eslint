@@ -1,6 +1,6 @@
 {
   "name": "@yasainet/eslint",
-  "version": "0.1.4",
+  "version": "0.1.0",
   "description": "ESLint",
   "type": "module",
   "exports": {
@@ -29,12 +29,6 @@
     "eslint-plugin-simple-import-sort": "^12.1.1"
   },
   "peerDependencies": {
-    "eslint": "^9",
-    "eslint-plugin-react-you-might-not-need-an-effect": "^0.5.6"
-  },
-  "peerDependenciesMeta": {
-    "eslint-plugin-react-you-might-not-need-an-effect": {
-      "optional": true
-    }
+    "eslint": "^9"
   }
 }

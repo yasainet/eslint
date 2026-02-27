@@ -8,12 +8,6 @@ Shared ESLint configuration for feature-based architecture.
 npm install -D @yasainet/eslint eslint
 ```
 
-For Next.js projects, also install the React effect plugin:
-
-```sh
-npm install -D eslint-plugin-react-you-might-not-need-an-effect
-```
-
 ## Usage
 
 ### Next.js
