@@ -1,5 +1,3 @@
-import { featuresGlob } from "./constants.mjs";
-
 export const layersConfigs = [
   {
     name: "layers/repositories",
@@ -30,21 +28,6 @@ export const layersConfigs = [
           selector: "TryStatement",
           message:
             "try-catch is not allowed in services. Error handling belongs in actions.",
-        },
-      ],
-    },
-  },
-  {
-    name: "layers/actions-naming",
-    files: featuresGlob("**/actions/*.ts"),
-    rules: {
-      "no-restricted-syntax": [
-        "error",
-        {
-          selector:
-            "ExportNamedDeclaration > FunctionDeclaration[id.name!=/^handle[A-Z]/]",
-          message:
-            "Exported functions in actions must start with 'handle' (e.g., handleGetComics).",
         },
       ],
     },
