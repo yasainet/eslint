@@ -1,17 +1,3 @@
-/**
- * @fileoverview Directive requirements for React Server Components.
- *
- * Ensures correct usage of "use server" and "use client" directives:
- * - server.action.ts: Must start with "use server"
- * - admin.action.ts: Must start with "use server"
- * - client.action.ts: Must NOT have "use server"
- * - hooks/*.ts: Must start with "use client"
- */
-
-/**
- * Directive requirement configurations.
- * @type {import("eslint").Linter.Config[]}
- */
 export const directivesConfigs = [
   {
     name: "directives/server-action",

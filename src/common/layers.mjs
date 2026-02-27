@@ -1,21 +1,5 @@
-/**
- * @fileoverview Common layer architecture constraints.
- *
- * Enforces syntax restrictions per layer:
- * - Repositories: No try-catch or if statements
- * - Services: No try-catch
- * - Actions: Exported functions must start with "handle"
- *
- * Import restrictions (layer, cross-feature, cardinality, lib-boundary)
- * are consolidated in imports.mjs to avoid flat-config "last wins" override.
- */
-
 import { featuresGlob } from "./constants.mjs";
 
-/**
- * Common layer constraint configurations.
- * @type {import("eslint").Linter.Config[]}
- */
 export const layersConfigs = [
   {
     name: "layers/repositories",

@@ -1,15 +1,5 @@
-/**
- * @fileoverview Shared rules applied to all files.
- *
- * Includes TypeScript best practices, stylistic rules, and import sorting.
- */
-
 import { simpleImportSortPlugin, stylistic } from "./plugins.mjs";
 
-/**
- * Common rule configurations.
- * @type {import("eslint").Linter.Config[]}
- */
 export const rulesConfigs = [
   {
     name: "rules/shared",

@@ -1,34 +1,8 @@
-/**
- * @fileoverview Common file naming conventions for feature modules.
- *
- * Enforces consistent naming patterns:
- * - services: {prefix}.service.ts (e.g., server.service.ts, stripe.service.ts)
- * - repositories: {prefix}.repo.ts (e.g., server.repo.ts, stripe.repo.ts)
- * - actions: {prefix}.action.ts (e.g., server.action.ts, stripe.action.ts)
- * - types: {feature}.type.ts (e.g., threads.type.ts) — shared: free naming
- * - schemas: xxx.schema.ts (e.g., comic.schema.ts)
- * - utils: {feature}.utils.ts (e.g., threads.utils.ts) — shared: free naming
- * - constants: xxx.constant.ts (e.g., api.constant.ts)
- *
- * Extension constraint:
- * - features/**: .ts only (no .tsx — components belong in src/components/)
- *
- * Valid prefixes are defined in PREFIX_LIB_MAPPING (constants.mjs).
- */
-
 import { featuresGlob, PREFIX_LIB_MAPPING } from "./constants.mjs";
 import { checkFile } from "./plugins.mjs";
 
-/**
- * Generate glob pattern from PREFIX_LIB_MAPPING keys.
- * @example "@(server|client|admin)"
- */
 const prefixPattern = `@(${Object.keys(PREFIX_LIB_MAPPING).join("|")})`;
 
-/**
- * Common file naming convention configurations.
- * @type {import("eslint").Linter.Config[]}
- */
 export const namingConfigs = [
   {
     name: "naming/services",
