@@ -1,20 +1,6 @@
-/**
- * @fileoverview Next.js-specific file naming conventions.
- *
- * Enforces:
- * - hooks: useXxx.ts (e.g., useAuth.ts)
- * - components/**: .tsx only (no .ts — logic belongs in src/features/)
- * - components/*.tsx: PascalCase (e.g., Button.tsx, AlertDialog.tsx)
- *   - components/shared/ui/ excluded (shadcn/ui uses kebab-case)
- */
-
 import { featuresGlob } from "../common/constants.mjs";
 import { checkFile } from "../common/plugins.mjs";
 
-/**
- * Next.js-specific naming convention configurations.
- * @type {import("eslint").Linter.Config[]}
- */
 export const namingConfigs = [
   {
     name: "naming/hooks",

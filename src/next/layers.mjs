@@ -1,15 +1,5 @@
-/**
- * @fileoverview Next.js-specific layer constraint.
- *
- * Enforces: exported functions in hooks must start with "use".
- */
-
 import { featuresGlob } from "../common/constants.mjs";
 
-/**
- * Next.js-specific layer constraint configurations.
- * @type {import("eslint").Linter.Config[]}
- */
 export const layersConfigs = [
   {
     name: "layers/hooks-naming",

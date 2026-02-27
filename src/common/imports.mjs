@@ -1,17 +1,3 @@
-/**
- * @fileoverview Consolidated import restrictions.
- *
- * Merges all `no-restricted-imports` rules into a single source to avoid
- * the ESLint flat-config "last wins" override bug.
- *
- * Pattern categories:
- * 1. Layer: upper-layer imports forbidden (repos < services < actions < hooks)
- * 2. Cross-feature: same-layer cross-feature imports forbidden
- * 3. Cardinality: action → services 1:1 prefix match
- * 4. Prefix-lib: repo → lib 1:1 prefix match
- * 5. Lib-boundary: @/lib/* only importable from repositories
- */
-
 import { PREFIX_LIB_MAPPING } from "./constants.mjs";
 
 // ---------------------------------------------------------------------------
@@ -111,12 +97,7 @@ const CARDINALITY_PATTERNS = {
 // 4. Prefix-lib pattern generator
 // ---------------------------------------------------------------------------
 
-/**
- * Generate forbidden lib patterns for a given prefix.
- *
- * @param {string} prefix
- * @returns {import("eslint").Linter.RuleEntry[]}
- */
+/** @description Generate forbidden lib patterns for a given prefix. */
 function prefixLibPatterns(prefix) {
   const prefixes = Object.keys(PREFIX_LIB_MAPPING);
   const allowedLib = PREFIX_LIB_MAPPING[prefix];
@@ -144,14 +125,7 @@ const LIB_BOUNDARY_PATTERNS = [
 // Config builder
 // ---------------------------------------------------------------------------
 
-/**
- * Build a single ESLint config with merged no-restricted-imports patterns.
- *
- * @param {string} name
- * @param {string[]} files
- * @param  {...object[]} patternArrays
- * @returns {import("eslint").Linter.Config | null}
- */
+/** @description Build a single ESLint config with merged no-restricted-imports patterns. */
 function makeConfig(name, files, ...patternArrays) {
   const patterns = patternArrays.flat();
   if (patterns.length === 0) return null;
@@ -169,12 +143,8 @@ function makeConfig(name, files, ...patternArrays) {
 // ---------------------------------------------------------------------------
 
 /**
- * Generate consolidated import restriction configs.
- *
- * Ordering matters: general configs come first and are overridden by
- * specific configs (ESLint flat config "last wins" for the same rule).
- *
- * @returns {import("eslint").Linter.Config[]}
+ * @description Generate consolidated import restriction configs.
+ * Ordering matters: general configs first, overridden by specific configs (flat config "last wins").
  */
 function generateImportConfigs() {
   const configs = [];
@@ -254,8 +224,4 @@ function generateImportConfigs() {
   return configs.filter(Boolean);
 }
 
-/**
- * Consolidated import restriction configurations.
- * @type {import("eslint").Linter.Config[]}
- */
 export const importsConfigs = generateImportConfigs();
