@@ -4,15 +4,13 @@
  * Combines all configuration modules:
  * - base: Next.js presets and shared rules
  * - naming: File naming conventions
- * - layers: Layer architecture constraints
- * - cardinality: Action-domain relationships
+ * - layers: Layer architecture constraints (syntax only)
  * - directives: "use server" / "use client" requirements
- * - imports: Repository import restrictions (prefix → lib mapping)
+ * - imports: Consolidated import restrictions (layer, cross-feature, cardinality, prefix-lib, lib-boundary)
  * - jsdoc: JSDoc description requirements for exported functions
  */
 
 import { baseConfigs, ignoresConfig, sharedRulesConfig } from "./base.mjs";
-import { cardinalityConfigs } from "./cardinality.mjs";
 import { directivesConfigs } from "./directives.mjs";
 import { importsConfigs } from "./imports.mjs";
 import { jsdocConfigs } from "./jsdoc.mjs";
@@ -29,7 +27,6 @@ export const eslintConfig = [
   sharedRulesConfig,
   ...namingConfigs,
   ...layersConfigs,
-  ...cardinalityConfigs,
   ...directivesConfigs,
   ...importsConfigs,
   ...jsdocConfigs,
