@@ -7,7 +7,7 @@
  * Pattern categories:
  * 1. Layer: upper-layer imports forbidden (repos < services < actions < hooks)
  * 2. Cross-feature: same-layer cross-feature imports forbidden
- * 3. Cardinality: action → domain 1:1 prefix match
+ * 3. Cardinality: action → services 1:1 prefix match
  * 4. Prefix-lib: repo → lib 1:1 prefix match
  * 5. Lib-boundary: @/lib/* only importable from repositories
  */

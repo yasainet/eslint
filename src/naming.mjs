@@ -8,7 +8,7 @@
  * - hooks: useXxx.ts (e.g., useAuth.ts)
  * - types: {feature}.type.ts (e.g., threads.type.ts) — shared: free naming
  * - schemas: xxx.schema.ts (e.g., comic.schema.ts)
- * - util: {feature}.util.ts (e.g., threads.util.ts) — shared: free naming
+ * - utils: {feature}.utils.ts (e.g., threads.utils.ts) — shared: free naming
  * - constants: xxx.constant.ts (e.g., api.constant.ts)
  *
  * Extension constraints:
@@ -106,26 +106,26 @@ export const namingConfigs = [
     },
   },
   {
-    name: "naming/util",
-    files: featuresGlob("*/util/*.util.ts"),
-    ignores: featuresGlob("shared/util/*.ts"),
+    name: "naming/utils",
+    files: featuresGlob("*/utils/*.utils.ts"),
+    ignores: featuresGlob("shared/utils/*.ts"),
     plugins: { "check-file": checkFile },
     rules: {
       "check-file/filename-naming-convention": [
         "error",
-        { "**/*/util/*.ts": "<1>" },
+        { "**/*/utils/*.ts": "<1>" },
         { ignoreMiddleExtensions: true },
       ],
     },
   },
   {
-    name: "naming/util-shared",
-    files: featuresGlob("shared/util/*.ts"),
+    name: "naming/utils-shared",
+    files: featuresGlob("shared/utils/*.ts"),
     plugins: { "check-file": checkFile },
     rules: {
       "check-file/filename-naming-convention": [
         "error",
-        { "**/*.ts": "+([a-z0-9_-]).util" },
+        { "**/*.ts": "+([a-z0-9_-]).utils" },
       ],
     },
   },
