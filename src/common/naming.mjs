@@ -1,23 +1,17 @@
 /**
- * @fileoverview File naming conventions for feature modules.
+ * @fileoverview Common file naming conventions for feature modules.
  *
  * Enforces consistent naming patterns:
  * - services: {prefix}.service.ts (e.g., server.service.ts, stripe.service.ts)
  * - repositories: {prefix}.repo.ts (e.g., server.repo.ts, stripe.repo.ts)
  * - actions: {prefix}.action.ts (e.g., server.action.ts, stripe.action.ts)
- * - hooks: useXxx.ts (e.g., useAuth.ts)
  * - types: {feature}.type.ts (e.g., threads.type.ts) — shared: free naming
  * - schemas: xxx.schema.ts (e.g., comic.schema.ts)
  * - utils: {feature}.utils.ts (e.g., threads.utils.ts) — shared: free naming
  * - constants: xxx.constant.ts (e.g., api.constant.ts)
  *
- * Extension constraints:
+ * Extension constraint:
  * - features/**: .ts only (no .tsx — components belong in src/components/)
- * - components/**:  .tsx only (no .ts — logic belongs in src/features/)
- *
- * Component naming:
- * - components/ *.tsx: PascalCase (e.g., Button.tsx, AlertDialog.tsx)
- * - components/shared/ui/ : excluded (shadcn/ui uses kebab-case)
  *
  * Valid prefixes are defined in PREFIX_LIB_MAPPING (constants.mjs).
  */
@@ -32,7 +26,7 @@ import { checkFile } from "./plugins.mjs";
 const prefixPattern = `@(${Object.keys(PREFIX_LIB_MAPPING).join("|")})`;
 
 /**
- * File naming convention configurations.
+ * Common file naming convention configurations.
  * @type {import("eslint").Linter.Config[]}
  */
 export const namingConfigs = [
@@ -55,18 +49,6 @@ export const namingConfigs = [
       "check-file/filename-naming-convention": [
         "error",
         { "**/*.ts": `${prefixPattern}.repo` },
-      ],
-    },
-  },
-  {
-    name: "naming/hooks",
-    files: featuresGlob("**/hooks/*.ts"),
-    plugins: { "check-file": checkFile },
-    rules: {
-      "check-file/filename-naming-convention": [
-        "error",
-        { "**/*.ts": "use[A-Z]*([a-zA-Z0-9])" },
-        { ignoreMiddleExtensions: true },
       ],
     },
   },
@@ -162,32 +144,6 @@ export const namingConfigs = [
           message:
             "features/ must only contain .ts files. Components belong in src/components/.",
         },
-      ],
-    },
-  },
-  {
-    name: "naming/components-tsx-only",
-    files: ["src/components/**/*.ts"],
-    rules: {
-      "no-restricted-syntax": [
-        "error",
-        {
-          selector: "Program",
-          message:
-            "components/ must only contain .tsx files. Logic belongs in src/features/.",
-        },
-      ],
-    },
-  },
-  {
-    name: "naming/components-pascal-case",
-    files: ["src/components/**/*.tsx"],
-    ignores: ["src/components/shared/ui/**"],
-    plugins: { "check-file": checkFile },
-    rules: {
-      "check-file/filename-naming-convention": [
-        "error",
-        { "**/*.tsx": "PASCAL_CASE" },
       ],
     },
   },

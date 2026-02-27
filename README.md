@@ -1,18 +1,43 @@
-# @yasainet/eslint-next
+# @yasainet/eslint
 
-Shared ESLint configuration for Next.js projects with feature-based architecture.
+Shared ESLint configuration for feature-based architecture.
 
 ## Install
 
 ```sh
-npm install -D @yasainet/eslint-next eslint eslint-config-next
+npm install -D @yasainet/eslint eslint
+```
+
+For Next.js projects, also install the React effect plugin:
+
+```sh
+npm install -D eslint-plugin-react-you-might-not-need-an-effect
 ```
 
 ## Usage
 
+### Next.js
+
 ```js
 // eslint.config.mjs
-import { eslintConfig } from "@yasainet/eslint-next";
+import { defineConfig, globalIgnores } from "eslint/config";
+import nextVitals from "eslint-config-next/core-web-vitals";
+import nextTs from "eslint-config-next/typescript";
+import { eslintConfig } from "@yasainet/eslint/next";
+
+export default defineConfig([
+  ...nextVitals,
+  ...nextTs,
+  globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts"]),
+  ...eslintConfig,
+]);
+```
+
+### Node.js
+
+```js
+// eslint.config.mjs
+import { eslintConfig } from "@yasainet/eslint/node";
 
 export default eslintConfig;
 ```
@@ -24,7 +49,7 @@ export default eslintConfig;
 3. Create and push a tag:
 
 ```sh
-git tag v0.1.0
+git tag v1.0.0
 git push --tags
 ```
 
