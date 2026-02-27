@@ -1,17 +1,29 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Shared ESLint flat config for Next.js projects that enforces feature-based architecture.
 
 ## Project Overview
 
-`@yasainet/eslint-next` is a shared ESLint flat config for Next.js projects that enforces feature-based architecture. It provides rules for file naming, layer dependencies, cardinality constraints, RSC directives, and import restrictions.
+`@yasainet/eslint-next` provides a single `eslintConfig` array that aggregates all config modules in order: base → ignores → shared rules → naming → layers → directives → imports → jsdoc.
+
+Key design points:
+
+- `constants.mjs` scans the consuming project's `src/lib/` directory at lint-time to build `PREFIX_LIB_MAPPING` (e.g., `{ server: "@/lib/supabase/server" }`). This mapping drives `naming.mjs` (valid file prefixes) and `imports.mjs` (per-prefix import restrictions)
+- Rules apply across three feature root directories defined in `FEATURE_ROOTS`: `src/features`, `scripts/features`, `supabase/functions/features`. The `featuresGlob()` helper generates glob patterns for all roots
 
 ## Tech Stack
 
 - ESLint 9 flat config (ESM only, `.mjs`)
 - No build step — source files in `src/` are shipped directly
 - No test framework — verify by running `npm install` in a consuming Next.js project
-- Published to npm via GitHub Actions on `v*` tags
+- Each config module exports a named `*Configs` array (e.g., `layersConfigs`, `namingConfigs`)
+- Code comments and JSDoc descriptions in English
+
+## Environment Architecture
+
+- **Local development**: `npm install` in a consuming Next.js project to verify config behavior
+- **CI/CD**: GitHub Actions triggers on `v*` tags to publish to npm
+- **npm**: Published as `@yasainet/eslint-next`, consumed via `npm install @yasainet/eslint-next`
 
 ## Directory Structure
 
@@ -23,9 +35,8 @@ src/
   base.mjs        # Next.js presets (core-web-vitals + typescript) and shared rules
   naming.mjs      # File naming conventions per directory (domain, repo, action, hook, etc.)
   layers.mjs      # Layer dependency direction: hooks → actions → domain → repositories
-  cardinality.mjs # 1:1 action-to-domain mapping (server→server, client→client, admin→admin)
   directives.mjs  # "use server" / "use client" directive enforcement
-  imports.mjs     # Repository import restrictions (prefix → lib mapping)
+  imports.mjs     # Consolidated import restrictions (layer, cross-feature, cardinality, prefix-lib, lib-boundary)
   jsdoc.mjs       # JSDoc description requirements for repositories, domain, util
 ```
 
@@ -34,29 +45,6 @@ src/
 ```bash
 npm install   # Install dependencies (no build or test commands)
 ```
-
-## Architecture
-
-### Config composition
-
-`index.mjs` exports a single `eslintConfig` array that spreads all config modules in order: base → ignores → shared rules → naming → layers → cardinality → directives → imports → jsdoc.
-
-### Dynamic config generation
-
-`constants.mjs` scans the consuming project's `src/lib/` directory at lint-time to build `PREFIX_LIB_MAPPING` (e.g., `{ server: "@/lib/supabase/server" }`). This mapping drives:
-
-- `naming.mjs` — valid file prefixes (e.g., `server.repo.ts`, `client.action.ts`)
-- `imports.mjs` — per-prefix import restrictions for repository files
-
-### Feature roots
-
-Rules apply across three feature root directories defined in `FEATURE_ROOTS`: `src/features`, `scripts/features`, `supabase/functions/features`. The `featuresGlob()` helper generates glob patterns for all roots.
-
-### Conventions
-
-- All source files are `.mjs` (ESM)
-- Code comments and JSDoc descriptions in English
-- Each config module exports a named `*Configs` array (e.g., `layersConfigs`, `namingConfigs`)
 
 ## Verification
 
