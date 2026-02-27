@@ -1,9 +1,5 @@
 import { PREFIX_LIB_MAPPING } from "./constants.mjs";
 
-// ---------------------------------------------------------------------------
-// 1. Layer patterns
-// ---------------------------------------------------------------------------
-
 const LAYER_PATTERNS = {
   repositories: [
     {
@@ -37,37 +33,29 @@ const LAYER_PATTERNS = {
   ],
 };
 
-// ---------------------------------------------------------------------------
-// 2. Cross-feature patterns
-// ---------------------------------------------------------------------------
-
-const CROSS_FEATURE_PATTERNS = {
+const LATERAL_PATTERNS = {
   repositories: [
     {
       group: ["@/features/*/repositories/*", "@/features/*/repositories"],
       message:
-        "repositories cannot import other feature's repositories (cross-feature violation)",
+        "repositories cannot import other feature's repositories (lateral violation)",
     },
   ],
   services: [
     {
       group: ["@/features/*/services/*", "@/features/*/services"],
       message:
-        "services cannot import other feature's services (cross-feature violation)",
+        "services cannot import other feature's services (lateral violation)",
     },
   ],
   actions: [
     {
       group: ["@/features/*/actions/*", "@/features/*/actions"],
       message:
-        "actions cannot import other feature's actions (cross-feature violation)",
+        "actions cannot import other feature's actions (lateral violation)",
     },
   ],
 };
-
-// ---------------------------------------------------------------------------
-// 3. Cardinality patterns
-// ---------------------------------------------------------------------------
 
 const CARDINALITY_PATTERNS = {
   server: [
@@ -93,11 +81,6 @@ const CARDINALITY_PATTERNS = {
   ],
 };
 
-// ---------------------------------------------------------------------------
-// 4. Prefix-lib pattern generator
-// ---------------------------------------------------------------------------
-
-/** @description Generate forbidden lib patterns for a given prefix. */
 function prefixLibPatterns(prefix) {
   const prefixes = Object.keys(PREFIX_LIB_MAPPING);
   const allowedLib = PREFIX_LIB_MAPPING[prefix];
@@ -109,10 +92,6 @@ function prefixLibPatterns(prefix) {
     }));
 }
 
-// ---------------------------------------------------------------------------
-// 5. Lib-boundary patterns
-// ---------------------------------------------------------------------------
-
 const LIB_BOUNDARY_PATTERNS = [
   {
     group: ["@/lib/*", "@/lib/**"],
@@ -121,11 +100,6 @@ const LIB_BOUNDARY_PATTERNS = [
   },
 ];
 
-// ---------------------------------------------------------------------------
-// Config builder
-// ---------------------------------------------------------------------------
-
-/** @description Build a single ESLint config with merged no-restricted-imports patterns. */
 function makeConfig(name, files, ...patternArrays) {
   const patterns = patternArrays.flat();
   if (patterns.length === 0) return null;
@@ -138,19 +112,9 @@ function makeConfig(name, files, ...patternArrays) {
   };
 }
 
-// ---------------------------------------------------------------------------
-// Generate all configs
-// ---------------------------------------------------------------------------
-
-/**
- * @description Generate consolidated import restriction configs.
- * Ordering matters: general configs first, overridden by specific configs (flat config "last wins").
- */
 function generateImportConfigs() {
   const configs = [];
 
-  // Catch-all: lib-boundary for all src files (overridden by specific configs below)
-  // lib internal cross-references are allowed
   configs.push({
     name: "imports/lib-boundary",
     files: ["src/**/*.{ts,tsx}"],
@@ -160,17 +124,15 @@ function generateImportConfigs() {
     },
   });
 
-  // Repositories (general): layer + cross-feature (repos CAN import @/lib)
   configs.push(
     makeConfig(
       "repositories",
       ["**/repositories/*.ts"],
       LAYER_PATTERNS.repositories,
-      CROSS_FEATURE_PATTERNS.repositories,
+      LATERAL_PATTERNS.repositories,
     ),
   );
 
-  // Repositories (per-prefix): layer + cross-feature + prefix-lib
   for (const prefix of Object.keys(PREFIX_LIB_MAPPING)) {
     const patterns = prefixLibPatterns(prefix);
     if (patterns.length === 0) continue;
@@ -179,42 +141,39 @@ function generateImportConfigs() {
         `repositories/${prefix}`,
         [`**/repositories/${prefix}.repo.ts`],
         LAYER_PATTERNS.repositories,
-        CROSS_FEATURE_PATTERNS.repositories,
+        LATERAL_PATTERNS.repositories,
         patterns,
       ),
     );
   }
 
-  // Services: layer + cross-feature + lib-boundary
   configs.push(
     makeConfig(
       "services",
       ["**/services/*.ts"],
       LAYER_PATTERNS.services,
-      CROSS_FEATURE_PATTERNS.services,
+      LATERAL_PATTERNS.services,
       LIB_BOUNDARY_PATTERNS,
     ),
   );
 
-  // Actions (general): layer + cross-feature + lib-boundary
   configs.push(
     makeConfig(
       "actions",
       ["**/actions/*.ts"],
       LAYER_PATTERNS.actions,
-      CROSS_FEATURE_PATTERNS.actions,
+      LATERAL_PATTERNS.actions,
       LIB_BOUNDARY_PATTERNS,
     ),
   );
 
-  // Actions (per-prefix): layer + cross-feature + cardinality + lib-boundary
   for (const prefix of ["server", "client", "admin"]) {
     configs.push(
       makeConfig(
         `actions/${prefix}`,
         [`**/actions/${prefix}.action.ts`],
         LAYER_PATTERNS.actions,
-        CROSS_FEATURE_PATTERNS.actions,
+        LATERAL_PATTERNS.actions,
         CARDINALITY_PATTERNS[prefix],
         LIB_BOUNDARY_PATTERNS,
       ),
