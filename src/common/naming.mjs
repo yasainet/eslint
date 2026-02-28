@@ -1,11 +1,10 @@
-import { featuresGlob, PREFIX_LIB_MAPPING } from "./constants.mjs";
+import { featuresGlob } from "./constants.mjs";
 import { checkFile } from "./plugins.mjs";
 import { actionHandleServiceRule } from "./local-plugins/action-handle-service.mjs";
 
-const prefixPattern = `@(${Object.keys(PREFIX_LIB_MAPPING).join("|")})`;
-
 /** @description Scope naming rules to the given feature root */
-export function createNamingConfigs(featureRoot) {
+export function createNamingConfigs(featureRoot, prefixLibMapping) {
+  const prefixPattern = `@(${Object.keys(prefixLibMapping).join("|")})`;
   return [
     {
       name: "naming/services",

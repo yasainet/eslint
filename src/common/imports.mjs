@@ -1,5 +1,3 @@
-import { PREFIX_LIB_MAPPING } from "./constants.mjs";
-
 const LAYER_PATTERNS = {
   repositories: [
     {
@@ -81,22 +79,22 @@ const CARDINALITY_PATTERNS = {
   ],
 };
 
-function prefixLibPatterns(prefix) {
-  const prefixes = Object.keys(PREFIX_LIB_MAPPING);
-  const allowedLib = PREFIX_LIB_MAPPING[prefix];
+function prefixLibPatterns(prefix, mapping) {
+  const prefixes = Object.keys(mapping);
+  const allowedLib = mapping[prefix];
   return prefixes
     .filter((p) => p !== prefix)
     .map((p) => ({
-      group: [PREFIX_LIB_MAPPING[p], `${PREFIX_LIB_MAPPING[p]}/*`],
-      message: `${prefix}.repo.ts can only import from ${allowedLib}. Use the correct repository file for this lib.`,
+      group: [`**/lib/${mapping[p]}`, `**/lib/${mapping[p]}/*`],
+      message: `${prefix}.repo.ts can only import from lib/${allowedLib}. Use the correct repository file for this lib.`,
     }));
 }
 
 const LIB_BOUNDARY_PATTERNS = [
   {
-    group: ["@/lib/*", "@/lib/**"],
+    group: ["**/lib/*", "**/lib/**"],
     message:
-      "@/lib/* can only be imported from repositories (lib-boundary violation)",
+      "lib/* can only be imported from repositories (lib-boundary violation)",
   },
 ];
 
@@ -131,7 +129,7 @@ export const libBoundaryConfigs = [
 ];
 
 /** @description Scope import restriction rules to the given feature root */
-export function createImportsConfigs(featureRoot) {
+export function createImportsConfigs(featureRoot, prefixLibMapping) {
   const configs = [];
 
   configs.push(
@@ -143,8 +141,8 @@ export function createImportsConfigs(featureRoot) {
     ),
   );
 
-  for (const prefix of Object.keys(PREFIX_LIB_MAPPING)) {
-    const patterns = prefixLibPatterns(prefix);
+  for (const prefix of Object.keys(prefixLibMapping)) {
+    const patterns = prefixLibPatterns(prefix, prefixLibMapping);
     if (patterns.length === 0) continue;
     configs.push(
       makeConfig(
