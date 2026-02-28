@@ -64,7 +64,7 @@ export const namingConfigs = [
   },
   {
     name: "naming/utils",
-    files: featuresGlob("*/utils/*.utils.ts"),
+    files: featuresGlob("*/utils/*.util.ts"),
     ignores: featuresGlob("shared/utils/*.ts"),
     plugins: { "check-file": checkFile },
     rules: {
@@ -82,7 +82,7 @@ export const namingConfigs = [
     rules: {
       "check-file/filename-naming-convention": [
         "error",
-        { "**/*.ts": "+([a-z0-9_-]).utils" },
+        { "**/*.ts": "+([a-z0-9_-]).util" },
       ],
     },
   },
