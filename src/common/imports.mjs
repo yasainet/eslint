@@ -117,7 +117,12 @@ export const libBoundaryConfigs = [
   {
     name: "imports/lib-boundary",
     files: ["src/**/*.{ts,tsx}"],
-    ignores: ["src/lib/**", "src/proxy.ts", "src/app/sitemap.ts"],
+    ignores: [
+      "src/lib/**",
+      "src/proxy.ts",
+      "src/app/sitemap.ts",
+      "src/features/**/repositories/**",
+    ],
     rules: {
       "no-restricted-imports": ["error", { patterns: LIB_BOUNDARY_PATTERNS }],
     },
