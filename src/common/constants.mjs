@@ -22,8 +22,10 @@ const PROJECT_ROOT = findProjectRoot();
 
 const EXCLUDE_LIST = ["proxy.ts", "types"];
 
-function generatePrefixLibMapping() {
-  const libDir = path.join(PROJECT_ROOT, "src/lib");
+/** @description Scan lib directory derived from featureRoot and build prefix-to-lib-relative-path mapping */
+export function generatePrefixLibMapping(featureRoot) {
+  const libRoot = featureRoot.replace(/features$/, "lib");
+  const libDir = path.join(PROJECT_ROOT, libRoot);
   const mapping = {};
 
   if (!fs.existsSync(libDir)) {
@@ -48,19 +50,17 @@ function generatePrefixLibMapping() {
           !EXCLUDE_LIST.includes(subEntry.name)
         ) {
           const prefix = subEntry.name.replace(".ts", "");
-          mapping[prefix] = `@/lib/${entry.name}/${prefix}`;
+          mapping[prefix] = `${entry.name}/${prefix}`;
         }
       }
     } else if (entry.isFile() && entry.name.endsWith(".ts")) {
       const prefix = entry.name.replace(".ts", "");
-      mapping[prefix] = `@/lib/${prefix}`;
+      mapping[prefix] = prefix;
     }
   }
 
   return mapping;
 }
-
-export const PREFIX_LIB_MAPPING = generatePrefixLibMapping();
 
 export const featuresGlob = (featureRoot, subpath) => [
   `${featureRoot}/${subpath}`,
