@@ -1,11 +1,17 @@
 {
   "name": "@yasainet/eslint",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "ESLint",
   "type": "module",
   "exports": {
-    "./next": "./src/next/index.mjs",
-    "./node": "./src/node/index.mjs"
+    "./next": {
+      "types": "./src/next/index.d.mts",
+      "default": "./src/next/index.mjs"
+    },
+    "./node": {
+      "types": "./src/node/index.d.mts",
+      "default": "./src/node/index.mjs"
+    }
   },
   "files": [
     "src"
