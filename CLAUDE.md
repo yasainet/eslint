@@ -4,7 +4,8 @@ Shared ESLint flat config that enforces feature-based architecture. Provides `./
 
 ## Project Overview
 
-`@yasainet/eslint` provides two entry points:
+`@yasainet/eslint` provides three entry points:
+
 - `@yasainet/eslint/next` — common rules + Next.js-specific rules (hooks/components naming, directives)
 - `@yasainet/eslint/node` — common rules only
 - `@yasainet/eslint/deno` — common rules only (Supabase Edge Functions)

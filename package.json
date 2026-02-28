@@ -1,6 +1,6 @@
 {
   "name": "@yasainet/eslint",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "ESLint",
   "type": "module",
   "exports": {
@@ -39,6 +39,7 @@
     "eslint-plugin-simple-import-sort": "^12.1.1"
   },
   "peerDependencies": {
-    "eslint": "^9"
+    "eslint": "^9",
+    "typescript-eslint": "^8"
   }
 }
