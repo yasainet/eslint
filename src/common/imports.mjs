@@ -122,6 +122,7 @@ export const libBoundaryConfigs = [
       "src/proxy.ts",
       "src/app/sitemap.ts",
       "src/features/**/repositories/**",
+      "src/features/**/types/**",
     ],
     rules: {
       "no-restricted-imports": ["error", { patterns: LIB_BOUNDARY_PATTERNS }],
