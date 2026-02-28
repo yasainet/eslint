@@ -8,32 +8,40 @@ Shared ESLint configuration for feature-based architecture.
 npm install -D @yasainet/eslint eslint
 ```
 
-## Usage
+## Entry Points
 
-### Next.js
+| Entry                   | Feature Root                   | Description                                                                         |
+| ----------------------- | ------------------------------ | ----------------------------------------------------------------------------------- |
+| `@yasainet/eslint/next` | `src/features/`                | Common rules + Next.js-specific rules (hooks, components, directives, lib-boundary) |
+| `@yasainet/eslint/node` | `scripts/features/`            | Common rules only                                                                   |
+| `@yasainet/eslint/deno` | `supabase/functions/features/` | Common rules only                                                                   |
+
+## Usage
 
 ```js
 // eslint.config.mjs
+import { eslintConfig as nextEslintConfig } from "@yasainet/eslint/next";
+import { eslintConfig as nodeEslintConfig } from "@yasainet/eslint/node";
+import { eslintConfig as denoEslintConfig } from "@yasainet/eslint/deno";
 import { defineConfig, globalIgnores } from "eslint/config";
 import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
-import { eslintConfig } from "@yasainet/eslint/next";
 
 export default defineConfig([
   ...nextVitals,
   ...nextTs,
-  globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts"]),
-  ...eslintConfig,
+  // Override default ignores of eslint-config-next.
+  globalIgnores([
+    // Default ignores of eslint-config-next:
+    ".next/**",
+    "out/**",
+    "build/**",
+    "next-env.d.ts",
+  ]),
+  ...nextEslintConfig,
+  ...nodeEslintConfig,
+  ...denoEslintConfig,
 ]);
-```
-
-### Node.js
-
-```js
-// eslint.config.mjs
-import { eslintConfig } from "@yasainet/eslint/node";
-
-export default eslintConfig;
 ```
 
 ## Release

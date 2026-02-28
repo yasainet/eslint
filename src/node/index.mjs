@@ -1,3 +1,3 @@
-import { commonConfigs } from "../common/index.mjs";
+import { createCommonConfigs } from "../common/index.mjs";
 
-export const eslintConfig = [...commonConfigs];
+export const eslintConfig = [...createCommonConfigs("scripts/features")];

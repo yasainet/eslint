@@ -112,22 +112,26 @@ function makeConfig(name, files, ...patternArrays) {
   };
 }
 
-function generateImportConfigs() {
-  const configs = [];
-
-  configs.push({
+/** @description Next.js-only: restrict @/lib imports to repositories */
+export const libBoundaryConfigs = [
+  {
     name: "imports/lib-boundary",
     files: ["src/**/*.{ts,tsx}"],
     ignores: ["src/lib/**", "src/proxy.ts", "src/app/sitemap.ts"],
     rules: {
       "no-restricted-imports": ["error", { patterns: LIB_BOUNDARY_PATTERNS }],
     },
-  });
+  },
+];
+
+/** @description Scope import restriction rules to the given feature root */
+export function createImportsConfigs(featureRoot) {
+  const configs = [];
 
   configs.push(
     makeConfig(
       "repositories",
-      ["**/repositories/*.ts"],
+      [`${featureRoot}/**/repositories/*.ts`],
       LAYER_PATTERNS.repositories,
       LATERAL_PATTERNS.repositories,
     ),
@@ -139,7 +143,7 @@ function generateImportConfigs() {
     configs.push(
       makeConfig(
         `repositories/${prefix}`,
-        [`**/repositories/${prefix}.repo.ts`],
+        [`${featureRoot}/**/repositories/${prefix}.repo.ts`],
         LAYER_PATTERNS.repositories,
         LATERAL_PATTERNS.repositories,
         patterns,
@@ -150,7 +154,7 @@ function generateImportConfigs() {
   configs.push(
     makeConfig(
       "services",
-      ["**/services/*.ts"],
+      [`${featureRoot}/**/services/*.ts`],
       LAYER_PATTERNS.services,
       LATERAL_PATTERNS.services,
       LIB_BOUNDARY_PATTERNS,
@@ -160,7 +164,7 @@ function generateImportConfigs() {
   configs.push(
     makeConfig(
       "actions",
-      ["**/actions/*.ts"],
+      [`${featureRoot}/**/actions/*.ts`],
       LAYER_PATTERNS.actions,
       LATERAL_PATTERNS.actions,
       LIB_BOUNDARY_PATTERNS,
@@ -171,7 +175,7 @@ function generateImportConfigs() {
     configs.push(
       makeConfig(
         `actions/${prefix}`,
-        [`**/actions/${prefix}.action.ts`],
+        [`${featureRoot}/**/actions/${prefix}.action.ts`],
         LAYER_PATTERNS.actions,
         LATERAL_PATTERNS.actions,
         CARDINALITY_PATTERNS[prefix],
@@ -182,5 +186,3 @@ function generateImportConfigs() {
 
   return configs.filter(Boolean);
 }
-
-export const importsConfigs = generateImportConfigs();
