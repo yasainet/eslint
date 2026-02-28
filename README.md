@@ -1,22 +1,22 @@
 # @yasainet/eslint
 
-Shared ESLint configuration for feature-based architecture.
-
-## Install
-
-```sh
-npm install -D @yasainet/eslint eslint
-```
+Shared ESLint configuration for Next.js, Node.js and Deno.
 
 ## Entry Points
 
-| Entry                   | Feature Root                   | Description                                                                         |
-| ----------------------- | ------------------------------ | ----------------------------------------------------------------------------------- |
-| `@yasainet/eslint/next` | `src/features/`                | Common rules + Next.js-specific rules (hooks, components, directives, lib-boundary) |
-| `@yasainet/eslint/node` | `scripts/features/`            | Common rules only                                                                   |
-| `@yasainet/eslint/deno` | `supabase/functions/features/` | Common rules only                                                                   |
+| Entry                   | Feature Root                   | Description             |
+| ----------------------- | ------------------------------ | ----------------------- |
+| `@yasainet/eslint/next` | `src/features/`                | Common rules + Next.js  |
+| `@yasainet/eslint/node` | `scripts/features/`            | Common rules only (WIP) |
+| `@yasainet/eslint/deno` | `supabase/functions/features/` | Common rules only (WIP) |
 
-## Usage
+## Setup
+
+### Next.js + Node.js + Deno
+
+```sh
+npm install -D @yasainet/eslint
+```
 
 ```js
 // eslint.config.mjs
@@ -42,6 +42,60 @@ export default defineConfig([
   ...nodeEslintConfig,
   ...denoEslintConfig,
 ]);
+```
+
+### Next.js
+
+```sh
+npm install -D @yasainet/eslint
+```
+
+```js
+// eslint.config.mjs
+import { eslintConfig } from "@yasainet/eslint/next";
+import { defineConfig, globalIgnores } from "eslint/config";
+import nextVitals from "eslint-config-next/core-web-vitals";
+import nextTs from "eslint-config-next/typescript";
+
+export default defineConfig([
+  ...nextVitals,
+  ...nextTs,
+  // Override default ignores of eslint-config-next.
+  globalIgnores([
+    // Default ignores of eslint-config-next:
+    ".next/**",
+    "out/**",
+    "build/**",
+    "next-env.d.ts",
+  ]),
+  ...eslintConfig,
+]);
+```
+
+### Node.js
+
+```sh
+npm install -D @yasainet/eslint eslint typescript-eslint
+```
+
+```js
+// eslint.config.mjs
+import { eslintConfig } from "@yasainet/eslint/node";
+
+export default [...eslintConfig];
+```
+
+### Deno
+
+```sh
+npm install -D @yasainet/eslint eslint typescript-eslint
+```
+
+```js
+// eslint.config.mjs
+import { eslintConfig } from "@yasainet/eslint/deno";
+
+export default [...eslintConfig];
 ```
 
 ## Release

@@ -1,3 +1,5 @@
+import tseslint from "typescript-eslint";
+
 import { simpleImportSortPlugin, stylistic } from "./plugins.mjs";
 
 export const rulesConfigs = [
@@ -5,6 +7,7 @@ export const rulesConfigs = [
     name: "rules/shared",
     plugins: {
       "@stylistic": stylistic,
+      "@typescript-eslint": tseslint.plugin,
       "simple-import-sort": simpleImportSortPlugin,
     },
     rules: {
