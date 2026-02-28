@@ -175,6 +175,14 @@ export function createImportsConfigs(featureRoot, prefixLibMapping) {
     ),
   );
 
+  configs.push(
+    makeConfig(
+      "utils",
+      [`${featureRoot}/**/utils/*.ts`],
+      LIB_BOUNDARY_PATTERNS,
+    ),
+  );
+
   for (const prefix of ["server", "client", "admin"]) {
     configs.push(
       makeConfig(
