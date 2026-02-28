@@ -20,12 +20,6 @@ function findProjectRoot() {
 
 const PROJECT_ROOT = findProjectRoot();
 
-export const FEATURE_ROOTS = [
-  "src/features",
-  "scripts/features",
-  "supabase/functions/features",
-];
-
 const EXCLUDE_LIST = ["proxy.ts", "types"];
 
 function generatePrefixLibMapping() {
@@ -68,5 +62,6 @@ function generatePrefixLibMapping() {
 
 export const PREFIX_LIB_MAPPING = generatePrefixLibMapping();
 
-export const featuresGlob = (subpath) =>
-  FEATURE_ROOTS.map((root) => `${root}/${subpath}`);
+export const featuresGlob = (featureRoot, subpath) => [
+  `${featureRoot}/${subpath}`,
+];

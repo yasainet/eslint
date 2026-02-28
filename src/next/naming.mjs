@@ -1,10 +1,9 @@
-import { featuresGlob } from "../common/constants.mjs";
 import { checkFile } from "../common/plugins.mjs";
 
 export const namingConfigs = [
   {
     name: "naming/hooks",
-    files: featuresGlob("**/hooks/*.ts"),
+    files: ["src/features/**/hooks/*.ts"],
     plugins: { "check-file": checkFile },
     rules: {
       "check-file/filename-naming-convention": [
@@ -16,7 +15,7 @@ export const namingConfigs = [
   },
   {
     name: "naming/hooks-export",
-    files: featuresGlob("**/hooks/*.ts"),
+    files: ["src/features/**/hooks/*.ts"],
     rules: {
       "no-restricted-syntax": [
         "error",

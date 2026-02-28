@@ -1,13 +1,16 @@
-import { importsConfigs } from "./imports.mjs";
-import { jsdocConfigs } from "./jsdoc.mjs";
-import { layersConfigs } from "./layers.mjs";
-import { namingConfigs } from "./naming.mjs";
+import { createImportsConfigs } from "./imports.mjs";
+import { createJsdocConfigs } from "./jsdoc.mjs";
+import { createLayersConfigs } from "./layers.mjs";
+import { createNamingConfigs } from "./naming.mjs";
 import { rulesConfigs } from "./rules.mjs";
 
-export const commonConfigs = [
-  ...rulesConfigs,
-  ...namingConfigs,
-  ...layersConfigs,
-  ...importsConfigs,
-  ...jsdocConfigs,
-];
+/** @description Build common configs scoped to the given feature root */
+export function createCommonConfigs(featureRoot) {
+  return [
+    ...rulesConfigs,
+    ...createNamingConfigs(featureRoot),
+    ...createLayersConfigs(featureRoot),
+    ...createImportsConfigs(featureRoot),
+    ...createJsdocConfigs(featureRoot),
+  ];
+}

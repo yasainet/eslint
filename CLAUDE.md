@@ -7,11 +7,14 @@ Shared ESLint flat config that enforces feature-based architecture. Provides `./
 `@yasainet/eslint` provides two entry points:
 - `@yasainet/eslint/next` — common rules + Next.js-specific rules (hooks/components naming, directives)
 - `@yasainet/eslint/node` — common rules only
+- `@yasainet/eslint/deno` — common rules only (Supabase Edge Functions)
 
 Key design points:
 
+- Each config module exports a factory function (`create*Configs(featureRoot)`) that scopes rules to a single feature root directory. Entry points bake in their own root: `next` uses `"src/features"`, `node` uses `"scripts/features"`
 - `common/constants.mjs` scans the consuming project's `src/lib/` directory at lint-time to build `PREFIX_LIB_MAPPING` (e.g., `{ server: "@/lib/supabase/server" }`). This mapping drives `naming.mjs` (valid file prefixes) and `imports.mjs` (per-prefix import restrictions)
-- Rules apply across three feature root directories defined in `FEATURE_ROOTS`: `src/features`, `scripts/features`, `supabase/functions/features`. The `featuresGlob()` helper generates glob patterns for all roots
+- `featuresGlob(featureRoot, subpath)` generates a glob pattern scoped to the given root
+- `libBoundaryConfigs` is a Next.js-only config (exported separately from `imports.mjs`) that restricts `@/lib/*` imports to repositories across all `src/` files
 - `@yasainet/eslint/next` does NOT include Next.js presets (core-web-vitals, typescript). Consumer adds those separately via `eslint-config-next`
 
 ## Tech Stack
@@ -19,7 +22,7 @@ Key design points:
 - ESLint 9 flat config (ESM only, `.mjs`)
 - No build step — source files in `src/` are shipped directly
 - No test framework — verify by running `npm install` in a consuming project
-- Each config module exports a named `*Configs` array (e.g., `layersConfigs`, `namingConfigs`)
+- Each config module exports a factory function (e.g., `createLayersConfigs(featureRoot)`, `createNamingConfigs(featureRoot)`)
 - Code comments and JSDoc descriptions in English
 
 ## Environment Architecture
@@ -33,20 +36,22 @@ Key design points:
 ```text
 src/
 ├── common/
-│   ├── index.mjs        # Common configs aggregator
-│   ├── constants.mjs    # FEATURE_ROOTS, PREFIX_LIB_MAPPING, featuresGlob()
+│   ├── index.mjs        # createCommonConfigs(featureRoot) — aggregator factory
+│   ├── constants.mjs    # PREFIX_LIB_MAPPING, featuresGlob(featureRoot, subpath)
 │   ├── plugins.mjs      # Common plugins (stylistic, checkFile, jsdoc, simpleImportSort)
 │   ├── rules.mjs        # Shared rules (TypeScript, stylistic, import sorting, no-console)
-│   ├── naming.mjs       # Common naming (services, repos, actions, types, schemas, utils, constants)
-│   ├── layers.mjs       # Common layers (repos, services, actions)
-│   ├── imports.mjs      # Import restrictions (layer, cross-feature, cardinality, prefix-lib, lib-boundary)
-│   └── jsdoc.mjs        # JSDoc requirements
+│   ├── naming.mjs       # createNamingConfigs(featureRoot) — services, repos, actions, types, schemas, utils, constants
+│   ├── layers.mjs       # createLayersConfigs(featureRoot) — repos, services
+│   ├── imports.mjs      # createImportsConfigs(featureRoot) + libBoundaryConfigs (Next.js-only)
+│   └── jsdoc.mjs        # createJsdocConfigs(featureRoot)
 ├── next/
-│   ├── index.mjs        # Entry: common + Next.js-specific rules
-│   ├── naming.mjs       # hooks (filename + export), components naming
-│   └── directives.mjs   # "use server" / "use client"
-└── node/
-    └── index.mjs        # Entry: common only
+│   ├── index.mjs        # Entry: createCommonConfigs("src/features") + libBoundaryConfigs + Next.js rules
+│   ├── naming.mjs       # hooks (filename + export), components naming (hardcoded to src/)
+│   └── directives.mjs   # "use server" / "use client" (hardcoded to src/features/)
+├── node/
+│   └── index.mjs        # Entry: createCommonConfigs("scripts/features")
+└── deno/
+    └── index.mjs        # Entry: createCommonConfigs("supabase/functions/features")
 ```
 
 ## Commands

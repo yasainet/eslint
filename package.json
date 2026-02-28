@@ -11,6 +11,10 @@
     "./node": {
       "types": "./src/node/index.d.mts",
       "default": "./src/node/index.mjs"
+    },
+    "./deno": {
+      "types": "./src/deno/index.d.mts",
+      "default": "./src/deno/index.mjs"
     }
   },
   "files": [
