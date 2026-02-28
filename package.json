@@ -1,6 +1,6 @@
 {
   "name": "@yasainet/eslint",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "ESLint",
   "type": "module",
   "exports": {
