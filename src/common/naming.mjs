@@ -5,7 +5,14 @@ import { actionHandleServiceRule } from "./local-plugins/action-handle-service.m
 /** @description Scope naming rules to the given feature root */
 export function createNamingConfigs(featureRoot, prefixLibMapping) {
   const prefixPattern = `@(${Object.keys(prefixLibMapping).join("|")})`;
-  return [
+  const sharedPrefixPattern = `@(shared|${Object.keys(prefixLibMapping).join("|")})`;
+
+  // DB prefix: value contains "/" = sub-directory origin = DB client
+  const dbPrefixKeys = Object.entries(prefixLibMapping)
+    .filter(([, value]) => value.includes("/"))
+    .map(([key]) => key);
+
+  const configs = [
     {
       name: "naming/services",
       files: featuresGlob(featureRoot, "**/services/*.ts"),
@@ -17,17 +24,39 @@ export function createNamingConfigs(featureRoot, prefixLibMapping) {
         ],
       },
     },
-    {
+  ];
+
+  // Non-shared features: only DB prefixes allowed for repositories
+  if (dbPrefixKeys.length > 0) {
+    const dbPrefixPattern = `@(${dbPrefixKeys.join("|")})`;
+    configs.push({
       name: "naming/repositories",
       files: featuresGlob(featureRoot, "**/repositories/*.ts"),
+      ignores: featuresGlob(featureRoot, "shared/repositories/*.ts"),
       plugins: { "check-file": checkFile },
       rules: {
         "check-file/filename-naming-convention": [
           "error",
-          { "**/*.ts": `${prefixPattern}.repo` },
+          { "**/*.ts": `${dbPrefixPattern}.repo` },
         ],
       },
+    });
+  }
+
+  // Shared feature: any name allowed for repositories
+  configs.push({
+    name: "naming/repositories-shared",
+    files: featuresGlob(featureRoot, "shared/repositories/*.ts"),
+    plugins: { "check-file": checkFile },
+    rules: {
+      "check-file/filename-naming-convention": [
+        "error",
+        { "**/*.ts": "+([a-z0-9_-]).repo" },
+      ],
     },
+  });
+
+  configs.push(
     {
       name: "naming/types",
       files: featuresGlob(featureRoot, "*/types/*.type.ts"),
@@ -48,7 +77,7 @@ export function createNamingConfigs(featureRoot, prefixLibMapping) {
       rules: {
         "check-file/filename-naming-convention": [
           "error",
-          { "**/*.ts": "+([a-z0-9_-]).type" },
+          { "**/*.ts": `${sharedPrefixPattern}.type` },
         ],
       },
     },
@@ -83,7 +112,7 @@ export function createNamingConfigs(featureRoot, prefixLibMapping) {
       rules: {
         "check-file/filename-naming-convention": [
           "error",
-          { "**/*.ts": "+([a-z0-9_-]).util" },
+          { "**/*.ts": `${sharedPrefixPattern}.util` },
         ],
       },
     },
@@ -150,5 +179,7 @@ export function createNamingConfigs(featureRoot, prefixLibMapping) {
         ],
       },
     },
-  ];
+  );
+
+  return configs;
 }
