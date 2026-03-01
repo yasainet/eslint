@@ -16,6 +16,7 @@ export function createNamingConfigs(featureRoot, prefixLibMapping) {
     {
       name: "naming/services",
       files: featuresGlob(featureRoot, "**/services/*.ts"),
+      ignores: featuresGlob(featureRoot, "shared/services/*.ts"),
       plugins: { "check-file": checkFile },
       rules: {
         "check-file/filename-naming-convention": [
@@ -43,7 +44,19 @@ export function createNamingConfigs(featureRoot, prefixLibMapping) {
     });
   }
 
-  // Shared feature: any name allowed for repositories
+  configs.push({
+    name: "naming/services-shared",
+    files: featuresGlob(featureRoot, "shared/services/*.ts"),
+    plugins: { "check-file": checkFile },
+    rules: {
+      "check-file/filename-naming-convention": [
+        "error",
+        { "**/*.ts": "shared.service" },
+      ],
+    },
+  });
+
+  // Shared feature: only "shared" prefix allowed
   configs.push({
     name: "naming/repositories-shared",
     files: featuresGlob(featureRoot, "shared/repositories/*.ts"),
@@ -51,7 +64,7 @@ export function createNamingConfigs(featureRoot, prefixLibMapping) {
     rules: {
       "check-file/filename-naming-convention": [
         "error",
-        { "**/*.ts": "+([a-z0-9_-]).repo" },
+        { "**/*.ts": "shared.repo" },
       ],
     },
   });
@@ -130,11 +143,23 @@ export function createNamingConfigs(featureRoot, prefixLibMapping) {
     {
       name: "naming/actions",
       files: featuresGlob(featureRoot, "**/actions/*.ts"),
+      ignores: featuresGlob(featureRoot, "shared/actions/*.ts"),
       plugins: { "check-file": checkFile },
       rules: {
         "check-file/filename-naming-convention": [
           "error",
           { "**/*.ts": `${prefixPattern}.action` },
+        ],
+      },
+    },
+    {
+      name: "naming/actions-shared",
+      files: featuresGlob(featureRoot, "shared/actions/*.ts"),
+      plugins: { "check-file": checkFile },
+      rules: {
+        "check-file/filename-naming-convention": [
+          "error",
+          { "**/*.ts": "shared.action" },
         ],
       },
     },
