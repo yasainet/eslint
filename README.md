@@ -100,22 +100,22 @@ export default [...eslintConfig];
 
 ## Release
 
-1. Update `version` in `package.json`
-2. Commit and push to `main`
-3. Create and push a tag:
+Version is derived from the Git tag. CI automatically sets `package.json` version before publishing.
+
+1. Commit and push to `main`
+2. Create and push a tag:
 
 ```sh
 git tag v1.0.0
 git push --tags
 ```
 
-4. GitHub Actions will automatically publish to npm
+3. GitHub Actions will automatically publish to npm
 
 ### With lazygit
 
-1. Update `version` in `package.json`
-2. Stage and commit in lazygit
-3. Select the commit, press `T` to create a tag (e.g. `v1.0.0`)
-4. Press `P` to push the commit
-5. Switch to the Tags panel (`]`), select the tag, and press `P` to push it
-6. GitHub Actions will automatically publish to npm
+1. Stage and commit in lazygit
+2. Select the commit, press `T` to create a tag (e.g. `v1.0.0`)
+3. Press `P` to push the commit
+4. Switch to the Tags panel (`]`), select the tag, and press `P` to push it
+5. GitHub Actions will automatically publish to npm
