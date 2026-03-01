@@ -20,7 +20,7 @@ function findProjectRoot() {
 
 const PROJECT_ROOT = findProjectRoot();
 
-const EXCLUDE_LIST = ["proxy.lib.ts", "types"];
+const EXCLUDE_LIST = ["proxy.lib.ts"];
 
 /** @description Extract the base name from a .ts filename by stripping all extensions. */
 function baseName(filename) {
@@ -51,16 +51,16 @@ export function generatePrefixLibMapping(featureRoot) {
       for (const subEntry of subEntries) {
         if (
           subEntry.isFile() &&
-          subEntry.name.endsWith(".ts") &&
+          subEntry.name.endsWith(".lib.ts") &&
           !EXCLUDE_LIST.includes(subEntry.name)
         ) {
           const prefix = baseName(subEntry.name);
-          mapping[prefix] = `${entry.name}/${subEntry.name.replace(".ts", "")}`;
+          mapping[prefix] = `${entry.name}/${subEntry.name.replace(".lib.ts", "")}`;
         }
       }
-    } else if (entry.isFile() && entry.name.endsWith(".ts")) {
+    } else if (entry.isFile() && entry.name.endsWith(".lib.ts")) {
       const prefix = baseName(entry.name);
-      mapping[prefix] = entry.name.replace(".ts", "");
+      mapping[prefix] = entry.name.replace(".lib.ts", "");
     }
   }
 
