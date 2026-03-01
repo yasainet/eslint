@@ -51,7 +51,7 @@ export function createNamingConfigs(featureRoot, prefixLibMapping) {
     rules: {
       "check-file/filename-naming-convention": [
         "error",
-        { "**/*.ts": "shared.service" },
+        { "**/*.ts": "@(shared).service" },
       ],
     },
   });
@@ -64,7 +64,7 @@ export function createNamingConfigs(featureRoot, prefixLibMapping) {
     rules: {
       "check-file/filename-naming-convention": [
         "error",
-        { "**/*.ts": "shared.repo" },
+        { "**/*.ts": "@(shared).repo" },
       ],
     },
   });
@@ -159,7 +159,7 @@ export function createNamingConfigs(featureRoot, prefixLibMapping) {
       rules: {
         "check-file/filename-naming-convention": [
           "error",
-          { "**/*.ts": "shared.action" },
+          { "**/*.ts": "@(shared).action" },
         ],
       },
     },
