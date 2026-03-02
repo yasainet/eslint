@@ -11,6 +11,7 @@ export function createNamingConfigs(featureRoot, prefixLibMapping) {
     {
       name: "naming/services",
       files: featuresGlob(featureRoot, "**/services/*.ts"),
+      ignores: featuresGlob(featureRoot, "shared/services/*.ts"),
       plugins: { "check-file": checkFile },
       rules: {
         "check-file/filename-naming-convention": [
@@ -20,13 +21,36 @@ export function createNamingConfigs(featureRoot, prefixLibMapping) {
       },
     },
     {
+      name: "naming/services-shared",
+      files: featuresGlob(featureRoot, "shared/services/*.ts"),
+      plugins: { "check-file": checkFile },
+      rules: {
+        "check-file/filename-naming-convention": [
+          "error",
+          { "**/*.ts": `${sharedPrefixPattern}.service` },
+        ],
+      },
+    },
+    {
       name: "naming/repositories",
       files: featuresGlob(featureRoot, "**/repositories/*.ts"),
+      ignores: featuresGlob(featureRoot, "shared/repositories/*.ts"),
       plugins: { "check-file": checkFile },
       rules: {
         "check-file/filename-naming-convention": [
           "error",
           { "**/*.ts": `${prefixPattern}.repo` },
+        ],
+      },
+    },
+    {
+      name: "naming/repositories-shared",
+      files: featuresGlob(featureRoot, "shared/repositories/*.ts"),
+      plugins: { "check-file": checkFile },
+      rules: {
+        "check-file/filename-naming-convention": [
+          "error",
+          { "**/*.ts": `${sharedPrefixPattern}.repo` },
         ],
       },
     },
@@ -60,11 +84,23 @@ export function createNamingConfigs(featureRoot, prefixLibMapping) {
     {
       name: "naming/schemas",
       files: featuresGlob(featureRoot, "**/schemas/*.ts"),
+      ignores: featuresGlob(featureRoot, "shared/schemas/*.ts"),
       plugins: { "check-file": checkFile },
       rules: {
         "check-file/filename-naming-convention": [
           "error",
           { "**/*.ts": `${prefixPattern}.schema` },
+        ],
+      },
+    },
+    {
+      name: "naming/schemas-shared",
+      files: featuresGlob(featureRoot, "shared/schemas/*.ts"),
+      plugins: { "check-file": checkFile },
+      rules: {
+        "check-file/filename-naming-convention": [
+          "error",
+          { "**/*.ts": `${sharedPrefixPattern}.schema` },
         ],
       },
     },
@@ -119,11 +155,23 @@ export function createNamingConfigs(featureRoot, prefixLibMapping) {
     {
       name: "naming/actions",
       files: featuresGlob(featureRoot, "**/actions/*.ts"),
+      ignores: featuresGlob(featureRoot, "shared/actions/*.ts"),
       plugins: { "check-file": checkFile },
       rules: {
         "check-file/filename-naming-convention": [
           "error",
           { "**/*.ts": `${prefixPattern}.action` },
+        ],
+      },
+    },
+    {
+      name: "naming/actions-shared",
+      files: featuresGlob(featureRoot, "shared/actions/*.ts"),
+      plugins: { "check-file": checkFile },
+      rules: {
+        "check-file/filename-naming-convention": [
+          "error",
+          { "**/*.ts": `${sharedPrefixPattern}.action` },
         ],
       },
     },
