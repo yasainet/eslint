@@ -110,7 +110,7 @@ function makeConfig(name, files, ...patternArrays) {
   };
 }
 
-/** @description Next.js-only: restrict @/lib imports to repositories */
+/** Next.js-only: restrict @/lib imports to repositories. */
 export const libBoundaryConfigs = [
   {
     name: "imports/lib-boundary",
@@ -128,7 +128,7 @@ export const libBoundaryConfigs = [
   },
 ];
 
-/** @description Scope import restriction rules to the given feature root */
+/** Scope import restriction rules to the given feature root. */
 export function createImportsConfigs(
   featureRoot,
   prefixLibMapping,

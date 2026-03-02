@@ -22,12 +22,12 @@ const PROJECT_ROOT = findProjectRoot();
 
 const EXCLUDE_LIST = ["proxy.lib.ts"];
 
-/** @description Extract the base name from a .ts filename by stripping all extensions. */
+/** Extract the base name from a .ts filename by stripping all extensions. */
 function baseName(filename) {
   return filename.replace(/\..*$/, "");
 }
 
-/** @description Scan lib directory derived from featureRoot and build prefix-to-lib-relative-path mapping */
+/** Scan lib directory derived from featureRoot and build prefix-to-lib-relative-path mapping. */
 export function generatePrefixLibMapping(featureRoot) {
   const libRoot = featureRoot.replace(/features$/, "lib");
   const libDir = path.join(PROJECT_ROOT, libRoot);
@@ -67,7 +67,7 @@ export function generatePrefixLibMapping(featureRoot) {
   return mapping;
 }
 
-/** @description Build glob patterns scoped to the given feature root */
+/** Build glob patterns scoped to the given feature root. */
 export const featuresGlob = (featureRoot, subpath) => [
   `${featureRoot}/${subpath}`,
 ];

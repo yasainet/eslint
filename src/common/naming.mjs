@@ -2,7 +2,7 @@ import { featuresGlob } from "./constants.mjs";
 import { localPlugin } from "./local-plugins/index.mjs";
 import { checkFile } from "./plugins.mjs";
 
-/** @description Scope naming rules to the given feature root */
+/** Scope naming rules to the given feature root. */
 export function createNamingConfigs(featureRoot, prefixLibMapping) {
   const prefixPattern = `@(${Object.keys(prefixLibMapping).join("|")})`;
   const sharedPrefixPattern = `@(shared|${Object.keys(prefixLibMapping).join("|")})`;

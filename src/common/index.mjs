@@ -5,7 +5,7 @@ import { createLayersConfigs } from "./layers.mjs";
 import { createNamingConfigs } from "./naming.mjs";
 import { rulesConfigs } from "./rules.mjs";
 
-/** @description Build common configs scoped to the given feature root */
+/** Build common configs scoped to the given feature root. */
 export function createCommonConfigs(
   featureRoot,
   { banAliasImports = false } = {},

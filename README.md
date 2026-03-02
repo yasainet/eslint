@@ -111,11 +111,3 @@ git push --tags
 ```
 
 3. GitHub Actions will automatically publish to npm
-
-### With lazygit
-
-1. Stage and commit in lazygit
-2. Select the commit, press `T` to create a tag (e.g. `v1.0.0`)
-3. Press `P` to push the commit
-4. Switch to the Tags panel (`]`), select the tag, and press `P` to push it
-5. GitHub Actions will automatically publish to npm

@@ -1,6 +1,4 @@
-/**
- * @description In *.action.ts, `handleXxx` must call the service method `*.xxx()`.
- */
+/** In *.action.ts, handleXxx must call the service method *.xxx(). */
 export const actionHandleServiceRule = {
   meta: {
     type: "problem",

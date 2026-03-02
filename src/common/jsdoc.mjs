@@ -2,7 +2,7 @@ import jsdocPlugin from "eslint-plugin-jsdoc";
 
 import { featuresGlob } from "./constants.mjs";
 
-/** @description Scope JSDoc rules to the given feature root */
+/** Scope JSDoc rules to the given feature root. */
 export function createJsdocConfigs(featureRoot) {
   return [
     {
