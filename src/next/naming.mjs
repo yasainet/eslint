@@ -1,6 +1,6 @@
 import { checkFile } from "../common/plugins.mjs";
 
-/** @description Next.js-specific naming convention configs for hooks and components */
+/** Next.js-specific naming convention configs for hooks and components. */
 export const namingConfigs = [
   {
     name: "naming/hooks",

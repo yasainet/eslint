@@ -1,7 +1,7 @@
 import path from "path";
 
 /**
- * @description Enforce import path style within features:
+ * Enforce import path style within features:
  * - Same-feature imports must use relative paths
  * - Cross-feature imports must use @/ alias
  */
@@ -37,11 +37,9 @@ export const importPathStyleRule = {
     const featureName = afterRoot.split("/")[0];
     if (!featureName) return {};
 
-    // Absolute path of the current feature directory
     const featureDir =
       filename.slice(0, rootIdx + rootSep.length) + featureName;
 
-    // Alias prefix for same-feature: @/features/{featureName}
     const aliasBase = featureRoot.replace(/^src\//, "");
     const sameFeaturePrefix = `@/${aliasBase}/${featureName}/`;
     const sameFeatureExact = `@/${aliasBase}/${featureName}`;
@@ -50,7 +48,7 @@ export const importPathStyleRule = {
       if (!source || typeof source.value !== "string") return;
       const importPath = source.value;
 
-      // Case 1: @/features/{same-feature}/... → use relative path
+      // Same-feature alias should be a relative path for consistency.
       if (
         importPath.startsWith(sameFeaturePrefix) ||
         importPath === sameFeatureExact
@@ -63,7 +61,7 @@ export const importPathStyleRule = {
         return;
       }
 
-      // Case 2: relative path that exits current feature → use @/
+      // Cross-feature relative path should use @/ alias for clarity.
       if (importPath.startsWith(".")) {
         const resolved = path.resolve(path.dirname(filename), importPath);
         if (

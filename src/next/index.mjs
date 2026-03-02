@@ -5,7 +5,7 @@ import { directivesConfigs } from "./directives.mjs";
 import { importPathStyleConfigs } from "./imports.mjs";
 import { namingConfigs } from "./naming.mjs";
 
-/** @description Next.js ESLint flat config entry point */
+/** Next.js ESLint flat config entry point. */
 export const eslintConfig = [
   ...createCommonConfigs("src/features"),
   ...libBoundaryConfigs,

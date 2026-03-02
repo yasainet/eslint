@@ -1,4 +1,4 @@
-/** @description Enforce "use server" / "use client" directives per file convention */
+/** Enforce "use server" / "use client" directives per file convention. */
 export const directivesConfigs = [
   {
     name: "directives/server-action",

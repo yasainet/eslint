@@ -1,4 +1,4 @@
-/** @description Scope layer rules to the given feature root */
+/** Scope layer rules to the given feature root. */
 export function createLayersConfigs(featureRoot) {
   const loggerSelector = "CallExpression[callee.object.name='logger']";
   const loggerMessage =

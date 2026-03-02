@@ -2,7 +2,7 @@ import tseslint from "typescript-eslint";
 
 import { simpleImportSortPlugin, stylistic } from "./plugins.mjs";
 
-/** @description Base rule configs for code style and TypeScript checks */
+/** Base rule configs for code style and TypeScript checks. */
 export const rulesConfigs = [
   {
     name: "rules/shared",
