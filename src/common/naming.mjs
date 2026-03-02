@@ -7,16 +7,10 @@ export function createNamingConfigs(featureRoot, prefixLibMapping) {
   const prefixPattern = `@(${Object.keys(prefixLibMapping).join("|")})`;
   const sharedPrefixPattern = `@(shared|${Object.keys(prefixLibMapping).join("|")})`;
 
-  // DB prefix: value contains "/" = sub-directory origin = DB client
-  const dbPrefixKeys = Object.entries(prefixLibMapping)
-    .filter(([, value]) => value.includes("/"))
-    .map(([key]) => key);
-
   const configs = [
     {
       name: "naming/services",
       files: featuresGlob(featureRoot, "**/services/*.ts"),
-      ignores: featuresGlob(featureRoot, "shared/services/*.ts"),
       plugins: { "check-file": checkFile },
       rules: {
         "check-file/filename-naming-convention": [
@@ -25,49 +19,18 @@ export function createNamingConfigs(featureRoot, prefixLibMapping) {
         ],
       },
     },
-  ];
-
-  // Non-shared features: only DB prefixes allowed for repositories
-  if (dbPrefixKeys.length > 0) {
-    const dbPrefixPattern = `@(${dbPrefixKeys.join("|")})`;
-    configs.push({
+    {
       name: "naming/repositories",
       files: featuresGlob(featureRoot, "**/repositories/*.ts"),
-      ignores: featuresGlob(featureRoot, "shared/repositories/*.ts"),
       plugins: { "check-file": checkFile },
       rules: {
         "check-file/filename-naming-convention": [
           "error",
-          { "**/*.ts": `${dbPrefixPattern}.repo` },
+          { "**/*.ts": `${prefixPattern}.repo` },
         ],
       },
-    });
-  }
-
-  configs.push({
-    name: "naming/services-shared",
-    files: featuresGlob(featureRoot, "shared/services/*.ts"),
-    plugins: { "check-file": checkFile },
-    rules: {
-      "check-file/filename-naming-convention": [
-        "error",
-        { "**/*.ts": "@(shared).service" },
-      ],
     },
-  });
-
-  // Shared feature: only "shared" prefix allowed
-  configs.push({
-    name: "naming/repositories-shared",
-    files: featuresGlob(featureRoot, "shared/repositories/*.ts"),
-    plugins: { "check-file": checkFile },
-    rules: {
-      "check-file/filename-naming-convention": [
-        "error",
-        { "**/*.ts": "@(shared).repo" },
-      ],
-    },
-  });
+  ];
 
   configs.push(
     {
@@ -143,23 +106,11 @@ export function createNamingConfigs(featureRoot, prefixLibMapping) {
     {
       name: "naming/actions",
       files: featuresGlob(featureRoot, "**/actions/*.ts"),
-      ignores: featuresGlob(featureRoot, "shared/actions/*.ts"),
       plugins: { "check-file": checkFile },
       rules: {
         "check-file/filename-naming-convention": [
           "error",
           { "**/*.ts": `${prefixPattern}.action` },
-        ],
-      },
-    },
-    {
-      name: "naming/actions-shared",
-      files: featuresGlob(featureRoot, "shared/actions/*.ts"),
-      plugins: { "check-file": checkFile },
-      rules: {
-        "check-file/filename-naming-convention": [
-          "error",
-          { "**/*.ts": "@(shared).action" },
         ],
       },
     },
