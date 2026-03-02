@@ -94,12 +94,25 @@ export function createNamingConfigs(featureRoot, prefixLibMapping) {
     },
     {
       name: "naming/constants",
-      files: featuresGlob(featureRoot, "**/constants/*.ts"),
+      files: featuresGlob(featureRoot, "*/constants/*.constant.ts"),
+      ignores: featuresGlob(featureRoot, "shared/constants/*.ts"),
       plugins: { "check-file": checkFile },
       rules: {
         "check-file/filename-naming-convention": [
           "error",
-          { "**/*.ts": "+([a-z0-9-]).constant" },
+          { "**/*/constants/*.ts": "<1>" },
+          { ignoreMiddleExtensions: true },
+        ],
+      },
+    },
+    {
+      name: "naming/constants-shared",
+      files: featuresGlob(featureRoot, "shared/constants/*.ts"),
+      plugins: { "check-file": checkFile },
+      rules: {
+        "check-file/filename-naming-convention": [
+          "error",
+          { "**/*.ts": `${sharedPrefixPattern}.constant` },
         ],
       },
     },
