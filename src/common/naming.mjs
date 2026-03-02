@@ -64,7 +64,7 @@ export function createNamingConfigs(featureRoot, prefixLibMapping) {
       rules: {
         "check-file/filename-naming-convention": [
           "error",
-          { "**/*.ts": "+([a-z0-9-]).schema" },
+          { "**/*.ts": `${prefixPattern}.schema` },
         ],
       },
     },
