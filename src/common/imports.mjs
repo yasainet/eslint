@@ -129,8 +129,33 @@ export const libBoundaryConfigs = [
 ];
 
 /** @description Scope import restriction rules to the given feature root */
-export function createImportsConfigs(featureRoot, prefixLibMapping) {
+export function createImportsConfigs(
+  featureRoot,
+  prefixLibMapping,
+  { banAliasImports = false } = {},
+) {
   const configs = [];
+
+  if (banAliasImports) {
+    configs.push({
+      name: "imports/ban-alias",
+      files: [`${featureRoot}/**/*.ts`],
+      rules: {
+        "no-restricted-imports": [
+          "error",
+          {
+            patterns: [
+              {
+                group: ["@/*", "@/**"],
+                message:
+                  "Alias imports (@/) are not available in this environment. Use relative paths.",
+              },
+            ],
+          },
+        ],
+      },
+    });
+  }
 
   configs.push(
     makeConfig(

@@ -2,6 +2,7 @@ import { createCommonConfigs } from "../common/index.mjs";
 import { libBoundaryConfigs } from "../common/imports.mjs";
 
 import { directivesConfigs } from "./directives.mjs";
+import { importPathStyleConfigs } from "./imports.mjs";
 import { namingConfigs } from "./naming.mjs";
 
 export const eslintConfig = [
@@ -9,4 +10,5 @@ export const eslintConfig = [
   ...libBoundaryConfigs,
   ...namingConfigs,
   ...directivesConfigs,
+  ...importPathStyleConfigs,
 ];

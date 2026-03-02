@@ -6,13 +6,16 @@ import { createNamingConfigs } from "./naming.mjs";
 import { rulesConfigs } from "./rules.mjs";
 
 /** @description Build common configs scoped to the given feature root */
-export function createCommonConfigs(featureRoot) {
+export function createCommonConfigs(
+  featureRoot,
+  { banAliasImports = false } = {},
+) {
   const prefixLibMapping = generatePrefixLibMapping(featureRoot);
   return [
     ...rulesConfigs,
     ...createNamingConfigs(featureRoot, prefixLibMapping),
     ...createLayersConfigs(featureRoot),
-    ...createImportsConfigs(featureRoot, prefixLibMapping),
+    ...createImportsConfigs(featureRoot, prefixLibMapping, { banAliasImports }),
     ...createJsdocConfigs(featureRoot),
   ];
 }

@@ -1,6 +1,6 @@
 import { featuresGlob } from "./constants.mjs";
+import { localPlugin } from "./local-plugins/index.mjs";
 import { checkFile } from "./plugins.mjs";
-import { actionHandleServiceRule } from "./local-plugins/action-handle-service.mjs";
 
 /** @description Scope naming rules to the given feature root */
 export function createNamingConfigs(featureRoot, prefixLibMapping) {
@@ -181,11 +181,7 @@ export function createNamingConfigs(featureRoot, prefixLibMapping) {
     {
       name: "naming/actions-handle-service",
       files: featuresGlob(featureRoot, "**/actions/*.ts"),
-      plugins: {
-        local: {
-          rules: { "action-handle-service": actionHandleServiceRule },
-        },
-      },
+      plugins: { local: localPlugin },
       rules: {
         "local/action-handle-service": "error",
       },
