@@ -67,6 +67,7 @@ export function generatePrefixLibMapping(featureRoot) {
   return mapping;
 }
 
+/** @description Build glob patterns scoped to the given feature root */
 export const featuresGlob = (featureRoot, subpath) => [
   `${featureRoot}/${subpath}`,
 ];
