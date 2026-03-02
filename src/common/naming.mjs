@@ -83,13 +83,14 @@ export function createNamingConfigs(featureRoot, prefixLibMapping) {
     },
     {
       name: "naming/schemas",
-      files: featuresGlob(featureRoot, "**/schemas/*.ts"),
+      files: featuresGlob(featureRoot, "*/schemas/*.schema.ts"),
       ignores: featuresGlob(featureRoot, "shared/schemas/*.ts"),
       plugins: { "check-file": checkFile },
       rules: {
         "check-file/filename-naming-convention": [
           "error",
-          { "**/*.ts": `${prefixPattern}.schema` },
+          { "**/*/schemas/*.ts": "<1>" },
+          { ignoreMiddleExtensions: true },
         ],
       },
     },
