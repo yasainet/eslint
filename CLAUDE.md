@@ -16,8 +16,7 @@ Key design points:
 - `common/constants.mjs` scans the consuming project's `src/lib/` directory at lint-time to build `PREFIX_LIB_MAPPING` (e.g., `{ server: "@/lib/supabase/server" }`). This mapping drives `naming.mjs` (valid file prefixes) and `imports.mjs` (per-prefix import restrictions)
 - `featuresGlob(featureRoot, subpath)` generates a glob pattern scoped to the given root
 - `libBoundaryConfigs` is a Next.js-only config (exported separately from `imports.mjs`) that restricts `@/lib/*` imports to repositories and types across all `src/` files. `utils` also receive lib-boundary restrictions via `createImportsConfigs`
-- `naming.mjs` treats the `shared` feature specially: `repositories-shared` allows any kebab-case name (no DB prefix required), `types-shared` and `utils-shared` accept both `shared` and lib prefixes (e.g., `shared.type.ts`, `server.util.ts`)
-- DB prefix is auto-derived from `PREFIX_LIB_MAPPING`: entries whose value contains `/` are treated as DB-client origins (e.g., `server` → `supabase/server`). Non-shared repositories require one of these DB prefixes
+- `naming.mjs` treats the `shared` feature specially: `types-shared` and `utils-shared` accept both `shared` and lib prefixes (e.g., `shared.type.ts`, `server.util.ts`). All other layers (repositories, services, actions) use lib prefixes uniformly across shared and non-shared features
 - `@yasainet/eslint/next` does NOT include Next.js presets (core-web-vitals, typescript). Consumer adds those separately via `eslint-config-next`
 
 ## Tech Stack
