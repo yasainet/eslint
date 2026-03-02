@@ -3,6 +3,7 @@ import checkFile from "eslint-plugin-check-file";
 import jsdocPlugin from "eslint-plugin-jsdoc";
 import simpleImportSortPlugin from "eslint-plugin-simple-import-sort";
 
+/** @description Shared plugin instances used across ESLint configs */
 export const plugins = {
   "@stylistic": stylistic,
   "check-file": checkFile,
