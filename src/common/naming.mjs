@@ -4,10 +4,33 @@ import { checkFile } from "./plugins.mjs";
 
 /** Scope naming rules to the given feature root. */
 export function createNamingConfigs(featureRoot, prefixLibMapping) {
-  const prefixPattern = `@(${Object.keys(prefixLibMapping).join("|")})`;
-  const sharedPrefixPattern = `@(shared|${Object.keys(prefixLibMapping).join("|")})`;
+  const prefixes = Object.keys(prefixLibMapping);
+  const hasPrefixes = prefixes.length > 0;
+  const prefixPattern = hasPrefixes ? `@(${prefixes.join("|")})` : null;
+  const sharedPrefixPattern = hasPrefixes
+    ? `@(shared|${prefixes.join("|")})`
+    : "shared";
 
-  const configs = [
+  const servicePattern = prefixPattern
+    ? `${prefixPattern}.service`
+    : "*.service";
+  const repoPattern = prefixPattern ? `${prefixPattern}.repo` : "*.repo";
+  const actionPattern = prefixPattern
+    ? `${prefixPattern}.action`
+    : "*.action";
+
+  const configs = [];
+
+  configs.push({
+    name: "naming/namespace-import-name",
+    files: featuresGlob(featureRoot, "**/*.ts"),
+    plugins: { local: localPlugin },
+    rules: {
+      "local/namespace-import-name": ["error", { featureRoot }],
+    },
+  });
+
+  configs.push(
     {
       name: "naming/services",
       files: featuresGlob(featureRoot, "**/services/*.ts"),
@@ -16,18 +39,7 @@ export function createNamingConfigs(featureRoot, prefixLibMapping) {
       rules: {
         "check-file/filename-naming-convention": [
           "error",
-          { "**/*.ts": `${prefixPattern}.service` },
-        ],
-      },
-    },
-    {
-      name: "naming/services-shared",
-      files: featuresGlob(featureRoot, "shared/services/*.ts"),
-      plugins: { "check-file": checkFile },
-      rules: {
-        "check-file/filename-naming-convention": [
-          "error",
-          { "**/*.ts": `${sharedPrefixPattern}.service` },
+          { "**/*.ts": servicePattern },
         ],
       },
     },
@@ -39,7 +51,21 @@ export function createNamingConfigs(featureRoot, prefixLibMapping) {
       rules: {
         "check-file/filename-naming-convention": [
           "error",
-          { "**/*.ts": `${prefixPattern}.repo` },
+          { "**/*.ts": repoPattern },
+        ],
+      },
+    },
+  );
+
+  configs.push(
+    {
+      name: "naming/services-shared",
+      files: featuresGlob(featureRoot, "shared/services/*.ts"),
+      plugins: { "check-file": checkFile },
+      rules: {
+        "check-file/filename-naming-convention": [
+          "error",
+          { "**/*.ts": `${sharedPrefixPattern}.service` },
         ],
       },
     },
@@ -54,7 +80,7 @@ export function createNamingConfigs(featureRoot, prefixLibMapping) {
         ],
       },
     },
-  ];
+  );
 
   configs.push(
     {
@@ -153,18 +179,22 @@ export function createNamingConfigs(featureRoot, prefixLibMapping) {
         ],
       },
     },
-    {
-      name: "naming/actions",
-      files: featuresGlob(featureRoot, "**/actions/*.ts"),
-      ignores: featuresGlob(featureRoot, "shared/actions/*.ts"),
-      plugins: { "check-file": checkFile },
-      rules: {
-        "check-file/filename-naming-convention": [
-          "error",
-          { "**/*.ts": `${prefixPattern}.action` },
-        ],
-      },
+  );
+
+  configs.push({
+    name: "naming/actions",
+    files: featuresGlob(featureRoot, "**/actions/*.ts"),
+    ignores: featuresGlob(featureRoot, "shared/actions/*.ts"),
+    plugins: { "check-file": checkFile },
+    rules: {
+      "check-file/filename-naming-convention": [
+        "error",
+        { "**/*.ts": actionPattern },
+      ],
     },
+  });
+
+  configs.push(
     {
       name: "naming/actions-shared",
       files: featuresGlob(featureRoot, "shared/actions/*.ts"),
