@@ -441,20 +441,40 @@ import { supabase } from "../../_lib/supabase";
 import { supabase } from "../../_lib/supabase";
 ```
 
-### commands エントリポイント制約
+### エントリポイント制約
 
-- **説明**: `commands/` は actions のみを import できる。services、repositories、`_lib/` の直接 import を禁止し、actions をエントリポイントとする
-- **対象**: `supabase/functions/commands/**/*.ts`
+- **説明**: Edge Function エントリポイント（`_` プレフィックスなしのディレクトリ）は actions と `_utils/` のみを import できる。services、repositories、`_lib/` の直接 import を禁止し、actions をエントリポイントとする
+- **対象**: `supabase/functions/**/*.ts`（`_features/`, `_lib/`, `_utils/` を除く）
 - **NG 例**:
 
 ```ts
-// commands/sync.ts
+// execute-jobs/index.ts
 import { getComics } from "../_features/comics/services/server.service";
 ```
 
 - **OK 例**:
 
 ```ts
-// commands/sync.ts
+// execute-jobs/index.ts
 import { handleSyncComics } from "../_features/comics/actions/server.action";
+import { createResponse } from "../_utils/http/response.util.ts";
+```
+
+### `_utils/` の boundary 制約
+
+- **説明**: `_utils/` は `_features/` と `_lib/` を import できない。汎用ユーティリティとしての独立性を保つ
+- **対象**: `supabase/functions/_utils/**/*.ts`
+- **NG 例**:
+
+```ts
+// _utils/http/response.util.ts
+import { supabase } from "../_lib/supabase";
+import { getComics } from "../_features/comics/services/server.service";
+```
+
+- **OK 例**:
+
+```ts
+// _utils/http/response.util.ts
+import { Status } from "jsr:@std/http/status";
 ```
