@@ -1,0 +1,1 @@
+-[ ] hooks に logger を利用している例: `~/Projects/bitcomic.net/src/features/comics/hooks/useDisplayMode.ts`
