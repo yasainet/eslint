@@ -119,6 +119,7 @@ export const libBoundaryConfigs = [
       "src/lib/**",
       "src/proxy.ts",
       "src/app/sitemap.ts",
+      "src/app/**/route.ts",
       "src/features/**/repositories/**",
       "src/features/**/types/**",
     ],
