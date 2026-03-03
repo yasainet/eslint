@@ -40,3 +40,13 @@ npm install   # Install dependencies (no build or test commands)
 node -e "import('./src/next/index.mjs').then(m => console.log('next:', Object.keys(m)))"
 node -e "import('./src/node/index.mjs').then(m => console.log('node:', Object.keys(m)))"
 ```
+
+## Testing in Consuming Projects
+
+`npm link` is not suitable — symlinks cause duplicate plugin errors (e.g., "Cannot redefine plugin @typescript-eslint"). Use `npm pack` instead:
+
+```bash
+# Pack the local package, then install the tarball in the consuming project
+cd ~/Projects/eslint && npm pack --pack-destination /tmp
+cd ~/Projects/<project> && npm install /tmp/yasainet-eslint-*.tgz
+```

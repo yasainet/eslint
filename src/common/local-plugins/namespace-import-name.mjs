@@ -42,15 +42,16 @@ function parseImportSource(importPath, featureRoot) {
 
   // Only process paths within the feature root
   const rootPrefix = featureRoot + "/";
-  if (!normalized.startsWith(rootPrefix)) return null;
+  const rootIdx = normalized.indexOf(rootPrefix);
+  if (rootIdx === -1) return null;
 
-  const afterRoot = normalized.slice(rootPrefix.length);
+  const afterRoot = normalized.slice(rootIdx + rootPrefix.length);
   // Expected: {feature}/{layerDir}/{scope}.{layerExt}
   const segments = afterRoot.split("/");
   if (segments.length < 2) return null;
 
   const featureDir = segments[0];
-  const fileName = segments[segments.length - 1];
+  const fileName = segments[segments.length - 1].replace(/\.tsx?$/, "");
 
   const dotIdx = fileName.indexOf(".");
   if (dotIdx === -1) return null;
@@ -68,11 +69,6 @@ function parseImportSource(importPath, featureRoot) {
 function buildExpectedName(featureDir, scope, layer) {
   const featureCamel = toCamelCase(featureDir);
   const scopePascal = toPascalCase(scope);
-
-  // Dedup: if feature is "shared" or featureName === scope, omit feature prefix
-  if (featureDir === "shared" || featureCamel === scope) {
-    return scope + layer;
-  }
 
   return featureCamel + scopePascal + layer;
 }
