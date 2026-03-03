@@ -27,8 +27,9 @@ export const denoImportsConfigs = [
     },
   },
   {
-    name: "deno/commands-entry-point",
-    files: [`${FUNCTIONS_ROOT}/commands/**/*.ts`],
+    name: "deno/entry-point",
+    files: [`${FUNCTIONS_ROOT}/**/*.ts`],
+    ignores: [`${FUNCTIONS_ROOT}/_*/**`],
     rules: {
       "no-restricted-imports": [
         "error",
@@ -37,17 +38,38 @@ export const denoImportsConfigs = [
             {
               group: ["**/services/*", "**/services"],
               message:
-                "commands/ must not import services directly. Import from actions instead.",
+                "Entry points must not import services directly. Import from actions instead.",
             },
             {
               group: ["**/repositories/*", "**/repositories"],
               message:
-                "commands/ must not import repositories directly. Import from actions instead.",
+                "Entry points must not import repositories directly. Import from actions instead.",
             },
             {
               group: ["*/_lib/*", "*/_lib/**"],
               message:
-                "commands/ must not import _lib/ directly. Import from actions instead.",
+                "Entry points must not import _lib/ directly. Import from actions instead.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    name: "deno/utils-boundary",
+    files: [`${FUNCTIONS_ROOT}/_utils/**/*.ts`],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["*/_features/*", "*/_features/**"],
+              message: "_utils/ cannot import _features/",
+            },
+            {
+              group: ["*/_lib/*", "*/_lib/**"],
+              message: "_utils/ cannot import _lib/",
             },
           ],
         },

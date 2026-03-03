@@ -25,7 +25,7 @@ src/
 ├── common/   # Shared rules for all environments
 ├── next/     # Next.js-specific rules (hooks, components, directives)
 ├── node/     # Node.js entry point (common rules only)
-└── deno/     # Deno entry point for Supabase Edge Functions (common rules only)
+└── deno/     # Deno entry point (entry-point boundary, _utils boundary, _lib boundary)
 ```
 
 ## Commands
