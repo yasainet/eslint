@@ -92,7 +92,7 @@ function prefixLibPatterns(prefix, mapping) {
 
 const LIB_BOUNDARY_PATTERNS = [
   {
-    group: ["**/lib/*", "**/lib/**"],
+    group: ["@/lib/*", "@/lib/**"],
     message:
       "lib/* can only be imported from repositories (lib-boundary violation)",
   },
