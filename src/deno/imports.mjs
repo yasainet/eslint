@@ -1,3 +1,5 @@
+import { denoLocalPlugin } from "./local-plugins/index.mjs";
+
 const FUNCTIONS_ROOT = "supabase/functions";
 const FEATURE_ROOT = "supabase/functions/_features";
 
@@ -74,6 +76,15 @@ export const denoImportsConfigs = [
           ],
         },
       ],
+    },
+  },
+  {
+    name: "deno/flat-entry-point",
+    files: [`${FUNCTIONS_ROOT}/**/*.ts`],
+    ignores: [`${FUNCTIONS_ROOT}/_*/**`],
+    plugins: { "deno-local": denoLocalPlugin },
+    rules: {
+      "deno-local/flat-entry-point": "error",
     },
   },
 ];
