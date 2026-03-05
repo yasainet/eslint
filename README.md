@@ -10,6 +10,34 @@ Shared ESLint configuration for Next.js, Node.js and Deno.
 | `@yasainet/eslint/node` | `scripts/features/`            | Common rules only (WIP) |
 | `@yasainet/eslint/deno` | `supabase/functions/features/` | Common rules only (WIP) |
 
+## Directory Structure
+
+```text
+src/
+├── common/   # Shared rules for all environments
+├── next/     # Next.js-specific rules (hooks, components, directives)
+├── node/     # Node.js entry point (common rules only)
+└── deno/     # Deno entry point (entry-point boundary, _utils boundary, _lib boundary)
+```
+
+Each entry point enforces a feature-based architecture with the following convention in consuming projects:
+
+```text
+{featureRoot}/
+├── {feature}/
+│   ├── actions/        # *.action.ts — entry points (handleXxx)
+│   ├── services/       # *.service.ts — business logic
+│   ├── repositories/   # *.repo.ts — data access
+│   ├── types/          # *.type.ts
+│   ├── schemas/        # *.schema.ts
+│   ├── utils/          # *.util.ts
+│   └── constants/      # *.constant.ts
+├── shared/             # Cross-feature shared modules
+├── ...
+{libRoot}/              # *.lib.ts — library wrappers (e.g., supabase.lib.ts)
+{utilsRoot}/            # *.util.ts — top-level utilities
+```
+
 ## Setup
 
 ### Next.js + Node.js + Deno

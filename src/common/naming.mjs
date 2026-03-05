@@ -21,6 +21,25 @@ export function createLibNamingConfigs(featureRoot) {
   ];
 }
 
+/** Scope utils naming rules to the utils root derived from the given feature root. */
+export function createUtilsNamingConfigs(featureRoot) {
+  const utilsRoot = featureRoot.replace(/features$/, "utils");
+  return [
+    {
+      name: "naming/top-level-utils",
+      files: [`${utilsRoot}/**/*.ts`],
+      ignores: [`${utilsRoot}/**/*.type.ts`],
+      plugins: { "check-file": checkFile },
+      rules: {
+        "check-file/filename-naming-convention": [
+          "error",
+          { "**/*.ts": "*.util" },
+        ],
+      },
+    },
+  ];
+}
+
 /** Scope naming rules to the given feature root. */
 export function createNamingConfigs(featureRoot, prefixLibMapping) {
   const prefixes = Object.keys(prefixLibMapping);
