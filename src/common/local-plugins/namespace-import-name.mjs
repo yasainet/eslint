@@ -51,7 +51,7 @@ function parseImportSource(importPath, featureRoot) {
   if (segments.length < 2) return null;
 
   const featureDir = segments[0];
-  const fileName = segments[segments.length - 1].replace(/\.tsx?$/, "");
+  const fileName = segments[segments.length - 1].replace(/\.[jt]sx?$/, "");
 
   const dotIdx = fileName.indexOf(".");
   if (dotIdx === -1) return null;
