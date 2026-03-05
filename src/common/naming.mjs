@@ -2,6 +2,25 @@ import { featuresGlob } from "./constants.mjs";
 import { localPlugin } from "./local-plugins/index.mjs";
 import { checkFile } from "./plugins.mjs";
 
+/** Scope lib naming rules to the lib root derived from the given feature root. */
+export function createLibNamingConfigs(featureRoot) {
+  const libRoot = featureRoot.replace(/features$/, "lib");
+  return [
+    {
+      name: "naming/lib",
+      files: [`${libRoot}/**/*.ts`],
+      ignores: [`${libRoot}/**/*.type.ts`],
+      plugins: { "check-file": checkFile },
+      rules: {
+        "check-file/filename-naming-convention": [
+          "error",
+          { "**/*.ts": "*.lib" },
+        ],
+      },
+    },
+  ];
+}
+
 /** Scope naming rules to the given feature root. */
 export function createNamingConfigs(featureRoot, prefixLibMapping) {
   const prefixes = Object.keys(prefixLibMapping);
