@@ -3,7 +3,8 @@ import path from "path";
 
 /**
  * Extract table names from Supabase generated types file.
- * Looks for keys directly under `Tables: {` in the Database interface.
+ * Looks for top-level keys under `Tables: {` inside the `public` schema.
+ * Uses brace counting to handle deeply nested type definitions.
  */
 function extractTableNames(supabaseTypePath) {
   if (!fs.existsSync(supabaseTypePath)) {
@@ -11,17 +12,57 @@ function extractTableNames(supabaseTypePath) {
   }
 
   const content = fs.readFileSync(supabaseTypePath, "utf-8");
-  const tablesMatch = content.match(/Tables:\s*\{([^}]*(?:\{[^}]*\}[^}]*)*)\}/);
-  if (!tablesMatch) {
+
+  // Find `public:` excluding `graphql_public:` via negative lookbehind
+  const publicMatch = /(?<!\w)public:\s*\{/.exec(content);
+  if (!publicMatch) {
     return [];
   }
 
-  const tablesBlock = tablesMatch[1];
-  const keyRegex = /^\s*(\w+)\s*:/gm;
+  const tablesLabel = "Tables:";
+  const tablesIdx = content.indexOf(tablesLabel, publicMatch.index);
+  if (tablesIdx === -1) {
+    return [];
+  }
+
+  // Find the opening brace of `Tables: {`
+  const braceStart = content.indexOf("{", tablesIdx + tablesLabel.length);
+  if (braceStart === -1) {
+    return [];
+  }
+
+  // Extract the Tables block using brace counting
+  let depth = 0;
+  let blockEnd = -1;
+  for (let i = braceStart; i < content.length; i++) {
+    if (content[i] === "{") depth++;
+    else if (content[i] === "}") depth--;
+    if (depth === 0) {
+      blockEnd = i;
+      break;
+    }
+  }
+  if (blockEnd === -1) {
+    return [];
+  }
+
+  // Extract top-level keys (depth 0) inside the Tables block
+  const tablesBlock = content.slice(braceStart + 1, blockEnd);
   const names = [];
+  depth = 0;
+  const keyRegex = /(\w+)\s*:/g;
   let match;
   while ((match = keyRegex.exec(tablesBlock)) !== null) {
-    names.push(match[1]);
+    // Count braces before this match to determine depth
+    const preceding = tablesBlock.slice(0, match.index);
+    let d = 0;
+    for (const ch of preceding) {
+      if (ch === "{") d++;
+      else if (ch === "}") d--;
+    }
+    if (d === 0) {
+      names.push(match[1]);
+    }
   }
   return names;
 }
