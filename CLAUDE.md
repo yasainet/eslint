@@ -49,4 +49,7 @@ node -e "import('./src/node/index.mjs').then(m => console.log('node:', Object.ke
 # Pack the local package, then install the tarball in the consuming project
 cd ~/Projects/eslint && npm pack --pack-destination /tmp
 cd ~/Projects/<project> && npm install /tmp/yasainet-eslint-*.tgz
+
+# After testing, revert to the registry version
+npm install @yasainet/eslint@latest
 ```
