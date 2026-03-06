@@ -1,4 +1,5 @@
 import { actionHandleServiceRule } from "./action-handle-service.mjs";
+import { featureNameRule } from "./feature-name.mjs";
 import { importPathStyleRule } from "./import-path-style.mjs";
 import { namespaceImportNameRule } from "./namespace-import-name.mjs";
 
@@ -6,6 +7,7 @@ import { namespaceImportNameRule } from "./namespace-import-name.mjs";
 export const localPlugin = {
   rules: {
     "action-handle-service": actionHandleServiceRule,
+    "feature-name": featureNameRule,
     "import-path-style": importPathStyleRule,
     "namespace-import-name": namespaceImportNameRule,
   },
