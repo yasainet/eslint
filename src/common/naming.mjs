@@ -60,6 +60,15 @@ export function createNamingConfigs(featureRoot, prefixLibMapping) {
   const configs = [];
 
   configs.push({
+    name: "naming/feature-name",
+    files: featuresGlob(featureRoot, "**/*.ts"),
+    plugins: { local: localPlugin },
+    rules: {
+      "local/feature-name": ["error", { featureRoot }],
+    },
+  });
+
+  configs.push({
     name: "naming/namespace-import-name",
     files: featuresGlob(featureRoot, "**/*.ts"),
     plugins: { local: localPlugin },
