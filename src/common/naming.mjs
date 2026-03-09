@@ -168,6 +168,14 @@ export function createNamingConfigs(featureRoot, prefixLibMapping) {
       },
     },
     {
+      name: "naming/schema-naming",
+      files: featuresGlob(featureRoot, "**/schemas/*.schema.ts"),
+      plugins: { local: localPlugin },
+      rules: {
+        "local/schema-naming": "error",
+      },
+    },
+    {
       name: "naming/schemas-shared",
       files: featuresGlob(featureRoot, "shared/schemas/*.ts"),
       plugins: { "check-file": checkFile },
