@@ -1,1 +1,2 @@
--[ ] hooks に logger を利用している例: `~/Projects/bitcomic.net/src/features/comics/hooks/useDisplayMode.ts`
+- [ ] hooks に logger を利用している例: `~/Projects/bitcomic.net/src/features/comics/hooks/useDisplayMode.ts`
+- [ ] `console[level]()` の挙動がランタイムで異なる問題: Supabase Edge Runtime (Deno) は `console.info()` 等に `[Info]` プレフィックスを自動付与するため、logger の `[INFO]` と二重になる。全環境で `console.log` に統一すれば解消するが、Node.js 側で stderr 出力を失うトレードオフがある。現状は許容としている
