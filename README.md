@@ -1,14 +1,15 @@
 # @yasainet/eslint
 
-Shared ESLint configuration for Next.js, Node.js and Deno.
+Shared ESLint configuration for Next.js, Hono, Node.js and Deno.
 
 ## Entry Points
 
-| Entry                   | Feature Root                   | Description             |
-| ----------------------- | ------------------------------ | ----------------------- |
-| `@yasainet/eslint/next` | `src/features/`                | Common rules + Next.js  |
-| `@yasainet/eslint/node` | `scripts/features/`            | Common rules only (WIP) |
-| `@yasainet/eslint/deno` | `supabase/functions/features/` | Common rules only (WIP) |
+| Entry                   | Feature Root                   | Entry Points            | Description                   |
+| ----------------------- | ------------------------------ | ----------------------- | ----------------------------- |
+| `@yasainet/eslint/next` | `src/features/`                | -                       | Common rules + Next.js        |
+| `@yasainet/eslint/hono` | `src/features/`                | -                       | Common rules (web server)     |
+| `@yasainet/eslint/node` | `scripts/features/`            | `scripts/commands/*.ts` | Common rules (CLI scripts)    |
+| `@yasainet/eslint/deno` | `supabase/functions/features/` | -                       | Common rules (Edge Functions) |
 
 ## Directory Structure
 
@@ -16,7 +17,8 @@ Shared ESLint configuration for Next.js, Node.js and Deno.
 src/
 ├── common/   # Shared rules for all environments
 ├── next/     # Next.js-specific rules (hooks, components, directives)
-├── node/     # Node.js entry point (common rules only)
+├── hono/     # Hono web server (src/features)
+├── node/     # Node.js CLI scripts (scripts/features, scripts/commands)
 └── deno/     # Deno entry point (entry-point boundary, _utils boundary, _lib boundary)
 ```
 
@@ -100,6 +102,19 @@ export default defineConfig([
   ]),
   ...eslintConfig,
 ]);
+```
+
+### Hono
+
+```sh
+npm install -D @yasainet/eslint eslint typescript-eslint
+```
+
+```js
+// eslint.config.mjs
+import { eslintConfig } from "@yasainet/eslint/hono";
+
+export default [...eslintConfig];
 ```
 
 ### Node.js
