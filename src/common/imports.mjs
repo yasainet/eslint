@@ -25,6 +25,10 @@ const LAYER_PATTERNS = {
   ],
   actions: [
     {
+      group: ["*/repositories/*", "*/repositories"],
+      message: "actions cannot import repositories (layer violation)",
+    },
+    {
       group: ["*/hooks/*", "*/hooks"],
       message: "actions cannot import hooks (layer violation)",
     },
