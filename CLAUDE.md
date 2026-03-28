@@ -4,7 +4,7 @@ Shared ESLint flat config that enforces feature-based architecture.
 
 ## Project Overview
 
-`@yasainet/eslint` provides four entry points: `@yasainet/eslint/next`, `@yasainet/eslint/hono`, `@yasainet/eslint/node`, `@yasainet/eslint/deno`
+`@yasainet/eslint` provides three entry points: `@yasainet/eslint/next`, `@yasainet/eslint/node`, `@yasainet/eslint/deno`
 
 ## Tech Stack
 
@@ -24,7 +24,6 @@ Shared ESLint flat config that enforces feature-based architecture.
 src/
 ├── common/   # Shared rules for all environments
 ├── next/     # Next.js-specific rules (hooks, components, directives)
-├── hono/     # Hono web server (src/features)
 ├── node/     # Node.js CLI scripts (scripts/features, scripts/commands)
 └── deno/     # Deno entry point (entry-point boundary, _utils boundary, _lib boundary)
 ```
@@ -39,7 +38,6 @@ npm install   # Install dependencies (no build or test commands)
 
 ```bash
 node -e "import('./src/next/index.mjs').then(m => console.log('next:', Object.keys(m)))"
-node -e "import('./src/hono/index.mjs').then(m => console.log('hono:', Object.keys(m)))"
 node -e "import('./src/node/index.mjs').then(m => console.log('node:', Object.keys(m)))"
 ```
 

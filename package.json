@@ -12,10 +12,6 @@
       "types": "./src/node/index.d.mts",
       "default": "./src/node/index.mjs"
     },
-    "./hono": {
-      "types": "./src/hono/index.d.mts",
-      "default": "./src/hono/index.mjs"
-    },
     "./deno": {
       "types": "./src/deno/index.d.mts",
       "default": "./src/deno/index.mjs"
