@@ -102,6 +102,19 @@ const LIB_BOUNDARY_PATTERNS = [
   },
 ];
 
+const PAGE_BOUNDARY_PATTERNS = [
+  {
+    group: ["*/repositories/*", "*/repositories"],
+    message:
+      "page.tsx can only import actions, not repositories (page-boundary violation)",
+  },
+  {
+    group: ["*/services/*", "*/services"],
+    message:
+      "page.tsx can only import actions, not services (page-boundary violation)",
+  },
+];
+
 function makeConfig(name, files, ...patternArrays) {
   const patterns = patternArrays.flat();
   if (patterns.length === 0) return null;
@@ -113,6 +126,17 @@ function makeConfig(name, files, ...patternArrays) {
     },
   };
 }
+
+/** Next.js-only: restrict page.tsx to only import actions. */
+export const pageBoundaryConfigs = [
+  {
+    name: "imports/page-boundary",
+    files: ["src/app/**/page.tsx"],
+    rules: {
+      "no-restricted-imports": ["error", { patterns: PAGE_BOUNDARY_PATTERNS }],
+    },
+  },
+];
 
 /** Next.js-only: restrict @/lib imports to repositories. */
 export const libBoundaryConfigs = [

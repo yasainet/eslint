@@ -1,6 +1,6 @@
 import { createEntryPointConfigs } from "../common/entry-points.mjs";
 import { createCommonConfigs } from "../common/index.mjs";
-import { libBoundaryConfigs } from "../common/imports.mjs";
+import { libBoundaryConfigs, pageBoundaryConfigs } from "../common/imports.mjs";
 
 import { directivesConfigs } from "./directives.mjs";
 import { importPathStyleConfigs } from "./imports.mjs";
@@ -14,6 +14,7 @@ const nextEntryPointConfigs = createEntryPointConfigs(
 export const eslintConfig = [
   ...createCommonConfigs("src/features"),
   ...libBoundaryConfigs,
+  ...pageBoundaryConfigs,
   ...namingConfigs,
   ...directivesConfigs,
   ...importPathStyleConfigs,
