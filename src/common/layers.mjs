@@ -39,7 +39,7 @@ export function createLayersConfigs(featureRoot) {
         ],
       },
     },
-    // Services: try-catch + logger
+    // Services: try-catch + logger + dead error fallbacks
     {
       name: "layers/services",
       files: [`${featureRoot}/**/services/*.ts`],
@@ -52,6 +52,18 @@ export function createLayersConfigs(featureRoot) {
               "try-catch is not allowed in services. Error handling belongs in actions.",
           },
           { selector: loggerSelector, message: loggerMessage },
+          {
+            selector:
+              "LogicalExpression[operator='??'][left.type='ChainExpression'][left.expression.property.name='message'][right.type='Literal']",
+            message:
+              "Dead fallback for error message. If you reached this branch the error is known — return the error directly. Unhandled exceptions belong in actions.",
+          },
+          {
+            selector:
+              "LogicalExpression[operator='??'][left.type='MemberExpression'][left.property.name='error'][right.type='ObjectExpression']",
+            message:
+              "Dead fallback for nullable error. Check `if (error)` and return the error directly. Unhandled exceptions belong in actions.",
+          },
         ],
       },
     },

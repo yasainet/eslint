@@ -102,6 +102,15 @@ const LIB_BOUNDARY_PATTERNS = [
   },
 ];
 
+const MAPPING_PATTERNS = [
+  {
+    group: ["@/utils/mapping.util"],
+    importNames: ["mapSnakeToCamel", "mapCamelToSnake"],
+    message:
+      "Mapping functions are only allowed in services. Snake/camel conversion belongs at the service boundary.",
+  },
+];
+
 const PAGE_BOUNDARY_PATTERNS = [
   {
     group: ["*/repositories/*", "*/repositories"],
@@ -138,7 +147,10 @@ export const pageBoundaryConfigs = [
   },
 ];
 
-/** Next.js-only: restrict @/lib imports to repositories. */
+/**
+ * Next.js-only: restrict @/lib imports and mapping imports outside features.
+ * Per-feature subdir rules live in createImportsConfigs to avoid clobbering each other.
+ */
 export const libBoundaryConfigs = [
   {
     name: "imports/lib-boundary",
@@ -148,11 +160,13 @@ export const libBoundaryConfigs = [
       "src/proxy.ts",
       "src/app/sitemap.ts",
       "src/app/**/route.ts",
-      "src/features/**/repositories/**",
-      "src/features/**/types/**",
+      "src/features/**",
     ],
     rules: {
-      "no-restricted-imports": ["error", { patterns: LIB_BOUNDARY_PATTERNS }],
+      "no-restricted-imports": [
+        "error",
+        { patterns: [...LIB_BOUNDARY_PATTERNS, ...MAPPING_PATTERNS] },
+      ],
     },
   },
 ];
@@ -192,6 +206,7 @@ export function createImportsConfigs(
       [`${featureRoot}/**/repositories/*.ts`],
       LAYER_PATTERNS.repositories,
       LATERAL_PATTERNS.repositories,
+      MAPPING_PATTERNS,
     ),
   );
 
@@ -205,6 +220,7 @@ export function createImportsConfigs(
         LAYER_PATTERNS.repositories,
         LATERAL_PATTERNS.repositories,
         patterns,
+        MAPPING_PATTERNS,
       ),
     );
   }
@@ -226,6 +242,7 @@ export function createImportsConfigs(
       LAYER_PATTERNS.actions,
       LATERAL_PATTERNS.actions,
       LIB_BOUNDARY_PATTERNS,
+      MAPPING_PATTERNS,
     ),
   );
 
@@ -234,8 +251,38 @@ export function createImportsConfigs(
       "utils",
       [`${featureRoot}/**/utils/*.ts`],
       LIB_BOUNDARY_PATTERNS,
+      MAPPING_PATTERNS,
     ),
   );
+
+  // Catch-all for feature subdirs without a per-layer config
+  // (constants, hooks, schemas). lib-boundary + mapping ban.
+  configs.push({
+    name: "imports/feature-other",
+    files: [`${featureRoot}/**/*.ts`],
+    ignores: [
+      `${featureRoot}/**/services/*.ts`,
+      `${featureRoot}/**/repositories/*.ts`,
+      `${featureRoot}/**/actions/*.ts`,
+      `${featureRoot}/**/utils/*.ts`,
+      `${featureRoot}/**/types/*.ts`,
+    ],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        { patterns: [...LIB_BOUNDARY_PATTERNS, ...MAPPING_PATTERNS] },
+      ],
+    },
+  });
+
+  // Types: mapping ban only. lib is allowed (Database/Tables type imports).
+  configs.push({
+    name: "imports/feature-types",
+    files: [`${featureRoot}/**/types/*.ts`],
+    rules: {
+      "no-restricted-imports": ["error", { patterns: MAPPING_PATTERNS }],
+    },
+  });
 
   for (const prefix of ["server", "client", "admin"]) {
     configs.push(
@@ -246,6 +293,7 @@ export function createImportsConfigs(
         LATERAL_PATTERNS.actions,
         CARDINALITY_PATTERNS[prefix],
         LIB_BOUNDARY_PATTERNS,
+        MAPPING_PATTERNS,
       ),
     );
   }
