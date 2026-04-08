@@ -9,7 +9,7 @@ export const namingConfigs = [
     rules: {
       "check-file/filename-naming-convention": [
         "error",
-        { "**/*.ts": "use[A-Z]*([a-zA-Z0-9])" },
+        { "**/*.ts": "use-+([a-z0-9])*(-+([a-z0-9]))" },
         { ignoreMiddleExtensions: true },
       ],
     },
