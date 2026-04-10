@@ -24,6 +24,17 @@ export const rulesConfigs = [
       "simple-import-sort/imports": "warn",
       "simple-import-sort/exports": "warn",
       "@stylistic/quotes": ["warn", "double", { avoidEscape: true }],
+      // Dead code detection: rules with no legitimate use case, so always safe to error.
+      "no-unreachable": "error",
+      "no-unreachable-loop": "error",
+      "no-useless-return": "error",
+      "no-constant-condition": "error",
+      "no-constant-binary-expression": "error",
+      "no-dupe-else-if": "error",
+      "no-self-assign": "error",
+      "no-self-compare": "error",
+      "no-useless-catch": "error",
+      "no-fallthrough": "error",
     },
   },
   {
