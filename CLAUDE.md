@@ -53,3 +53,7 @@ cd ~/Projects/<project> && npm install /tmp/yasainet-eslint-*.tgz
 # After testing, revert to the registry version
 npm install @yasainet/eslint@latest
 ```
+
+## TODO
+
+- Promote `@typescript-eslint/no-unnecessary-condition` from `warn` to `error` in `src/common/rules.mjs` once all consuming projects have 0 warnings. The rule aligns with the existing "Dead code detection: rules with no legitimate use case, so always safe to error." policy, but is kept at `warn` until legacy violations are cleaned up across projects.
