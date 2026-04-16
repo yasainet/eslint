@@ -42,6 +42,12 @@ export const rulesConfigs = [
     files: ["**/*.ts", "**/*.tsx"],
     languageOptions: {
       parser: tseslint.parser,
+      // Enable type-aware linting so rules like `no-unnecessary-condition`
+      // can consult the TypeScript type checker.
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: process.cwd(),
+      },
     },
     plugins: {
       "@typescript-eslint": tseslint.plugin,
@@ -60,6 +66,10 @@ export const rulesConfigs = [
         { prefer: "type-imports" },
       ],
       "@typescript-eslint/no-explicit-any": "warn",
+      // Detect defensive fallbacks on non-nullable values (e.g., `?? ''`
+      // on a non-null column). Kept at warn until existing violations are
+      // cleaned up across consuming projects; promote to error afterwards.
+      "@typescript-eslint/no-unnecessary-condition": "warn",
     },
   },
 ];
