@@ -60,6 +60,11 @@ export function createLayersConfigs(featureRoot) {
             message:
               "Loops are not allowed in repositories. Repositories should be thin CRUD wrappers — iteration belongs in services.",
           },
+          {
+            selector: "ThrowStatement",
+            message:
+              "throw is not allowed in repositories. Repositories must return Supabase's { data, error } shape as-is. Error handling belongs in actions.",
+          },
           { selector: loggerSelector, message: loggerMessage },
         ],
       },

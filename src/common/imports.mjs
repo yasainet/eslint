@@ -124,6 +124,32 @@ const PAGE_BOUNDARY_PATTERNS = [
   },
 ];
 
+const HOOKS_BOUNDARY_PATTERNS = [
+  {
+    group: ["*/repositories/*", "*/repositories"],
+    message:
+      "hooks can only import actions, not repositories (hooks-boundary violation)",
+  },
+  {
+    group: ["*/services/*", "*/services"],
+    message:
+      "hooks can only import actions, not services (hooks-boundary violation)",
+  },
+];
+
+const COMPONENTS_BOUNDARY_PATTERNS = [
+  {
+    group: ["*/repositories/*", "*/repositories"],
+    message:
+      "components can only import actions or hooks, not repositories (components-boundary violation)",
+  },
+  {
+    group: ["*/services/*", "*/services"],
+    message:
+      "components can only import actions or hooks, not services (components-boundary violation)",
+  },
+];
+
 function makeConfig(name, files, ...patternArrays) {
   const patterns = patternArrays.flat();
   if (patterns.length === 0) return null;
@@ -143,6 +169,31 @@ export const pageBoundaryConfigs = [
     files: ["src/app/**/page.tsx"],
     rules: {
       "no-restricted-imports": ["error", { patterns: PAGE_BOUNDARY_PATTERNS }],
+    },
+  },
+];
+
+/** Next.js-only: restrict hooks to only import actions (not repositories or services). */
+export const hooksBoundaryConfigs = [
+  {
+    name: "imports/hooks-boundary",
+    files: ["src/features/**/hooks/*.ts"],
+    rules: {
+      "no-restricted-imports": ["error", { patterns: HOOKS_BOUNDARY_PATTERNS }],
+    },
+  },
+];
+
+/** Next.js-only: restrict components to only import actions or hooks (not repositories or services). */
+export const componentsBoundaryConfigs = [
+  {
+    name: "imports/components-boundary",
+    files: ["src/components/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        { patterns: COMPONENTS_BOUNDARY_PATTERNS },
+      ],
     },
   },
 ];
