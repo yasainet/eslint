@@ -18,7 +18,7 @@ export function createLayersConfigs(featureRoot) {
         ],
       },
     },
-    // Repositories: try-catch + if + logger
+    // Repositories: try-catch + if + loops + logger
     {
       name: "layers/repositories",
       files: [`${featureRoot}/**/repositories/*.ts`],
@@ -34,6 +34,31 @@ export function createLayersConfigs(featureRoot) {
             selector: "IfStatement",
             message:
               "if statements are not allowed in repositories. Conditional logic belongs in services.",
+          },
+          {
+            selector: "ForStatement",
+            message:
+              "Loops are not allowed in repositories. Repositories should be thin CRUD wrappers — iteration belongs in services.",
+          },
+          {
+            selector: "ForOfStatement",
+            message:
+              "Loops are not allowed in repositories. Repositories should be thin CRUD wrappers — iteration belongs in services.",
+          },
+          {
+            selector: "ForInStatement",
+            message:
+              "Loops are not allowed in repositories. Repositories should be thin CRUD wrappers — iteration belongs in services.",
+          },
+          {
+            selector: "WhileStatement",
+            message:
+              "Loops are not allowed in repositories. Repositories should be thin CRUD wrappers — iteration belongs in services.",
+          },
+          {
+            selector: "DoWhileStatement",
+            message:
+              "Loops are not allowed in repositories. Repositories should be thin CRUD wrappers — iteration belongs in services.",
           },
           { selector: loggerSelector, message: loggerMessage },
         ],
