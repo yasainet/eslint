@@ -1,6 +1,27 @@
+import { existsSync } from "node:fs";
+import { dirname, join, sep } from "node:path";
+
 import tseslint from "typescript-eslint";
 
 import { simpleImportSortPlugin, stylistic } from "./plugins.mjs";
+
+// When evaluated under LSP servers like vscode-eslint, `process.cwd()` returns
+// the linted file's directory rather than the consumer's project root, so it
+// cannot be used to derive `tsconfigRootDir`. Walk up from this module until a
+// `tsconfig.json` outside of `node_modules` is found. Falls back to
+// `process.cwd()` for CLI parity if no such directory is reachable.
+const findProjectRoot = (start) => {
+  let dir = start;
+  while (dir !== dirname(dir)) {
+    if (!dir.split(sep).includes("node_modules") && existsSync(join(dir, "tsconfig.json"))) {
+      return dir;
+    }
+    dir = dirname(dir);
+  }
+  return process.cwd();
+};
+
+const projectRoot = findProjectRoot(import.meta.dirname);
 
 /** Base rule configs for code style and TypeScript checks. */
 export const rulesConfigs = [
@@ -46,7 +67,7 @@ export const rulesConfigs = [
       // can consult the TypeScript type checker.
       parserOptions: {
         projectService: true,
-        tsconfigRootDir: process.cwd(),
+        tsconfigRootDir: projectRoot,
       },
     },
     plugins: {
