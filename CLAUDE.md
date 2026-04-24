@@ -118,7 +118,7 @@ npm install @yasainet/eslint@latest
 
 #### Phase 2: 関数名の allow list 化（Rails 5 actions）🟡 協議中
 
-**Phase 1 で `handle*` 強制は既に撤廃済み**。Phase 2 では Rails 5 verbs を allow list として追加する。
+**Phase 1 で `handle*` 強制は既に撤廃済み**、かつ `scripts/migrate-handle-prefix.mjs` で既存コードからも prefix を削除済み（REDACTED では 30 関数 / 37 ファイル / 223 箇所を rename）。Phase 2 では Rails 5 verbs を allow list として追加する。
 
 **方針:**
 
