@@ -1,3 +1,5 @@
+import { localPlugin } from "./local-plugins/index.mjs";
+
 /** Scope layer rules to the given feature root. */
 export function createLayersConfigs(featureRoot) {
   const loggerSelector = "CallExpression[callee.object.name='logger']";
@@ -67,6 +69,20 @@ export function createLayersConfigs(featureRoot) {
           },
           { selector: loggerSelector, message: loggerMessage },
         ],
+      },
+    },
+    // Boundary type safety: repositories & services must not leak `any`
+    // into their public API. Uses type-aware inspection of the inferred
+    // return type so unannotated functions are still checked.
+    {
+      name: "layers/no-any-return",
+      files: [
+        `${featureRoot}/**/repositories/*.ts`,
+        `${featureRoot}/**/services/*.ts`,
+      ],
+      plugins: { local: localPlugin },
+      rules: {
+        "local/no-any-return": "error",
       },
     },
     // Services: try-catch + logger + dead error fallbacks

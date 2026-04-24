@@ -91,6 +91,19 @@ export const rulesConfigs = [
       // on a non-null column). Kept at warn until existing violations are
       // cleaned up across consuming projects; promote to error afterwards.
       "@typescript-eslint/no-unnecessary-condition": "warn",
+      // Type-aware async safety: silent await omissions are a leading cause
+      // of race conditions in server actions and background tasks.
+      "@typescript-eslint/no-floating-promises": "error",
+      "@typescript-eslint/no-misused-promises": "error",
+      "@typescript-eslint/await-thenable": "error",
+      "@typescript-eslint/require-await": "error",
+      // Type-aware `any` propagation checks: any が境界を越えた瞬間に
+      // 残りのコードで型検査が無効化されるため、検出したら確実に止める。
+      "@typescript-eslint/no-unsafe-assignment": "error",
+      "@typescript-eslint/no-unsafe-call": "error",
+      "@typescript-eslint/no-unsafe-member-access": "error",
+      "@typescript-eslint/no-unsafe-argument": "error",
+      "@typescript-eslint/no-unsafe-return": "error",
     },
   },
 ];
