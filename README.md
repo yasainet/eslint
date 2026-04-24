@@ -25,9 +25,9 @@ Each entry point enforces a feature-based architecture with the following conven
 ```text
 {featureRoot}/
 ├── {feature}/
-│   ├── actions/        # *.action.ts — entry points (handleXxx)
+│   ├── interactors/    # *.interactor.ts — entry points
 │   ├── services/       # *.service.ts — business logic
-│   ├── repositories/   # *.repo.ts — data access
+│   ├── queries/        # *.query.ts — data access
 │   ├── types/          # *.type.ts
 │   ├── schemas/        # *.schema.ts
 │   ├── utils/          # *.util.ts

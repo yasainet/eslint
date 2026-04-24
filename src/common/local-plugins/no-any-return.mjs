@@ -4,7 +4,7 @@ import ts from "typescript";
  * Exported function の return type が any を含んでいる場合に error:
  *
  * - typescript-eslint の type checker を使って inferred type まで見る
- * - repositories / services の API 境界を any 汚染から守ることで、domain shape が型で保証される
+ * - queries / services の API 境界を any 汚染から守ることで、domain shape が型で保証される
  * - Promise<any>, Promise<{ data: any }>, Array<any> など nested も展開して検査する
  */
 export const noAnyReturnRule = {

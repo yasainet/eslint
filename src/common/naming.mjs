@@ -52,10 +52,10 @@ export function createNamingConfigs(featureRoot, prefixLibMapping) {
   const servicePattern = prefixPattern
     ? `${prefixPattern}.service`
     : "*.service";
-  const repoPattern = prefixPattern ? `${prefixPattern}.repo` : "*.repo";
-  const actionPattern = prefixPattern
-    ? `${prefixPattern}.action`
-    : "*.action";
+  const queryPattern = prefixPattern ? `${prefixPattern}.query` : "*.query";
+  const interactorPattern = prefixPattern
+    ? `${prefixPattern}.interactor`
+    : "*.interactor";
 
   const configs = [];
 
@@ -91,14 +91,14 @@ export function createNamingConfigs(featureRoot, prefixLibMapping) {
       },
     },
     {
-      name: "naming/repositories",
-      files: featuresGlob(featureRoot, "**/repositories/*.ts"),
-      ignores: featuresGlob(featureRoot, "shared/repositories/*.ts"),
+      name: "naming/queries",
+      files: featuresGlob(featureRoot, "**/queries/*.ts"),
+      ignores: featuresGlob(featureRoot, "shared/queries/*.ts"),
       plugins: { "check-file": checkFile },
       rules: {
         "check-file/filename-naming-convention": [
           "error",
-          { "**/*.ts": repoPattern },
+          { "**/*.ts": queryPattern },
         ],
       },
     },
@@ -117,13 +117,13 @@ export function createNamingConfigs(featureRoot, prefixLibMapping) {
       },
     },
     {
-      name: "naming/repositories-shared",
-      files: featuresGlob(featureRoot, "shared/repositories/*.ts"),
+      name: "naming/queries-shared",
+      files: featuresGlob(featureRoot, "shared/queries/*.ts"),
       plugins: { "check-file": checkFile },
       rules: {
         "check-file/filename-naming-convention": [
           "error",
-          { "**/*.ts": `${sharedPrefixPattern}.repo` },
+          { "**/*.ts": `${sharedPrefixPattern}.query` },
         ],
       },
     },
@@ -237,51 +237,28 @@ export function createNamingConfigs(featureRoot, prefixLibMapping) {
   );
 
   configs.push({
-    name: "naming/actions",
-    files: featuresGlob(featureRoot, "**/actions/*.ts"),
-    ignores: featuresGlob(featureRoot, "shared/actions/*.ts"),
+    name: "naming/interactors",
+    files: featuresGlob(featureRoot, "**/interactors/*.ts"),
+    ignores: featuresGlob(featureRoot, "shared/interactors/*.ts"),
     plugins: { "check-file": checkFile },
     rules: {
       "check-file/filename-naming-convention": [
         "error",
-        { "**/*.ts": actionPattern },
+        { "**/*.ts": interactorPattern },
       ],
     },
   });
 
   configs.push(
     {
-      name: "naming/actions-shared",
-      files: featuresGlob(featureRoot, "shared/actions/*.ts"),
+      name: "naming/interactors-shared",
+      files: featuresGlob(featureRoot, "shared/interactors/*.ts"),
       plugins: { "check-file": checkFile },
       rules: {
         "check-file/filename-naming-convention": [
           "error",
-          { "**/*.ts": `${sharedPrefixPattern}.action` },
+          { "**/*.ts": `${sharedPrefixPattern}.interactor` },
         ],
-      },
-    },
-    {
-      name: "naming/actions-export",
-      files: featuresGlob(featureRoot, "**/actions/*.ts"),
-      rules: {
-        "no-restricted-syntax": [
-          "error",
-          {
-            selector:
-              "ExportNamedDeclaration > FunctionDeclaration[id.name!=/^handle[A-Z]/]",
-            message:
-              "Exported functions in actions must start with 'handle' (e.g., handleGetComics).",
-          },
-        ],
-      },
-    },
-    {
-      name: "naming/actions-handle-service",
-      files: featuresGlob(featureRoot, "**/actions/*.ts"),
-      plugins: { local: localPlugin },
-      rules: {
-        "local/action-handle-service": "error",
       },
     },
     {

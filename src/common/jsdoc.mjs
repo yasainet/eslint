@@ -8,7 +8,7 @@ export function createJsdocConfigs(featureRoot) {
     {
       name: "jsdoc",
       files: [
-        ...featuresGlob(featureRoot, "**/repositories/*.ts"),
+        ...featuresGlob(featureRoot, "**/queries/*.ts"),
         ...featuresGlob(featureRoot, "**/services*/*.ts"),
         ...featuresGlob(featureRoot, "**/utils*/*.ts"),
       ],

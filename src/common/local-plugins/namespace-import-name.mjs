@@ -7,10 +7,10 @@
 
 /** @type {Record<string, string>} */
 const LAYER_MAP = {
-  repo: "Repository",
+  query: "Query",
   service: "Service",
   domain: "Domain",
-  action: "Action",
+  interactor: "Interactor",
   util: "Util",
   type: "Type",
   schema: "Schema",

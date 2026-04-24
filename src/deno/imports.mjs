@@ -10,7 +10,7 @@ export const denoImportsConfigs = [
     files: [`${FUNCTIONS_ROOT}/**/*.ts`],
     ignores: [
       `${FUNCTIONS_ROOT}/_lib/**`,
-      `${FEATURE_ROOT}/**/repositories/**`,
+      `${FEATURE_ROOT}/**/queries/**`,
       `${FEATURE_ROOT}/**/types/**`,
     ],
     rules: {
@@ -21,7 +21,7 @@ export const denoImportsConfigs = [
             {
               group: ["*/_lib/*", "*/_lib/**"],
               message:
-                "_lib/ can only be imported from repositories (lib-boundary violation)",
+                "_lib/ can only be imported from queries (lib-boundary violation)",
             },
           ],
         },
@@ -40,17 +40,17 @@ export const denoImportsConfigs = [
             {
               group: ["**/services/*", "**/services"],
               message:
-                "Entry points must not import services directly. Import from actions instead.",
+                "Entry points must not import services directly. Import from interactors instead.",
             },
             {
-              group: ["**/repositories/*", "**/repositories"],
+              group: ["**/queries/*", "**/queries"],
               message:
-                "Entry points must not import repositories directly. Import from actions instead.",
+                "Entry points must not import queries directly. Import from interactors instead.",
             },
             {
               group: ["*/_lib/*", "*/_lib/**"],
               message:
-                "Entry points must not import _lib/ directly. Import from actions instead.",
+                "Entry points must not import _lib/ directly. Import from interactors instead.",
             },
           ],
         },

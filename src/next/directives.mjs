@@ -1,43 +1,45 @@
 /** Enforce "use server" / "use client" directives per file convention. */
 export const directivesConfigs = [
   {
-    name: "directives/server-action",
-    files: ["src/features/**/actions/server.action.ts"],
+    name: "directives/server-interactor",
+    files: ["src/features/**/interactors/server.interactor.ts"],
     rules: {
       "no-restricted-syntax": [
         "error",
         {
           selector:
             "Program > :first-child:not(ExpressionStatement[expression.value='use server'])",
-          message: 'server.action.ts must start with "use server" directive.',
+          message:
+            'server.interactor.ts must start with "use server" directive.',
         },
       ],
     },
   },
   {
-    name: "directives/admin-action",
-    files: ["src/features/**/actions/admin.action.ts"],
+    name: "directives/admin-interactor",
+    files: ["src/features/**/interactors/admin.interactor.ts"],
     rules: {
       "no-restricted-syntax": [
         "error",
         {
           selector:
             "Program > :first-child:not(ExpressionStatement[expression.value='use server'])",
-          message: 'admin.action.ts must start with "use server" directive.',
+          message:
+            'admin.interactor.ts must start with "use server" directive.',
         },
       ],
     },
   },
   {
-    name: "directives/client-action",
-    files: ["src/features/**/actions/client.action.ts"],
+    name: "directives/client-interactor",
+    files: ["src/features/**/interactors/client.interactor.ts"],
     rules: {
       "no-restricted-syntax": [
         "error",
         {
           selector: "ExpressionStatement[expression.value='use server']",
           message:
-            'client.action.ts must NOT have "use server" directive. It uses @/lib/supabase/client.',
+            'client.interactor.ts must NOT have "use server" directive. It uses @/lib/supabase/client.',
         },
       ],
     },

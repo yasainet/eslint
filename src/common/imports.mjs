@@ -1,46 +1,46 @@
 const LAYER_PATTERNS = {
-  repositories: [
+  queries: [
     {
       group: ["*/services/*", "*/services"],
-      message: "repositories cannot import services (layer violation)",
+      message: "queries cannot import services (layer violation)",
     },
     {
-      group: ["*/actions/*", "*/actions"],
-      message: "repositories cannot import actions (layer violation)",
+      group: ["*/interactors/*", "*/interactors"],
+      message: "queries cannot import interactors (layer violation)",
     },
     {
       group: ["*/hooks/*", "*/hooks"],
-      message: "repositories cannot import hooks (layer violation)",
+      message: "queries cannot import hooks (layer violation)",
     },
   ],
   services: [
     {
-      group: ["*/actions/*", "*/actions"],
-      message: "services cannot import actions (layer violation)",
+      group: ["*/interactors/*", "*/interactors"],
+      message: "services cannot import interactors (layer violation)",
     },
     {
       group: ["*/hooks/*", "*/hooks"],
       message: "services cannot import hooks (layer violation)",
     },
   ],
-  actions: [
+  interactors: [
     {
-      group: ["*/repositories/*", "*/repositories"],
-      message: "actions cannot import repositories (layer violation)",
+      group: ["*/queries/*", "*/queries"],
+      message: "interactors cannot import queries (layer violation)",
     },
     {
       group: ["*/hooks/*", "*/hooks"],
-      message: "actions cannot import hooks (layer violation)",
+      message: "interactors cannot import hooks (layer violation)",
     },
   ],
 };
 
 const LATERAL_PATTERNS = {
-  repositories: [
+  queries: [
     {
-      group: ["@/features/*/repositories/*", "@/features/*/repositories"],
+      group: ["@/features/*/queries/*", "@/features/*/queries"],
       message:
-        "repositories cannot import other feature's repositories (lateral violation)",
+        "queries cannot import other feature's queries (lateral violation)",
     },
   ],
   services: [
@@ -50,11 +50,11 @@ const LATERAL_PATTERNS = {
         "services cannot import other feature's services (lateral violation)",
     },
   ],
-  actions: [
+  interactors: [
     {
-      group: ["@/features/*/actions/*", "@/features/*/actions"],
+      group: ["@/features/*/interactors/*", "@/features/*/interactors"],
       message:
-        "actions cannot import other feature's actions (lateral violation)",
+        "interactors cannot import other feature's interactors (lateral violation)",
     },
   ],
 };
@@ -64,21 +64,21 @@ const CARDINALITY_PATTERNS = {
     {
       group: ["**/services/client.service*", "**/services/admin.service*"],
       message:
-        "server.action can only import server.service (cardinality violation)",
+        "server.interactor can only import server.service (cardinality violation)",
     },
   ],
   client: [
     {
       group: ["**/services/server.service*", "**/services/admin.service*"],
       message:
-        "client.action can only import client.service (cardinality violation)",
+        "client.interactor can only import client.service (cardinality violation)",
     },
   ],
   admin: [
     {
       group: ["**/services/server.service*", "**/services/client.service*"],
       message:
-        "admin.action can only import admin.service (cardinality violation)",
+        "admin.interactor can only import admin.service (cardinality violation)",
     },
   ],
 };
@@ -90,7 +90,7 @@ function prefixLibPatterns(prefix, mapping) {
     .filter((p) => p !== prefix)
     .map((p) => ({
       group: [`**/lib/${mapping[p]}`, `**/lib/${mapping[p]}/*`],
-      message: `${prefix}.repo.ts can only import from lib/${allowedLib}. Use the correct repository file for this lib.`,
+      message: `${prefix}.query.ts can only import from lib/${allowedLib}. Use the correct query file for this lib.`,
     }));
 }
 
@@ -98,7 +98,7 @@ const LIB_BOUNDARY_PATTERNS = [
   {
     group: ["@/lib/*", "@/lib/**"],
     message:
-      "lib/* can only be imported from repositories (lib-boundary violation)",
+      "lib/* can only be imported from queries (lib-boundary violation)",
   },
 ];
 
@@ -113,40 +113,40 @@ const MAPPING_PATTERNS = [
 
 const PAGE_BOUNDARY_PATTERNS = [
   {
-    group: ["*/repositories/*", "*/repositories"],
+    group: ["*/queries/*", "*/queries"],
     message:
-      "page.tsx can only import actions, not repositories (page-boundary violation)",
+      "page.tsx can only import interactors, not queries (page-boundary violation)",
   },
   {
     group: ["*/services/*", "*/services"],
     message:
-      "page.tsx can only import actions, not services (page-boundary violation)",
+      "page.tsx can only import interactors, not services (page-boundary violation)",
   },
 ];
 
 const HOOKS_BOUNDARY_PATTERNS = [
   {
-    group: ["*/repositories/*", "*/repositories"],
+    group: ["*/queries/*", "*/queries"],
     message:
-      "hooks can only import actions, not repositories (hooks-boundary violation)",
+      "hooks can only import interactors, not queries (hooks-boundary violation)",
   },
   {
     group: ["*/services/*", "*/services"],
     message:
-      "hooks can only import actions, not services (hooks-boundary violation)",
+      "hooks can only import interactors, not services (hooks-boundary violation)",
   },
 ];
 
 const COMPONENTS_BOUNDARY_PATTERNS = [
   {
-    group: ["*/repositories/*", "*/repositories"],
+    group: ["*/queries/*", "*/queries"],
     message:
-      "components can only import actions or hooks, not repositories (components-boundary violation)",
+      "components can only import interactors or hooks, not queries (components-boundary violation)",
   },
   {
     group: ["*/services/*", "*/services"],
     message:
-      "components can only import actions or hooks, not services (components-boundary violation)",
+      "components can only import interactors or hooks, not services (components-boundary violation)",
   },
 ];
 
@@ -162,7 +162,7 @@ function makeConfig(name, files, ...patternArrays) {
   };
 }
 
-/** Next.js-only: restrict page.tsx to only import actions. */
+/** Next.js-only: restrict page.tsx to only import interactors. */
 export const pageBoundaryConfigs = [
   {
     name: "imports/page-boundary",
@@ -173,7 +173,7 @@ export const pageBoundaryConfigs = [
   },
 ];
 
-/** Next.js-only: restrict hooks to only import actions (not repositories or services). */
+/** Next.js-only: restrict hooks to only import interactors (not queries or services). */
 export const hooksBoundaryConfigs = [
   {
     name: "imports/hooks-boundary",
@@ -184,7 +184,7 @@ export const hooksBoundaryConfigs = [
   },
 ];
 
-/** Next.js-only: restrict components to only import actions or hooks (not repositories or services). */
+/** Next.js-only: restrict components to only import interactors or hooks (not queries or services). */
 export const componentsBoundaryConfigs = [
   {
     name: "imports/components-boundary",
@@ -253,10 +253,10 @@ export function createImportsConfigs(
 
   configs.push(
     makeConfig(
-      "repositories",
-      [`${featureRoot}/**/repositories/*.ts`],
-      LAYER_PATTERNS.repositories,
-      LATERAL_PATTERNS.repositories,
+      "queries",
+      [`${featureRoot}/**/queries/*.ts`],
+      LAYER_PATTERNS.queries,
+      LATERAL_PATTERNS.queries,
       MAPPING_PATTERNS,
     ),
   );
@@ -266,10 +266,10 @@ export function createImportsConfigs(
     if (patterns.length === 0) continue;
     configs.push(
       makeConfig(
-        `repositories/${prefix}`,
-        [`${featureRoot}/**/repositories/${prefix}.repo.ts`],
-        LAYER_PATTERNS.repositories,
-        LATERAL_PATTERNS.repositories,
+        `queries/${prefix}`,
+        [`${featureRoot}/**/queries/${prefix}.query.ts`],
+        LAYER_PATTERNS.queries,
+        LATERAL_PATTERNS.queries,
         patterns,
         MAPPING_PATTERNS,
       ),
@@ -288,10 +288,10 @@ export function createImportsConfigs(
 
   configs.push(
     makeConfig(
-      "actions",
-      [`${featureRoot}/**/actions/*.ts`],
-      LAYER_PATTERNS.actions,
-      LATERAL_PATTERNS.actions,
+      "interactors",
+      [`${featureRoot}/**/interactors/*.ts`],
+      LAYER_PATTERNS.interactors,
+      LATERAL_PATTERNS.interactors,
       LIB_BOUNDARY_PATTERNS,
       MAPPING_PATTERNS,
     ),
@@ -313,8 +313,8 @@ export function createImportsConfigs(
     files: [`${featureRoot}/**/*.ts`],
     ignores: [
       `${featureRoot}/**/services/*.ts`,
-      `${featureRoot}/**/repositories/*.ts`,
-      `${featureRoot}/**/actions/*.ts`,
+      `${featureRoot}/**/queries/*.ts`,
+      `${featureRoot}/**/interactors/*.ts`,
       `${featureRoot}/**/utils/*.ts`,
       `${featureRoot}/**/types/*.ts`,
     ],
@@ -338,10 +338,10 @@ export function createImportsConfigs(
   for (const prefix of ["server", "client", "admin"]) {
     configs.push(
       makeConfig(
-        `actions/${prefix}`,
-        [`${featureRoot}/**/actions/${prefix}.action.ts`],
-        LAYER_PATTERNS.actions,
-        LATERAL_PATTERNS.actions,
+        `interactors/${prefix}`,
+        [`${featureRoot}/**/interactors/${prefix}.interactor.ts`],
+        LAYER_PATTERNS.interactors,
+        LATERAL_PATTERNS.interactors,
         CARDINALITY_PATTERNS[prefix],
         LIB_BOUNDARY_PATTERNS,
         MAPPING_PATTERNS,
