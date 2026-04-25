@@ -75,7 +75,7 @@ npm install @yasainet/eslint@latest
 ### 3 層命名刷新（段階実装 - 2026-04-25 更新）
 
 > [!NOTE]
-> 3 フェーズで段階的に実装する。Phase 1 は決定、Phase 2 は協議中、Phase 3 は未着手。
+> Phase 1 ✅ 完了 / Phase 2 🟡 協議中 / Phase 3 🔴 未着手。Phase 2/3 は **下記の選択肢一覧から決定して進める**。
 
 #### 背景
 
@@ -84,7 +84,17 @@ npm install @yasainet/eslint@latest
 - 名前は LLM への指示である。コードの**位置（どの層にあるか）が意図を表す最大の装置**になるので、名前は「響き」ではなく「LLM が誤解せず、lint が縛りきれるか」で決める
 - Rails から借りるのは **community pattern (thin)** であり **core 用語 (fat)** ではない。Rails core (Model, Controller) は fat で yasainet の thin layer と合わない
 
-#### Phase 1: ディレクトリ名・ファイル名 + `handle*` prefix 撤廃 ✅ 実装済 (2026-04-25)
+#### Phase 1: ディレクトリ名・ファイル名 + `handle*` prefix 撤廃 ✅ 完了 (2026-04-25)
+
+**実装ステータス:**
+
+- ✅ `@yasainet/eslint` v0.0.51 publish 済（GitHub Actions 経由で npm publish 完了）
+- ✅ migration scripts: `~/Projects/eslint/scripts/migrate-phase1.mjs`, `~/Projects/eslint/scripts/migrate-handle-prefix.mjs`
+- ✅ REDACTED で dogfood 完了（preview branch に 3 commits split: rename / handle 撤廃 / lint cleanup）
+- 🟡 他 consuming project（catch, pornfusion, chuchu, oyatsu 等）への展開待ち
+  - 各 PJ で `node ~/Projects/eslint/scripts/migrate-phase1.mjs --apply` を実行
+  - features root が複数ある場合は `--dir scripts/features` 等で追加実行
+  - その後 `node ~/Projects/eslint/scripts/migrate-handle-prefix.mjs --apply`
 
 | 旧              | 新                | 変更    | 根拠                                                         |
 | --------------- | ----------------- | ------- | ------------------------------------------------------------ |
@@ -116,100 +126,168 @@ npm install @yasainet/eslint@latest
 - `actions/` → `interactors/`: `client.action.ts` が Server Action ではないという「嘘」状態を解消。`handlers/` + `handle*` prefix も最終候補だったが、Phase 2 で prefix 撤廃が決まったためディレクトリ名の根拠（韻）が消失。結果 `interactors/` に収束
 - **Rails core 用語 (`models/`, `controllers/`) は fat の連想で命名トラップになる**ため回避。community pattern (thin) に揃える
 
-#### Phase 2: 関数名の allow list 化（Rails 5 actions）🟡 協議中
+#### Phase 2: 関数名の allow list 化 🟡 協議中
 
-**Phase 1 で `handle*` 強制は既に撤廃済み**、かつ `scripts/migrate-handle-prefix.mjs` で既存コードからも prefix を削除済み（REDACTED では 30 関数 / 37 ファイル / 223 箇所を rename）。Phase 2 では Rails 5 verbs を allow list として追加する。
+**前提（既決事項）:**
 
-**方針:**
+- `handle*` prefix は Phase 1 で完全撤廃済（lint ルール削除 + 既存コードからも削除）
+- 現状の REDACTED interactor 関数名は `getComics()`, `signIn()`, `searchComics()` 等の動詞のみ
+- Phase 2 のゴール: **動詞の allow list を lint で強制し、3 層全てに適用する**
 
-- Rails 5 actions (`index / show / create / update / destroy`) を基軸に
-- auth は domain-specific verb (`signUp / signIn / signOut / current`)
-- custom action は Rails member / collection pattern (`pages`, `thumbnails`, `search`)
-- queries / services / interactors の 3 層で同じ関数名が並ぶことを許容（すでに queries ↔ services では実績あり）
+**ゴールの優先順位:**
 
-**関数名 allow list (ドラフト):**
+1. LLM 生成の予測可能性（同じ意味の関数を毎回同じ名前で生成）
+2. grep / nav の ergonomics
+3. Rails への思想的整合（必須ではない）
+
+---
+
+##### 論点 A: 動詞 allow list の方針
+
+| 案 | 例 | メリット | デメリット |
+|---|---|---|---|
+| **A1: Rails literal** | `index / show / create / update / destroy` | Rails 完全一致、最も予測可能 | `index` は JS で混同、`destroy` は JS 慣習と異なる、現状コードと乖離大 |
+| **A2: TS idiomatic** ⭐ | `getX / createX / updateX / deleteX` | TS/JS 慣習、grep しやすい、REDACTED 現状とほぼ一致 | Rails 純度は薄い |
+| **A3: 混合** | `index/show` + `create/update/delete` | 折衷 | 一貫性なし |
+
+**推し: A2（TS idiomatic）**。REDACTED で既に動いており migration コストゼロ。
+
+##### 論点 B: index/list variant の表現方法
+
+`getComicsByCircle`, `getComicsByCirclePaginated` のようなフィルタ・ページネーション付き取得をどう書くか。
+
+| 案 | 例 | メリット | デメリット |
+|---|---|---|---|
+| **B1: メソッド分化** ⭐ | `getComics()`, `getComicsByCircle(circle)`, `getComicsByCirclePaginated(circle, page, pageSize)` | 戻り値型がシンプル、LLM 予測可能性高い、REDACTED 現状 | 関数数が多い |
+| **B2: options 集約** | `getComics({ circle?, author?, tag?, page?, pageSize? })` | 関数数最小、Rails controller 風 | 戻り値型が条件付き、option 組み合わせを LLM が誤用するリスク |
+| **B3: 混合** | 基本は分化、ページネーションだけ options | ページネーションが optional として自然 | 一貫性なし |
+
+**推し: B1（分化、現状維持）**。LLM の予測可能性を最優先。
+
+##### 論点 C: auth の「現在のユーザー取得」関数名
+
+REDACTED の `auth/interactors/client.interactor.ts` で `getUser()` として実装中。意味が曖昧（ID 指定の getUser と紛らわしい）なので変えたい。
+
+| 案 | 例 | 根拠 |
+|---|---|---|
+| **C1: `current()`** | `await authClientInteractor.current()` | 「現在のユーザー」を明示、Rails-like |
+| **C2: `me()`** ⭐ | `await authClientInteractor.me()` | GitHub API / Twitter API の `/me` endpoint 慣習、短い |
+| **C3: `getCurrentUser()`** | 説明的 | 長い、prefix 撤廃方針と矛盾 |
+| **C4: 現状 `getUser()` 維持** | 現状 | ID 指定の `getUser(id)` と紛らわしい |
+
+**推し: C2（`me`）**。短く、業界慣習に沿う。
+
+##### 論点 D: property 別 update の扱い
+
+Rails には存在しないパターン（`update(params)` 一本）だが、UX 要件で `updateShopName(input)`, `updateBasePrice(input)` のように分離したい場合がある。
+
+| 案 | メリット | デメリット |
+|---|---|---|
+| **D1: 完全禁止**（`update(input)` 一本） | Rails 純度 | UX 上「name のみ更新」UI が冗長になる |
+| **D2: allow list で許可** ⭐ | UX 要件に沿う、実装コスト低 | 関数数が増える |
+| **D3: JSDoc で意図明示**（lint は許可） | 妥協案 | lint が緩くなる |
+
+**推し: D2**。UX 要件は無視できない。
+
+##### 論点 E: lint 正規表現の最終形
+
+A2（TS idiomatic）+ B1（分化）+ C2（me）+ D2 を採用した場合のドラフト:
 
 ```js
-const CORE_VERBS = /^(index|show|create|update|destroy)$/;
-const INDEX_FAMILY = /^index[A-Z][a-zA-Z]*$/; // indexByCircle, indexPaginated
-const AUTH_VERBS = /^(signUp|signIn|signOut|current|me)$/;
-const CUSTOM_ACTIONS = /^[a-z][a-zA-Z]*$/; // search, pages, thumbnails
+// 3 層共通の allow list (queries / services / interactors)
+const CRUD_VERBS = /^(get|create|update|delete)/;     // get, getX, getXById, getXBy*, getX*Paginated, etc.
+const AUTH_VERBS = /^(signUp|signIn|signOut|me)$/;    // 完全一致
+const CUSTOM_ACTIONS = /^(search|toggle|process|cleanup|checkDiff|notify|charge|send|refund|subscribe)/;  // 拡張可能リスト
 ```
 
-**現状から新命名へのマッピング (REDACTED の 3 feature で検証済):**
+REDACTED の現状関数名（一部抜粋）はこの正規表現で全てパス:
 
-`auth/interactors/server.interactor.ts`:
+- `getComics`, `getComicById`, `getComicsByCircle`, `getComicsByCirclePaginated`, `getAllComics` → `CRUD_VERBS` (`get`)
+- `createComment`, `createContact` → `CRUD_VERBS` (`create`)
+- `signUp`, `signIn`, `signOut` → `AUTH_VERBS`
+- `searchComics`, `toggleLike`, `processUrl`, `cleanup`, `checkDiff` → `CUSTOM_ACTIONS`
+- `getUser` (auth current) → C2 採用なら `me` に rename
 
-- `handleSignUp` → `signUp`
-- `handleSignIn` → `signIn`
-- `handleSignOut` → `signOut`
+---
 
-`auth/interactors/client.interactor.ts`:
+##### Phase 2 実装ステップ（決定後）
 
-- `handleGetUser` → `current` (または `me`)
-
-`users/interactors/server.interactor.ts`:
-
-- `handleGetUserById` → `show`
-
-`comics/interactors/server.interactor.ts`:
-
-- `handleGetComics` → `index`
-- `handleGetComicsPaginated` → `indexPaginated`
-- `handleGetComicsByCircle` → `indexByCircle`
-- `handleGetComicsByCirclePaginated` → `indexByCirclePaginated`
-- `handleGetComicsByAuthor` → `indexByAuthor`
-- `handleGetComicsByAuthorPaginated` → `indexByAuthorPaginated`
-- `handleGetComicsByAuthors` → `indexByAuthors`
-- `handleGetComicsByTag` → `indexByTag`
-- `handleGetComicsByTagPaginated` → `indexByTagPaginated`
-- `handleGetAllComics` → `indexAll`
-- `handleGetComicById` → `show`
-- `handleGetComicPages` → `pages` (member custom action)
-- `handleGetComicThumbnails` → `thumbnails` (collection custom action)
-
-`comics/interactors/client.interactor.ts`:
-
-- `handleSearchComics` → `search` (collection custom action)
-
-**協議中の論点:**
-
-- [ ] `index` variant の表現: `indexByX` 族 vs options 集約 (`index({ by, value })`)
-  - 推し: `indexByX` 族（LLM 生成の予測可能性優先、戻り値型が単純）
-  - 対立: options 集約（Rails 純度最高、関数数最小、条件付き型が複雑化）
-- [ ] `current` vs `me`（auth の「現在のユーザー取得」関数名）
-- [ ] 動詞 allow list に `fetch`, `list`, `find` を含めるか（推し: 含めない、Rails verbs に統一）
-- [ ] property 別 update (`handleUpdateShopName` 等) の扱い（既存 TODO 参照）
+1. `@yasainet/eslint` に lint ルール追加: `naming/queries-export`, `naming/services-export`, `naming/interactors-export`（同じ allow list を 3 層に適用）
+2. v0.0.52 として publish
+3. consuming project で違反検出 → 必要なら個別 rename
+4. REDACTED で C2 採用なら `getUser` → `me` を rename
 
 #### Phase 3: 外部サービス対応 🔴 未着手
 
-**背景:**
+**前提（既存システムで担保済み）:**
 
-- `queries/` (= 旧 repositories/) は Supabase への to/from を前提にしている
-- しかし実際には **Resend (メール送信), Stripe (決済), Discord (通知) など「to only / from only」の外部サービス**も存在する
-- 厳密には "query" とは呼びにくい（メール送信は create / send）
-- ただし SQL 文脈では INSERT も "query" なので、`create` / `send` 動詞として `queries/` に含めるのは整合可能
+- `queries/` は既に Supabase 専用ではなく、`garage.query.ts` 等の S3 系を許容
+- `generatePrefixLibMapping` により `lib/X.lib.ts` を置けば自動で `queries/X.query.ts` が許可される
+- つまり**アーキテクチャ的には resend/stripe/discord も既に乗る**。残るのは「配置場所と命名 semantic」の整理
 
-**過去プロジェクトでの対応例（統一されていない）:**
+**過去プロジェクトでの揺れ（統一規約なし）:**
 
-- `pornfusion.com`: `features/shared/` に resend 関連コード
-- `chuchu`: `features/shared/` + `templates` 概念
+- `pornfusion.com`: `features/shared/` に resend 関連
+- `chuchu`: `features/shared/` + `templates/` 概念
 - `oyatsu`: `resend.util.ts` を utils に配置
-- 現状: プロジェクト毎に揺れ。統一規約がない
 
-**論点:**
+---
 
-- [ ] `queries/` に送信系 action を含めるか（例: `queries/resend.query.ts` の `send()` / `create()` 関数）
-- [ ] それとも別の概念 (`commands/`, `operations/`) として分離するか
-- [ ] templates の扱い（メール本文、Discord embed、Stripe invoice item 等）をどこに置くか
-- [ ] 既存の prefix システム（`{prefix}.query.ts` は `lib/{prefix}` 以外 import 不可）に乗せるか。`lib/resend.lib.ts` + `queries/resend.query.ts` の構造で統一可能か
-- [ ] 関数名 allow list を拡張するか（`send`, `notify`, `charge` 等を許容）
+##### 論点 A: 配置レイヤ
 
-**Phase 1/2 との関係:**
+| 案 | 例 | メリット | デメリット |
+|---|---|---|---|
+| **A1: queries/ に統合** ⭐ | `features/notifications/queries/resend.query.ts` の `send()` | アーキテクチャ一貫、prefix システム流用 | 「query」と "send email" が semantic に合わない |
+| **A2: 新レイヤ `commands/`** | `features/notifications/commands/resend.command.ts` の `send()` | CQRS 風、semantic 純度 | レイヤ増（4 層に）、ESLint 追加コスト |
+| **A3: shared/ に集約** | `features/shared/queries/resend.query.ts` | 横断利用に対応 | shared が肥大 |
+| **A4: utils/ 配置** | `utils/resend.util.ts` | 軽量 | 層構造を回避する誘惑 |
 
-- 現時点で `queries/` は Supabase 専用ではなく、既に `garage.query.ts` 等の S3 系を許容している（`generatePrefixLibMapping` で自動派生）
-- したがって `resend.query.ts` / `stripe.query.ts` を追加すること自体はアーキテクチャ的に整合する
-- 問題は「関数名と責務の semantic」。Phase 2 の関数名規則（index/show/create/update/destroy）が resend に馴染むか検証が必要
+**推し: A1（queries/ 統合）**。queries の意味を「外部データソースとの 1 リクエスト」と再定義すれば semantic 整合。レイヤ数を増やさない。
+
+##### 論点 B: feature の切り方
+
+| 案 | 例 | メリット | デメリット |
+|---|---|---|---|
+| **B1: 専用 feature** ⭐ | `features/notifications/` (resend, discord), `features/payments/` (stripe) | ドメイン分離明確、拡張性 | サービスごとに feature が増える |
+| **B2: shared に集約** | `features/shared/queries/resend.query.ts` 等 | 1 箇所 | shared 肥大 |
+| **B3: 使う feature 内に配置** | `features/users/queries/resend.query.ts` (パスワードリセット用) | 利用箇所と近い | 重複リスク |
+
+**推し: B1（専用 feature）**。`notifications`, `payments`, `notifications/discord` 等で feature 化。
+
+##### 論点 C: templates の扱い
+
+メール本文・Discord embed・Stripe invoice item 等のテンプレート。
+
+| 案 | 例 |
+|---|---|
+| **C1: types/ 配置** | `features/notifications/types/templates.type.ts` |
+| **C2: 新 templates/ ディレクトリ** ⭐ | `features/notifications/templates/welcome.template.tsx` |
+| **C3: constants/ 配置** | `features/notifications/constants/templates.constant.ts` |
+| **C4: interactors にインライン** | テンプレートは個別関数の中で組み立て |
+
+**推し: C2（templates/ 専用ディレクトリ）**。chuchu の前例あり、React Email 使うなら .tsx になり types/ や constants/ には入れにくい。
+
+##### 論点 D: 関数名 allow list の拡張
+
+外部サービス向け動詞を Phase 2 の allow list にどう追加するか。
+
+| 案 | 例 |
+|---|---|
+| **D1: CRUD verbs 流用** | `createMessage()` for resend send |
+| **D2: 動詞追加** ⭐ | `send`, `notify`, `charge`, `refund`, `subscribe` を `CUSTOM_ACTIONS` に追加 |
+| **D3: サービス専用動詞**（個別管理） | resend: `send`, stripe: `charge/refund`, discord: `notify` |
+
+**推し: D2**。allow list が 10 程度に増えるが管理可能。
+
+---
+
+##### Phase 3 実装ステップ（決定後）
+
+1. `lib/` に `resend.lib.ts`, `stripe.lib.ts`, `discord.lib.ts` を配置（既存 prefix システムに乗る）
+2. 配置・命名規約を CLAUDE.md / README.md に明記
+3. 新 lint ルール追加（`templates/` ディレクトリの存在チェック等、必要なら）
+4. 一つの consuming project（pornfusion or chuchu）で dogfood
+5. 他に展開
 
 #### 責務の 1 行定義（Phase 1 決定版）
 
@@ -233,37 +311,6 @@ const CUSTOM_ACTIONS = /^[a-z][a-zA-Z]*$/; // search, pages, thumbnails
 | 関数名 prefix                 | なし    | なし     | なし (Phase 2)    |
 | 動詞 allow list               | ✅      | ✅       | ✅ (Phase 2)      |
 | `"use server"` ディレクティブ | N/A     | N/A      | server/admin のみ |
-
-#### 移行計画
-
-**Phase 1 実装 (ESLint 側):**
-
-1. `@yasainet/eslint` の全 lint ルールで名称変更:
-   - `repositories` → `queries` (glob, config name, error message)
-   - `actions` → `interactors`
-   - `*.repo` → `*.query` (check-file naming convention pattern)
-   - `*.action` → `*.interactor`
-2. backward compatibility 方針（**要決定**）:
-   - 案 A: 旧名称を廃止（破壊的変更、v1.0.0 でメジャーバンプ、consuming project は即時 migration）
-   - 案 B: 旧名称と新名称を両方許容する移行期間を設ける（実装複雑度↑）
-3. `handle*` prefix のルールは Phase 2 まで維持
-
-**Phase 1 実装 (consuming project 側):**
-
-1. migration script: directory rename + file rename + import path 書き換え
-2. REDACTED で dogfood → 他 consuming project へ展開
-
-**Phase 2 実装:**
-
-- `handle*` prefix 撤廃 (`naming/actions-export` ルール削除)
-- Rails 5 actions + auth verbs + custom action allow list を `naming/interactors-export` として追加
-- 関数名 migration script（AST ベース rename）
-
-**Phase 3 実装:**
-
-- `queries/` の意味論を外部サービスに拡張、または別 layer 追加
-- templates の配置規約
-- lib prefix システムの resend/stripe/discord 対応
 
 #### 補足: 3 層維持（`entities/` は導入しない）
 
