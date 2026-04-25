@@ -302,6 +302,17 @@ forceSettleLightningPurchase, disconnectLightning
   - `import type` は許容（`ComicInsert` 等の型再利用パターン）
   - value の named import のみ禁止
 
+- [x] **`@yasainet/eslint/deno` の type-aware ルールを opt-out 可能に**
+  - 背景: Deno files (Supabase Edge Functions) は consumer の `tsconfig.json` から exclude されており、`projectService: true` が parsing error を起こす。pornfusion.com で発覚
+  - `createCommonConfigs(featureRoot, { typeAware = true, rulesFiles })` を追加
+  - `deno` entry は `typeAware: false` + `rulesFiles: ["supabase/functions/**/*.ts"]` を渡す
+  - `typeAware: false` のとき:
+    - `parserOptions: { projectService: false, project: null }` で parsing error を回避
+    - type-aware ルール（`no-unnecessary-condition`/`no-floating-promises`/`no-unsafe-*` 等）を明示的に `off`
+    - `layers/no-any-return`（型情報が必要）も除外
+  - `rulesFiles` を narrow にすることで、`next` + `node` + `deno` を組み合わせても deno の override が他 entry の files を侵食しない
+  - consuming 側（pornfusion.com）の workaround 24 行を削除可能
+
 <details>
 <summary>削除した TODO（2026-04-25）</summary>
 
