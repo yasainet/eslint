@@ -88,9 +88,9 @@ export const rulesConfigs = [
       ],
       "@typescript-eslint/no-explicit-any": "warn",
       // Detect defensive fallbacks on non-nullable values (e.g., `?? ''`
-      // on a non-null column). Kept at warn until existing violations are
-      // cleaned up across consuming projects; promote to error afterwards.
-      "@typescript-eslint/no-unnecessary-condition": "warn",
+      // on a non-null column). Promoted to error once consuming projects
+      // (bitcomic.net, getpayme.net) reached 0 warnings.
+      "@typescript-eslint/no-unnecessary-condition": "error",
       // Type-aware async safety: silent await omissions are a leading cause
       // of race conditions in server actions and background tasks.
       "@typescript-eslint/no-floating-promises": "error",

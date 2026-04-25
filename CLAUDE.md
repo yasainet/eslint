@@ -175,10 +175,10 @@ const QUERIES_ALLOW = /^(get|create|update|delete|signUp|signIn|signOut)/;
 
 ##### 実証データ（2026-04-25）
 
-| PJ            | queries 関数数 | 違反数 | rename 例                                                                                  |
-| ------------- | --------------- | ------ | ------------------------------------------------------------------------------------------ |
-| bitcomic.net  | ~35             | 13     | `searchComics`→`getComicsByQuery`, `addLike`→`createLike`, `uploadImage`→`createImage` 等  |
-| getpayme.net  | ~48             | 0      | （rename 不要、最初から allow list 通過）                                                  |
+| PJ           | queries 関数数 | 違反数 | rename 例                                                                                 |
+| ------------ | -------------- | ------ | ----------------------------------------------------------------------------------------- |
+| bitcomic.net | ~35            | 13     | `searchComics`→`getComicsByQuery`, `addLike`→`createLike`, `uploadImage`→`createImage` 等 |
+| getpayme.net | ~48            | 0      | （rename 不要、最初から allow list 通過）                                                 |
 
 **示唆:**
 
@@ -197,12 +197,12 @@ const QUERIES_ALLOW = /^(get|create|update|delete|signUp|signIn|signOut)/;
 
 **実証された解決策（getpayme.net 2026-04-25）:**
 
-| 元論点                  | 状態        | 実例                                                          |
-| ----------------------- | ----------- | ------------------------------------------------------------- |
-| 論点 A: 配置レイヤ      | ✅ 解決     | `shared/queries/resend.query.ts`, `shared/queries/lnurl.query.ts` |
-| 論点 B: feature の切り方 | ✅ 解決     | `shared/queries/` で十分。専用 feature は不要                  |
-| 論点 D: 動詞 allow list | ✅ D1 採用 | `createEmail`, `createInvoice`, `getVerifyStatus` で CRUD 流用 |
-| 論点 C: templates の扱い | 🟡 未決    | React Email を採用する PJ が出たら再開                          |
+| 元論点                   | 状態       | 実例                                                              |
+| ------------------------ | ---------- | ----------------------------------------------------------------- |
+| 論点 A: 配置レイヤ       | ✅ 解決    | `shared/queries/resend.query.ts`, `shared/queries/lnurl.query.ts` |
+| 論点 B: feature の切り方 | ✅ 解決    | `shared/queries/` で十分。専用 feature は不要                     |
+| 論点 D: 動詞 allow list  | ✅ D1 採用 | `createEmail`, `createInvoice`, `getVerifyStatus` で CRUD 流用    |
+| 論点 C: templates の扱い | 🟡 未決    | React Email を採用する PJ が出たら再開                            |
 
 **残る作業（templates 採用時のみ）:**
 
@@ -270,46 +270,37 @@ forceSettleLightningPurchase, disconnectLightning
 
 #### 責務マトリクス（Phase 1 決定版）
 
-| 項目                          | queries | services | interactors       |
-| ----------------------------- | ------- | -------- | ----------------- |
-| try-catch                     | ❌      | ❌       | ✅                |
-| if 文                         | ❌      | ✅       | ✅                |
-| for/while                     | ❌      | ✅       | ✅                |
-| throw                         | ❌      | ❌       | ❌                |
-| logger                        | ❌      | ❌       | ✅                |
-| mapSnakeToCamel               | ❌      | ✅       | ❌                |
-| redirect                      | ❌      | ❌       | ✅                |
-| 他 feature の同層 import      | ❌      | ❌       | ❌                |
-| lib/\*.lib.ts 直接 import     | ✅      | ❌       | ❌                |
-| 関数名 prefix                 | なし    | なし     | なし              |
-| 動詞 allow list               | ✅ Phase 2 | ⏳ Phase 4 | ⏳ Phase 4    |
-| `"use server"` ディレクティブ | N/A     | N/A      | server/admin のみ |
-
-#### 補足: 3 層維持（`entities/` は導入しない）
-
-- 4 層は過剰。Fat Service に知識を集約する
-- `entities/` 導入の目安: `isPublished` / `isLikedBy` / `canEditBy` のような domain behavior が 5 個以上 service に散らばってきた時
-- 小規模なうちは types に JSDoc で業務ルールを書く程度で十分
-
----
+| 項目                          | queries    | services   | interactors       |
+| ----------------------------- | ---------- | ---------- | ----------------- |
+| try-catch                     | ❌         | ❌         | ✅                |
+| if 文                         | ❌         | ✅         | ✅                |
+| for/while                     | ❌         | ✅         | ✅                |
+| throw                         | ❌         | ❌         | ❌                |
+| logger                        | ❌         | ❌         | ✅                |
+| mapSnakeToCamel               | ❌         | ✅         | ❌                |
+| redirect                      | ❌         | ❌         | ✅                |
+| 他 feature の同層 import      | ❌         | ❌         | ❌                |
+| lib/\*.lib.ts 直接 import     | ✅         | ❌         | ❌                |
+| 関数名 prefix                 | なし       | なし       | なし              |
+| 動詞 allow list               | ✅ Phase 2 | ⏳ Phase 4 | ⏳ Phase 4        |
+| `"use server"` ディレクティブ | N/A        | N/A        | server/admin のみ |
 
 ### アクティブな TODO（2026-04-25 整理後）
 
 実装根拠が明確で、低コストで価値があるものに絞り込み済み。削除した TODO の判断履歴は git log を参照。
 
-- [ ] **`@typescript-eslint/no-unnecessary-condition` を `warn` から `error` に昇格**
-  - `src/common/rules.mjs` で定義
-  - 全 consuming project で warning 0 になってから昇格
+- [x] **`@typescript-eslint/no-unnecessary-condition` を `warn` から `error` に昇格** ✅ v0.0.53
+  - bitcomic.net / getpayme.net で warning 0 を確認後、`src/common/rules.mjs` で昇格
 
-- [ ] **`FormState` 型名を `{動詞}{対象}FormState` に統一**
-  - 現状: `SignInFormState`（動詞なし）, `UpdateShopNameFormState`, `CreateUserFormState`（動詞あり）の揺れ
-  - 実装: `TSInterfaceDeclaration` / `TSTypeAliasDeclaration` を AST 検査するカスタムルール
+- [x] **`FormState` 型名を `{動詞}{対象}FormState` に統一** ✅ v0.0.53
+  - `local/form-state-naming` ルール追加
+  - 単純な `^[A-Z][a-z]+[A-Z]\w*FormState$` で「2 PascalCase 単語以上 + FormState」を強制
+  - 動詞 allow list を持たないことで Phase 4 (services/interactors の動詞議論) を待たずに導入可能
 
-- [ ] **queries layer の import スタイルを namespace import に強制**
-  - 現状: `import * as` namespace と named import が混在
-  - 推奨: `import * as comicsServerQuery from "@/features/comics/queries/server.query"`
-  - 実装: `no-restricted-syntax` で `queries/*.query.ts` からの named import を禁止
-  - 既に `naming/namespace-import-name` で命名は強制済み。スタイルだけ追加すれば完成
+- [x] **queries layer の import スタイルを namespace import に強制** ✅ v0.0.53
+  - `local/queries-namespace-import` ルール追加
+  - `import type` は許容（`ComicInsert` 等の型再利用パターン）
+  - value の named import のみ禁止
 
 <details>
 <summary>削除した TODO（2026-04-25）</summary>

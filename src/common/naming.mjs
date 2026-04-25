@@ -110,6 +110,22 @@ export function createNamingConfigs(featureRoot, prefixLibMapping) {
         "local/queries-export": "error",
       },
     },
+    {
+      name: "naming/queries-namespace-import",
+      files: featuresGlob(featureRoot, "**/*.ts"),
+      plugins: { local: localPlugin },
+      rules: {
+        "local/queries-namespace-import": "error",
+      },
+    },
+    {
+      name: "naming/form-state",
+      files: featuresGlob(featureRoot, "**/*.ts"),
+      plugins: { local: localPlugin },
+      rules: {
+        "local/form-state-naming": "error",
+      },
+    },
   );
 
   configs.push(
