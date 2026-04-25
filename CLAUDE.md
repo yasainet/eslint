@@ -68,14 +68,10 @@ npm install @yasainet/eslint@latest
 
 ## TODO
 
-### 既存の TODO
-
-- `src/common/rules.mjs` の `@typescript-eslint/no-unnecessary-condition` を `warn` から `error` に昇格する。全 consuming project で warning が 0 になってから。
-
-### 3 層命名刷新（段階実装 - 2026-04-25 更新）
+### 3 層命名刷新（段階実装 - 2026-04-25 整理）
 
 > [!NOTE]
-> Phase 1 ✅ 完了 / Phase 2 🟡 協議中 / Phase 3 🔴 未着手。Phase 2/3 は **下記の選択肢一覧から決定して進める**。
+> Phase 1 ✅ 完了 / Phase 2 ✅ 完了 / Phase 3 🟢 大半解決済 / Phase 4 🔵 保留。アクティブな個別 TODO は本ファイル末尾を参照。
 
 #### 背景
 
@@ -125,7 +121,7 @@ npm install @yasainet/eslint@latest
 - `actions/` → `interactors/`: `client.action.ts` が Server Action ではないという「嘘」状態を解消。`handlers/` + `handle*` prefix も最終候補だったが、Phase 2 で prefix 撤廃が決まったためディレクトリ名の根拠（韻）が消失。結果 `interactors/` に収束
 - **Rails core 用語 (`models/`, `controllers/`) は fat の連想で命名トラップになる**ため回避。community pattern (thin) に揃える
 
-#### Phase 2: 関数名の allow list 化（queries 限定） 🟡 実装中
+#### Phase 2: 関数名の allow list 化（queries 限定） ✅ 完了 (2026-04-25)
 
 **前提（既決事項）:**
 
@@ -171,15 +167,24 @@ const QUERIES_ALLOW = /^(get|create|update|delete|signUp|signIn|signOut)/;
 
 ##### Phase 2 実装ステップ
 
-1. ✅ CLAUDE.md 更新（本書）
-2. 🟡 `@yasainet/eslint` に AST ルール `naming/queries-export` を追加
-   - `queries/*.query.ts` の `export (async )?function {name}` を AST 検査
-   - allow list に違反すれば error
-3. 🟡 `naming.mjs` の `createNamingConfigs` から新ルールを呼び出す
-4. 🟡 v0.0.52 として publish
-5. 🟡 bitcomic.net で dogfood
-   - 既知の違反候補: `addLike`, `removeLike`, `searchComics`
-   - rename 方針はユーザー協議
+1. ✅ CLAUDE.md 更新
+2. ✅ `@yasainet/eslint` に AST ルール `naming/queries-export` を追加
+3. ✅ `naming.mjs` の `createNamingConfigs` から新ルールを呼び出す
+4. ✅ v0.0.52 として publish
+5. ✅ bitcomic.net で dogfood (13 関数 rename, lint/type-check/build pass)
+
+##### 実証データ（2026-04-25）
+
+| PJ            | queries 関数数 | 違反数 | rename 例                                                                                  |
+| ------------- | --------------- | ------ | ------------------------------------------------------------------------------------------ |
+| bitcomic.net  | ~35             | 13     | `searchComics`→`getComicsByQuery`, `addLike`→`createLike`, `uploadImage`→`createImage` 等  |
+| getpayme.net  | ~48             | 0      | （rename 不要、最初から allow list 通過）                                                  |
+
+**示唆:**
+
+- 大規模 MVP（Lightning payment 統合あり）でも allow list は緩める必要なし
+- 違反が出るのは「初期に揺れた命名（add/remove, find, list, upload）」が残った PJ のみ
+- 一度 rename すれば、以降の Claude 生成は規約内に収束する（lint で強制されるため）
 
 ##### 後回しにしたもの（Phase 4 候補）
 
@@ -188,77 +193,20 @@ const QUERIES_ALLOW = /^(get|create|update|delete|signUp|signIn|signOut)/;
 - **論点 D**: property 別 update の扱い（`updateShopName` 等）→ services / interactors の議論と一緒
 - **services / interactors の動詞 allow list** → 実物が N 個以上溜まってから帰納
 
-#### Phase 3: 外部サービス対応 🔴 未着手
+#### Phase 3: 外部サービス対応 🟢 大半が実質解決済（templates のみ未決）
 
-**前提（既存システムで担保済み）:**
+**実証された解決策（getpayme.net 2026-04-25）:**
 
-- `queries/` は既に Supabase 専用ではなく、`garage.query.ts` 等の S3 系を許容
-- `generatePrefixLibMapping` により `lib/X.lib.ts` を置けば自動で `queries/X.query.ts` が許可される
-- つまり**アーキテクチャ的には resend/stripe/discord も既に乗る**。残るのは「配置場所と命名 semantic」の整理
+| 元論点                  | 状態        | 実例                                                          |
+| ----------------------- | ----------- | ------------------------------------------------------------- |
+| 論点 A: 配置レイヤ      | ✅ 解決     | `shared/queries/resend.query.ts`, `shared/queries/lnurl.query.ts` |
+| 論点 B: feature の切り方 | ✅ 解決     | `shared/queries/` で十分。専用 feature は不要                  |
+| 論点 D: 動詞 allow list | ✅ D1 採用 | `createEmail`, `createInvoice`, `getVerifyStatus` で CRUD 流用 |
+| 論点 C: templates の扱い | 🟡 未決    | React Email を採用する PJ が出たら再開                          |
 
-**過去プロジェクトでの揺れ（統一規約なし）:**
+**残る作業（templates 採用時のみ）:**
 
-- `pornfusion.com`: `features/shared/` に resend 関連
-- `chuchu`: `features/shared/` + `templates/` 概念
-- `oyatsu`: `resend.util.ts` を utils に配置
-
----
-
-##### 論点 A: 配置レイヤ
-
-| 案                           | 例                                                              | メリット                                | デメリット                                      |
-| ---------------------------- | --------------------------------------------------------------- | --------------------------------------- | ----------------------------------------------- |
-| **A1: queries/ に統合** ⭐   | `features/notifications/queries/resend.query.ts` の `send()`    | アーキテクチャ一貫、prefix システム流用 | 「query」と "send email" が semantic に合わない |
-| **A2: 新レイヤ `commands/`** | `features/notifications/commands/resend.command.ts` の `send()` | CQRS 風、semantic 純度                  | レイヤ増（4 層に）、ESLint 追加コスト           |
-| **A3: shared/ に集約**       | `features/shared/queries/resend.query.ts`                       | 横断利用に対応                          | shared が肥大                                   |
-| **A4: utils/ 配置**          | `utils/resend.util.ts`                                          | 軽量                                    | 層構造を回避する誘惑                            |
-
-**推し: A1（queries/ 統合）**。queries の意味を「外部データソースとの 1 リクエスト」と再定義すれば semantic 整合。レイヤ数を増やさない。
-
-##### 論点 B: feature の切り方
-
-| 案                            | 例                                                                         | メリット                 | デメリット                      |
-| ----------------------------- | -------------------------------------------------------------------------- | ------------------------ | ------------------------------- |
-| **B1: 専用 feature** ⭐       | `features/notifications/` (resend, discord), `features/payments/` (stripe) | ドメイン分離明確、拡張性 | サービスごとに feature が増える |
-| **B2: shared に集約**         | `features/shared/queries/resend.query.ts` 等                               | 1 箇所                   | shared 肥大                     |
-| **B3: 使う feature 内に配置** | `features/users/queries/resend.query.ts` (パスワードリセット用)            | 利用箇所と近い           | 重複リスク                      |
-
-**推し: B1（専用 feature）**。`notifications`, `payments`, `notifications/discord` 等で feature 化。
-
-##### 論点 C: templates の扱い
-
-メール本文・Discord embed・Stripe invoice item 等のテンプレート。
-
-| 案                                    | 例                                                       |
-| ------------------------------------- | -------------------------------------------------------- |
-| **C1: types/ 配置**                   | `features/notifications/types/templates.type.ts`         |
-| **C2: 新 templates/ ディレクトリ** ⭐ | `features/notifications/templates/welcome.template.tsx`  |
-| **C3: constants/ 配置**               | `features/notifications/constants/templates.constant.ts` |
-| **C4: interactors にインライン**      | テンプレートは個別関数の中で組み立て                     |
-
-**推し: C2（templates/ 専用ディレクトリ）**。chuchu の前例あり、React Email 使うなら .tsx になり types/ や constants/ には入れにくい。
-
-##### 論点 D: 関数名 allow list の拡張
-
-外部サービス向け動詞を Phase 2 の allow list にどう追加するか。
-
-| 案                                   | 例                                                                           |
-| ------------------------------------ | ---------------------------------------------------------------------------- |
-| **D1: CRUD verbs 流用**              | `createMessage()` for resend send                                            |
-| **D2: 動詞追加** ⭐                  | `send`, `notify`, `charge`, `refund`, `subscribe` を `CUSTOM_ACTIONS` に追加 |
-| **D3: サービス専用動詞**（個別管理） | resend: `send`, stripe: `charge/refund`, discord: `notify`                   |
-
-**推し: D2**。allow list が 10 程度に増えるが管理可能。
-
----
-
-##### Phase 3 実装ステップ（決定後）
-
-1. `lib/` に `resend.lib.ts`, `stripe.lib.ts`, `discord.lib.ts` を配置（既存 prefix システムに乗る）
-2. 配置・命名規約を CLAUDE.md / README.md に明記
-3. 新 lint ルール追加（`templates/` ディレクトリの存在チェック等、必要なら）
-4. 一つの consuming project（pornfusion or chuchu）で dogfood
-5. 他に展開
+- `templates/` 専用ディレクトリ案 (旧 C2) を実装する場合、`naming.mjs` に `templates/*.template.tsx` の glob を追加
 
 #### Phase 4: services / interactors の動詞 allow list 化 🔵 保留中
 
@@ -285,6 +233,34 @@ const QUERIES_ALLOW = /^(get|create|update|delete|signUp|signIn|signOut)/;
 - 各 consuming project の `**/services/*.service.ts`, `**/interactors/*.interactor.ts` から export 関数名を集計するスクリプトを書き、動詞の頻度分布を観測する
 - 観測結果から allow list 候補を帰納する
 - 「services は層別に動詞 allow list を分ける」案 (B2) を再評価する
+
+##### 観測サンプル: getpayme.net interactors（2026-04-25 抽出）
+
+CRUD 以外の動詞:
+
+```
+onboarding         (creators)         — 名詞動詞化、Auth ceremony と同じ業務固有語
+disconnect         (purchases)        — Lightning 接続切断
+forceSettle        (purchases)        — 強制状態遷移
+check              (purchases)        — Lightning payment 確認
+verify             (purchases)        — purchase 検証
+strip              (product-contents) — Content metadata 除去
+```
+
+合成名詞（CRUD ベース + 業務語）:
+
+```
+getSalesDashboard  (purchases)
+checkLightningPayment, verifyLightningPurchase
+forceSettleLightningPurchase, disconnectLightning
+```
+
+**示唆（Phase 4 の判断を補強）:**
+
+- 業務固有動詞 (`onboarding`, `disconnect`, `verify`, `strip`) は LLM への事前 allow list 化が困難
+- 「業務語をそのまま動詞にする」が現実解。一律規約より JSDoc + 命名一貫性 (camelCase) で十分
+- queries は CRUD で「物理的書き込み」、interactors は業務語で「意図」を表現する棲み分けが実装で確認できる
+  - 例: `updateLightningPurchaseSettled` (queries: 状態列を update) ↔ `forceSettleLightningPurchase` (interactor: 業務動詞 settle)
 
 #### 責務の 1 行定義（Phase 1 決定版）
 
@@ -317,88 +293,34 @@ const QUERIES_ALLOW = /^(get|create|update|delete|signUp|signIn|signOut)/;
 
 ---
 
-### 新規 TODO（Catch プロジェクトの調査から抽出）
+### アクティブな TODO（2026-04-25 整理後）
 
-#### 🔴 最優先: feature 骨格の統一
+実装根拠が明確で、低コストで価値があるものに絞り込み済み。削除した TODO の判断履歴は git log を参照。
 
-- [ ] **feature 配下の 8 ディレクトリ構造を強制**
-  - `interactors / constants / hooks / queries / schemas / services / types / utils` の 8 ディレクトリを全 feature で必須化（Phase 1 命名刷新済）
-  - 使用しない場合でも空ディレクトリ（または `.gitkeep`）を置く = Rails 的な「利用しないファイルですら規約」
-  - 実装: glob で feature root を検出し、存在しないディレクトリを error として報告するカスタムルール
-  - 悩み: 一部 PJ では `workflows` を利用している。どうしようかな〜という気持ち。workflows には json が配置されている
-
-- [ ] **`queries/` と `lib/` の逆方向対応を検証**
-  - すでに担保されていること:
-    - `lib/*.lib.ts` を自動 scan して prefix のマスターリストを生成（`generatePrefixLibMapping`）
-    - `queries/` のファイル名は allow list に従う（`createNamingConfigs` の `queryPattern`）
-    - `{prefix}.query.ts` は対応する `lib/{prefix}` 以外を import 不可（`prefixLibPatterns`）
-    - `server / client / admin`（認証コンテキスト軸）と `garage / stripe` 等（データソース軸）を区別する必要はなく、**全て `lib/*.lib.ts` からの 1:1 派生**として統一的に扱える
-  - まだ担保されていないこと:
-    - `lib/X.lib.ts` が存在するが、どの feature にも `X.query.ts` が無い（= 宣言したが使っていない）
-    - `feature` 内で `server / client / admin` が必要なのに欠けている（例: auth は server + client のみ、users は 3 層、shops は server のみ、という揺れ）
-  - 検討項目:
-    - 「feature ごとに必要な lib prefix を宣言するマニフェスト」を置くか？
-    - 「全 feature で全 prefix を揃える」は過剰なので避ける（実務的な落とし所）
-
-#### 🟡 中優先: CRUD 命名の Rails scaffold 相当化
-
-- [ ] **CRUD 関数名を Rails の 5 アクション（`index / show / create / update / destroy`）に対応させる**
-  - List: `handleGet{Plural}` 例: `handleGetShops`
-  - Show: `handleGet{Singular}ById` 例: `handleGetShopById`
-  - Create: `handleCreate{Singular}` 例: `handleCreateShop`
-  - Update: `handleUpdate{Singular}` 例: `handleUpdateShop`
-  - Delete: `handleDelete{Singular}` 例: `handleDeleteShop`
-  - ESLint rule: interactors 配下の export 関数名を AST で検査し、上記以外は error
-
-- [ ] **property 別 update action の扱いを決める**
-  - Rails には存在しない（`update(params)` 一本）
-  - 現状: `handleUpdateSeatStatus`, `handleUpdateShopName`, `handleUpdateBasePrice` などに分散
-  - UX 要件から来ているため、完全禁止ではなく allow list or JSDoc 明示で妥協するのが現実的
-
-- [ ] **service 層の関数名も action と対応させる**
-  - action → service の呼び出しルール（`actionHandleServiceRule`）と整合
-
-#### 🟡 中優先: コンポーネント粒度の命名規約化
-
-- [ ] **leaf コンポーネントの役割 suffix を allow list 化**
-  - 許可: `*Form.tsx`, `*Dialog.tsx`, `*List.tsx`, `*Table.tsx`, `*Card.tsx`, `*Tabs.tsx`, `*Filters.tsx`
-  - 禁止: 役割が不明瞭な名前（`Catcher.tsx`, `Shop.tsx` のようなページレベルの裸命名）
-  - ESLint rule: `check-file` で filename pattern を限定
-  - なんかしら根拠がないと破綻するので、あくまでも草案
-
-- [ ] **ページレベルコンポーネントは `*Page.tsx` で統一**
-  - 例: `components/pages/dashboard/Catcher.tsx` → `CatcherDashboardPage.tsx`
-  - もしくは `components/pages/` 配下はすべて Page コンポーネントである契約にする
-  - これも根拠弱いかも
-
-#### 🟡 中優先: styling ハードコードの禁止
-
-- [ ] **leaf コンポーネントで margin/padding ユーティリティをハードコード禁止**
-  - 禁止: `mt-*`, `mb-*`, `ml-*`, `mr-*`, `mx-*`, `my-*`, `pt-*`, `pb-*`, `pl-*`, `pr-*`, `px-*`, `py-*` を className 文字列リテラルで書く
-  - 許可: `space-y-*`, `gap-*` など "内部レイアウト" 用クラス
-  - 許可パス: `src/components/shared/ui/**`（shadcn）, `src/app/**/page.tsx`, `src/components/pages/**`
-  - ESLint rule: AST で JSX の className 属性の文字列リテラルを検査、正規表現でチェック
-  - 根拠弱めニキ
-
-- [ ] **その他 styling 揺れの一覧化**
-  - `w-full` ハードコード（例: `auth/sign-in/Form.tsx`）
-  - `space-y-4` / `space-y-8` の揺れ
-  - Card wrapper の有無の揺れ
-  - 段階的に規約化候補を追加
-  - これらは PJ 固有になりそう。時間がある時にじっくり考えたい所存
-
-#### 🟢 低優先: 型・schema の細かい揺れ
+- [ ] **`@typescript-eslint/no-unnecessary-condition` を `warn` から `error` に昇格**
+  - `src/common/rules.mjs` で定義
+  - 全 consuming project で warning 0 になってから昇格
 
 - [ ] **`FormState` 型名を `{動詞}{対象}FormState` に統一**
-  - 現状: `SignInFormState`（動詞なし）, `UpdateShopNameFormState`, `CreateUserFormState`（動詞あり）
-  - ESLint rule: TypeScript 型定義を AST で検査
-  - これはありよりのあり
+  - 現状: `SignInFormState`（動詞なし）, `UpdateShopNameFormState`, `CreateUserFormState`（動詞あり）の揺れ
+  - 実装: `TSInterfaceDeclaration` / `TSTypeAliasDeclaration` を AST 検査するカスタムルール
 
-- [ ] **service → repository の import スタイルを統一**
+- [ ] **queries layer の import スタイルを namespace import に強制**
   - 現状: `import * as` namespace と named import が混在
-  - どちらかに統一（`import * as shopsServerRepository from "..."` 推奨）
-  - ESLint rule: `no-restricted-syntax` で named import を禁止
-  - あり！
+  - 推奨: `import * as comicsServerQuery from "@/features/comics/queries/server.query"`
+  - 実装: `no-restricted-syntax` で `queries/*.query.ts` からの named import を禁止
+  - 既に `naming/namespace-import-name` で命名は強制済み。スタイルだけ追加すれば完成
+
+<details>
+<summary>削除した TODO（2026-04-25）</summary>
+
+- 8 ディレクトリ強制: 空ディレクトリは LLM ノイズ、`workflows` 等の例外もあり実装の落とし所が困難
+- queries/lib 逆方向対応 (lib にあって query に無い検出 / マニフェスト宣言): 過剰設計の懸念
+- CRUD 関数名 Rails scaffold 化 / property 別 update / service 層も対応: Phase 2 + Phase 4 に統合済
+- leaf component suffix allow list / `*Page.tsx` 統一: 自己評価「根拠弱い」
+- margin/padding ハードコード禁止 / styling 揺れ一覧化: 自己評価「根拠弱め」「PJ 固有」
+
+</details>
 
 ### 長期的な方向性
 
