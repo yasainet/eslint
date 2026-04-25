@@ -35,7 +35,7 @@ Each entry point enforces a feature-based architecture with the following conven
 ├── shared/             # Cross-feature shared modules
 ├── ...
 {libRoot}/              # *.lib.ts — library wrappers (e.g., supabase.lib.ts)
-{utilsRoot}/            # *.util.ts — top-level utilities
+{utilsRoot}/            # *.util.ts — top-level utilities (e.g., font.util.ts)
 ```
 
 ## Setup
