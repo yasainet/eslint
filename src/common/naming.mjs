@@ -102,6 +102,14 @@ export function createNamingConfigs(featureRoot, prefixLibMapping) {
         ],
       },
     },
+    {
+      name: "naming/queries-export",
+      files: featuresGlob(featureRoot, "**/queries/*.query.ts"),
+      plugins: { local: localPlugin },
+      rules: {
+        "local/queries-export": "error",
+      },
+    },
   );
 
   configs.push(

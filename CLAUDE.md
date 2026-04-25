@@ -125,97 +125,68 @@ npm install @yasainet/eslint@latest
 - `actions/` → `interactors/`: `client.action.ts` が Server Action ではないという「嘘」状態を解消。`handlers/` + `handle*` prefix も最終候補だったが、Phase 2 で prefix 撤廃が決まったためディレクトリ名の根拠（韻）が消失。結果 `interactors/` に収束
 - **Rails core 用語 (`models/`, `controllers/`) は fat の連想で命名トラップになる**ため回避。community pattern (thin) に揃える
 
-#### Phase 2: 関数名の allow list 化 🟡 協議中
+#### Phase 2: 関数名の allow list 化（queries 限定） 🟡 実装中
 
 **前提（既決事項）:**
 
 - `handle*` prefix は Phase 1 で完全撤廃済（lint ルール削除 + 既存コードからも削除）
-- 現状の interactor 関数名は `getComics()`, `signIn()`, `searchComics()` 等の動詞のみ
-- Phase 2 のゴール: **動詞の allow list を lint で強制し、3 層全てに適用する**
+- Phase 2 は **queries 層のみに allow list を導入する**（services / interactors は MVP 段階では保留 → Phase 4 に繰り延べ）
 
-**ゴールの優先順位:**
+##### スコープ縮小の根拠（2026-04-25 決定）
 
-1. LLM 生成の予測可能性（同じ意味の関数を毎回同じ名前で生成）
-2. grep / nav の ergonomics
-3. Rails への思想的整合（必須ではない）
+最初の構想は「3 層共通の動詞 allow list」だったが、以下の理由で **queries のみ** に絞り込んだ:
 
----
+1. **MVP 段階では帰納に十分なサンプルがない**
+   - 現状 consuming project は MVP 規模。services / interactors の動詞を「将来 N 個の PJ で通用する allow list」として演繹的に決めるのは不可能
+   - 実物のコードが N 個以上溜まってから帰納するのが正道（YAGNI 原則）
+2. **queries 層は外部制約により動詞が自然に収束する**
+   - SQL / HTTP リクエストという外部 I/O が動詞の表現力を制約する
+   - `get / create / update / delete` ＋ auth 特殊（`signUp / signIn / signOut`）でほぼ網羅可能
+3. **services はビジネスロジックゆえ動詞の幅が広い**
+   - 述語 (`is/can/should`)、計算 (`calculate/aggregate`)、整形 (`format/build`)、状態遷移 (`publish/archive`) など多彩
+   - 想像で allow list を作ると現実とズレる → 後で必ず緩めることになる
+4. **interactors も auth 系以外の動詞が未成熟**
+   - `search / toggle / process` 等は既出だが、まだ揺れの幅を観測しきれていない
 
-##### 論点 A: 動詞 allow list の方針
-
-| 案                      | 例                                         | メリット                     | デメリット                                                             |
-| ----------------------- | ------------------------------------------ | ---------------------------- | ---------------------------------------------------------------------- |
-| **A1: Rails literal**   | `index / show / create / update / destroy` | Rails 完全一致、最も予測可能 | `index` は JS で混同、`destroy` は JS 慣習と異なる、現状コードと乖離大 |
-| **A2: TS idiomatic** ⭐ | `getX / createX / updateX / deleteX`       | TS/JS 慣習、grep しやすい    | Rails 純度は薄い                                                       |
-| **A3: 混合**            | `index/show` + `create/update/delete`      | 折衷                         | 一貫性なし                                                             |
-
-**推し: A2（TS idiomatic）**。migration コストゼロ。
-
-##### 論点 B: index/list variant の表現方法
-
-`getComicsByCircle`, `getComicsByCirclePaginated` のようなフィルタ・ページネーション付き取得をどう書くか。
-
-| 案                      | 例                                                                                               | メリット                               | デメリット                                                   |
-| ----------------------- | ------------------------------------------------------------------------------------------------ | -------------------------------------- | ------------------------------------------------------------ |
-| **B1: メソッド分化** ⭐ | `getComics()`, `getComicsByCircle(circle)`, `getComicsByCirclePaginated(circle, page, pageSize)` | 戻り値型がシンプル、LLM 予測可能性高い | 関数数が多い                                                 |
-| **B2: options 集約**    | `getComics({ circle?, author?, tag?, page?, pageSize? })`                                        | 関数数最小、Rails controller 風        | 戻り値型が条件付き、option 組み合わせを LLM が誤用するリスク |
-| **B3: 混合**            | 基本は分化、ページネーションだけ options                                                         | ページネーションが optional として自然 | 一貫性なし                                                   |
-
-**推し: B1（分化、現状維持）**。LLM の予測可能性を最優先。
-
-##### 論点 C: auth の「現在のユーザー取得」関数名
-
-`auth/interactors/client.interactor.ts` で `getUser()` として実装中。意味が曖昧（ID 指定の getUser と紛らわしい）なので変えたい。
-
-| 案                            | 例                                     | 根拠                                                  |
-| ----------------------------- | -------------------------------------- | ----------------------------------------------------- |
-| **C1: `current()`**           | `await authClientInteractor.current()` | 「現在のユーザー」を明示、Rails-like                  |
-| **C2: `me()`** ⭐             | `await authClientInteractor.me()`      | GitHub API / Twitter API の `/me` endpoint 慣習、短い |
-| **C3: `getCurrentUser()`**    | 説明的                                 | 長い、prefix 撤廃方針と矛盾                           |
-| **C4: 現状 `getUser()` 維持** | 現状                                   | ID 指定の `getUser(id)` と紛らわしい                  |
-
-**推し: C2（`me`）**。短く、業界慣習に沿う。
-
-##### 論点 D: property 別 update の扱い
-
-Rails には存在しないパターン（`update(params)` 一本）だが、UX 要件で `updateShopName(input)`, `updateBasePrice(input)` のように分離したい場合がある。
-
-| 案                                       | メリット                    | デメリット                            |
-| ---------------------------------------- | --------------------------- | ------------------------------------- |
-| **D1: 完全禁止**（`update(input)` 一本） | Rails 純度                  | UX 上「name のみ更新」UI が冗長になる |
-| **D2: allow list で許可** ⭐             | UX 要件に沿う、実装コスト低 | 関数数が増える                        |
-| **D3: JSDoc で意図明示**（lint は許可）  | 妥協案                      | lint が緩くなる                       |
-
-**推し: D2**。UX 要件は無視できない。
-
-##### 論点 E: lint 正規表現の最終形
-
-A2（TS idiomatic）+ B1（分化）+ C2（me）+ D2 を採用した場合のドラフト:
+##### 採用する allow list（A2: TS idiomatic）
 
 ```js
-// 3 層共通の allow list (queries / services / interactors)
-const CRUD_VERBS = /^(get|create|update|delete)/; // get, getX, getXById, getXBy*, getX*Paginated, etc.
-const AUTH_VERBS = /^(signUp|signIn|signOut|me)$/; // 完全一致
-const CUSTOM_ACTIONS =
-  /^(search|toggle|process|cleanup|checkDiff|notify|charge|send|refund|subscribe)/; // 拡張可能リスト
+// queries 層のみに適用
+const QUERIES_ALLOW = /^(get|create|update|delete|signUp|signIn|signOut)/;
 ```
 
-現状関数名（一部抜粋）はこの正規表現で全てパス:
+- **CRUD**: `get / create / update / delete` （`get` には `getXById`, `getXBy*`, `getXPaginated` 等の variant を許可）
+- **auth 特殊**: `signUp / signIn / signOut` （Supabase / OAuth 等の業界慣習）
+- **why コメント**: `// queries layer verbs are the TS-idiomatic translation of Rails 5 actions (index/show/create/update/destroy)` を JSDoc に記載
 
-- `getComics`, `getComicById`, `getComicsByCircle`, `getComicsByCirclePaginated`, `getAllComics` → `CRUD_VERBS` (`get`)
-- `createComment`, `createContact` → `CRUD_VERBS` (`create`)
-- `signUp`, `signIn`, `signOut` → `AUTH_VERBS`
-- `searchComics`, `toggleLike`, `processUrl`, `cleanup`, `checkDiff` → `CUSTOM_ACTIONS`
-- `getUser` (auth current) → C2 採用なら `me` に rename
+##### Rails との対応関係（README に記載）
 
----
+| Rails 5 actions | TS idiomatic (採用) | 備考                                          |
+| --------------- | ------------------- | --------------------------------------------- |
+| `index`         | `getXs()`           | `index` は `index.tsx` 等と混同するため `get` |
+| `show`          | `getXById(id)`      | 単複は引数有無で判別                          |
+| `create`        | `createX(input)`    | 一致                                          |
+| `update`        | `updateX(input)`    | 一致                                          |
+| `destroy`       | `deleteX(id)`       | JS 慣習は `delete`                            |
 
-##### Phase 2 実装ステップ（決定後）
+##### Phase 2 実装ステップ
 
-1. `@yasainet/eslint` に lint ルール追加: `naming/queries-export`, `naming/services-export`, `naming/interactors-export`（同じ allow list を 3 層に適用）
-2. v0.0.52 として publish
-3. consuming project で違反検出 → 必要なら個別 rename
-4. C2 採用なら `getUser` → `me` を rename
+1. ✅ CLAUDE.md 更新（本書）
+2. 🟡 `@yasainet/eslint` に AST ルール `naming/queries-export` を追加
+   - `queries/*.query.ts` の `export (async )?function {name}` を AST 検査
+   - allow list に違反すれば error
+3. 🟡 `naming.mjs` の `createNamingConfigs` から新ルールを呼び出す
+4. 🟡 v0.0.52 として publish
+5. 🟡 bitcomic.net で dogfood
+   - 既知の違反候補: `addLike`, `removeLike`, `searchComics`
+   - rename 方針はユーザー協議
+
+##### 後回しにしたもの（Phase 4 候補）
+
+- **論点 B**: index/list variant の表現方法（メソッド分化 vs options 集約）→ B1 が暗黙の現状維持
+- **論点 C**: `getUser()` → `me()` rename → 必要性は実物が増えてから判断
+- **論点 D**: property 別 update の扱い（`updateShopName` 等）→ services / interactors の議論と一緒
+- **services / interactors の動詞 allow list** → 実物が N 個以上溜まってから帰納
 
 #### Phase 3: 外部サービス対応 🔴 未着手
 
@@ -289,6 +260,32 @@ const CUSTOM_ACTIONS =
 4. 一つの consuming project（pornfusion or chuchu）で dogfood
 5. 他に展開
 
+#### Phase 4: services / interactors の動詞 allow list 化 🔵 保留中
+
+**前提:**
+
+- Phase 2 で queries 層のみ allow list 強制を導入する判断をした
+- services / interactors は MVP 段階では allow list を保留
+
+**保留理由:**
+
+- services はビジネスロジックゆえ動詞の幅が広い（述語・計算・整形・状態遷移など）
+- interactors も auth 系以外の動詞 (`search/toggle/process` 等) はまだ揺れの幅を観測しきれていない
+- 想像で allow list を作ると現実とズレ、後で必ず緩める羽目になる
+- 「実物が N 個以上溜まってから帰納する」のが正道（YAGNI 原則）
+
+**開始条件（このいずれかを満たしたら検討）:**
+
+- consuming project が 5 個以上で services / interactors の動詞分布が観測できる
+- 同じ意味の関数が異なる動詞で書かれて grep / nav の苦痛が出始める
+- LLM 生成で「services の述語動詞」が予測不能になり始める
+
+**準備 TODO:**
+
+- 各 consuming project の `**/services/*.service.ts`, `**/interactors/*.interactor.ts` から export 関数名を集計するスクリプトを書き、動詞の頻度分布を観測する
+- 観測結果から allow list 候補を帰納する
+- 「services は層別に動詞 allow list を分ける」案 (B2) を再評価する
+
 #### 責務の 1 行定義（Phase 1 決定版）
 
 - **queries**: 外部データソースへの 1 回のリクエストをカプセル化する（入: プリミティブ / 出: raw response）
@@ -308,8 +305,8 @@ const CUSTOM_ACTIONS =
 | redirect                      | ❌      | ❌       | ✅                |
 | 他 feature の同層 import      | ❌      | ❌       | ❌                |
 | lib/\*.lib.ts 直接 import     | ✅      | ❌       | ❌                |
-| 関数名 prefix                 | なし    | なし     | なし (Phase 2)    |
-| 動詞 allow list               | ✅      | ✅       | ✅ (Phase 2)      |
+| 関数名 prefix                 | なし    | なし     | なし              |
+| 動詞 allow list               | ✅ Phase 2 | ⏳ Phase 4 | ⏳ Phase 4    |
 | `"use server"` ディレクティブ | N/A     | N/A      | server/admin のみ |
 
 #### 補足: 3 層維持（`entities/` は導入しない）
