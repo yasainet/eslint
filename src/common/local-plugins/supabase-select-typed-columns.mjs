@@ -1,59 +1,51 @@
 /**
- * Enforce typed column constants for Supabase `.select()` calls.
+ * Enforce explicit column lists for Supabase `.select()` calls.
  *
- * Apply to `**\/queries/*.query.ts`. Forces `.select()` to take the form
- * `joinColumns(<X_COLUMNS>)` where `X_COLUMNS` is an UPPER_SNAKE identifier
- * ending with `_COLUMNS`. The identifier is expected to be declared with
- * `as const satisfies readonly (keyof Tables<"table">)[]` so the column
- * names are validated against the schema at compile time. The `satisfies`
- * shape itself is enforced by the companion `supabase-columns-satisfies`
- * rule.
+ * Apply to `**\/queries/*.query.ts`. `.select()` の引数は次のいずれかでなければならない:
  *
- * `joinColumns()` is a project-supplied helper that comma-joins a const
- * string tuple while preserving the literal string type so Supabase's
- * `.select()` type parser can infer the row shape (a plain `.join(",")`
- * widens to `string` and breaks inference).
+ * - inline string literal（例: `.select("id,url,platform")`）
+ * - `*_COLUMNS` という UPPER_SNAKE 命名の identifier（例: `.select(POST_DETAIL_COLUMNS)`）
+ *
+ * `*_COLUMNS` 定数は companion rule `supabase-columns-satisfies` で
+ * `<string literal> as const` の形が強制される。これにより:
+ *
+ * - Supabase の `.select()` は literal string を parse して row 型を推論できる
+ * - 存在しない column 名は Supabase の型推論が `SelectQueryError` として弾く（compile time）
+ * - runtime helper（`joinColumns`）は不要
  *
  * Banned:
- *   .select()                                implicit "all columns"
- *   .select("*")                             silent exposure of new schema columns
- *   .select("id, name")                      inline literal, invisible to grep
- *   .select(`${x}, y`)                       dynamic concatenation
- *   .select(POST_LIST_COLUMNS.join(","))     plain .join widens to `string`, breaks inference
- *   .select(someVar)                         non-conforming variable
+ *   .select()                    implicit "all columns"
+ *   .select("*")                 silent exposure of new schema columns
+ *   .select(`${x},y`)            dynamic concatenation
+ *   .select(cols.join(","))      runtime expression
+ *   .select(someVar)             non-conforming variable
  *
  * Allowed:
- *   .select(joinColumns(POST_LIST_COLUMNS))  typed constant via project helper
+ *   .select("id,url,platform")        inline literal
+ *   .select(POST_DETAIL_COLUMNS)      *_COLUMNS named constant
  *
- * Why: column lists must be (1) named for grep / review, (2) checked
- * against the schema, (3) never silently grow on schema additions.
- * For column-level access control, use Postgres views (`from("posts_public")`).
+ * Why: column lists must be (1) statically analyzable for grep / review,
+ * (2) literal so Supabase can infer the row shape, (3) never silently grow
+ * on schema additions. For column-level access control, use Postgres views
+ * (`from("posts_public")`).
  */
 
 const COLUMNS_NAME = /^[A-Z][A-Z0-9_]*_COLUMNS$/;
-
-function asJoinColumnsCall(arg) {
-  if (!arg) return null;
-  if (arg.type !== "CallExpression") return null;
-  if (arg.callee.type !== "Identifier") return null;
-  if (arg.callee.name !== "joinColumns") return null;
-  if (arg.arguments.length !== 1) return null;
-  if (arg.arguments[0].type !== "Identifier") return null;
-  return arg.arguments[0];
-}
 
 export const supabaseSelectTypedColumnsRule = {
   meta: {
     type: "problem",
     messages: {
       noArgs:
-        "Empty `.select()` returns all columns implicitly. Pass `joinColumns(<X_COLUMNS>)` where X_COLUMNS is a typed constant.",
-      literalArg:
-        'Inline `.select()` argument is forbidden. Define `const X_COLUMNS = [...] as const satisfies readonly (keyof Tables<"table">)[];` and call `.select(joinColumns(X_COLUMNS))`. Use Postgres views for column-level access control.',
+        "Empty `.select()` returns all columns implicitly. Pass a string literal or a `*_COLUMNS` constant.",
+      wildcard:
+        '`.select("*")` exposes new schema columns silently. Enumerate columns explicitly.',
+      template:
+        "Template literal in `.select()` defeats type inference. Use a string literal or a `*_COLUMNS` constant.",
       shapeArg:
-        '`.select()` argument must be `joinColumns(<X_COLUMNS>)`. Other expressions defeat type inference and column-level review.',
+        "`.select()` argument must be a string literal or a `*_COLUMNS` identifier.",
       naming:
-        "Column constant `{{ name }}` must be UPPER_SNAKE_CASE ending with `_COLUMNS` (e.g. POST_LIST_COLUMNS, POST_DETAIL_COLUMNS).",
+        "Column constant `{{ name }}` must be UPPER_SNAKE_CASE ending with `_COLUMNS` (e.g. POST_DETAIL_COLUMNS).",
     },
     schema: [],
   },
@@ -71,24 +63,34 @@ export const supabaseSelectTypedColumnsRule = {
 
         const arg = node.arguments[0];
 
-        if (arg.type === "Literal" || arg.type === "TemplateLiteral") {
-          context.report({ node: arg, messageId: "literalArg" });
+        if (arg.type === "Literal") {
+          if (typeof arg.value !== "string") {
+            context.report({ node: arg, messageId: "shapeArg" });
+            return;
+          }
+          if (arg.value.trim() === "*") {
+            context.report({ node: arg, messageId: "wildcard" });
+          }
           return;
         }
 
-        const id = asJoinColumnsCall(arg);
-        if (!id) {
-          context.report({ node: arg, messageId: "shapeArg" });
+        if (arg.type === "TemplateLiteral") {
+          context.report({ node: arg, messageId: "template" });
           return;
         }
 
-        if (!COLUMNS_NAME.test(id.name)) {
-          context.report({
-            node: id,
-            messageId: "naming",
-            data: { name: id.name },
-          });
+        if (arg.type === "Identifier") {
+          if (!COLUMNS_NAME.test(arg.name)) {
+            context.report({
+              node: arg,
+              messageId: "naming",
+              data: { name: arg.name },
+            });
+          }
+          return;
         }
+
+        context.report({ node: arg, messageId: "shapeArg" });
       },
     };
   },

@@ -1,50 +1,47 @@
 /**
- * Enforce `[...] as const satisfies readonly (keyof Tables<"...">)[]` for
- * `*_COLUMNS` constant declarations.
+ * Enforce `<string literal> as const` for `*_COLUMNS` constant declarations.
  *
- * Apply to `**\/queries/*.query.ts`. Without `as const satisfies`, typos
- * in column names slip past the lint phase — Supabase only complains at
- * runtime when the query executes. The `satisfies` annotation forces
- * TypeScript to validate every entry against the schema before the code
- * ever runs. The actual `keyof Tables<"...">` content is left to the type
- * checker; the lint rule only verifies the syntactic shape.
+ * Apply to `**\/queries/*.query.ts` and `**\/constants/*.constant.ts`.
+ *
+ * `*_COLUMNS` 定数は Supabase の `.select()` に直接渡される。`as const` を
+ * 外すと TypeScript が `string` に widen し、Supabase の `.select<Query>()`
+ * が literal を parse できなくなって row 型推論が壊れる（戻り値が
+ * `GenericStringError` になる）。
+ *
+ * Allowed:
+ *   const POST_DETAIL_COLUMNS = "id,url,platform" as const;
+ *
+ * Banned:
+ *   const POST_DETAIL_COLUMNS = "id,url,platform";              // string に widen
+ *   const POST_DETAIL_COLUMNS = ["id", "url"] as const;         // 配列
+ *   const POST_DETAIL_COLUMNS = [...] as const satisfies ...;   // 配列 + satisfies
+ *   const POST_DETAIL_COLUMNS = `id,${col}`;                    // template literal
+ *
+ * Why: シンプルな string literal を `as const` で保つだけで、Supabase の
+ * 型推論（row 型 / column 名タイポ検出）はすべて自動で効く。runtime helper
+ * （`joinColumns` 等）は不要。
  */
 
 const COLUMNS_NAME = /^[A-Z][A-Z0-9_]*_COLUMNS$/;
 
-/** Unwrap nested type assertions and find the underlying expression. */
-function unwrapTypeAssertions(node) {
-  let current = node;
-  while (
-    current &&
-    (current.type === "TSAsExpression" ||
-      current.type === "TSSatisfiesExpression")
-  ) {
-    current = current.expression;
-  }
-  return current;
-}
-
-function isAsConstSatisfies(initNode) {
+function isStringAsConst(initNode) {
   if (!initNode) return false;
-  if (initNode.type !== "TSSatisfiesExpression") return false;
-  const inner = initNode.expression;
-  if (inner.type !== "TSAsExpression") return false;
-  const ann = inner.typeAnnotation;
-  if (!ann) return false;
-  if (ann.type !== "TSTypeReference") return false;
+  if (initNode.type !== "TSAsExpression") return false;
+  const ann = initNode.typeAnnotation;
+  if (!ann || ann.type !== "TSTypeReference") return false;
   if (ann.typeName.type !== "Identifier") return false;
   if (ann.typeName.name !== "const") return false;
-  if (inner.expression.type !== "ArrayExpression") return false;
-  return true;
+  const inner = initNode.expression;
+  if (inner.type !== "Literal") return false;
+  return typeof inner.value === "string";
 }
 
 export const supabaseColumnsSatisfiesRule = {
   meta: {
     type: "problem",
     messages: {
-      missing:
-        'Column constant `{{ name }}` must use `[...] as const satisfies readonly (keyof Tables<"table">)[]` so column names are validated against the schema at compile time.',
+      shape:
+        'Column constant `{{ name }}` must be `"<comma-separated columns>" as const`. `as const` を外すと Supabase の `.select()` 型推論が壊れる。配列 / template literal も不可。',
     },
     schema: [],
   },
@@ -53,15 +50,11 @@ export const supabaseColumnsSatisfiesRule = {
       VariableDeclarator(node) {
         if (node.id.type !== "Identifier") return;
         if (!COLUMNS_NAME.test(node.id.name)) return;
-        // Only enforce on array initializers. String literals like
-        // POST_UPSERT_CONFLICT_COLUMNS are PostgREST conflict-target specs,
-        // not column lists, and are out of scope.
-        const inner = unwrapTypeAssertions(node.init);
-        if (!inner || inner.type !== "ArrayExpression") return;
-        if (isAsConstSatisfies(node.init)) return;
+        if (!node.init) return;
+        if (isStringAsConst(node.init)) return;
         context.report({
           node: node.id,
-          messageId: "missing",
+          messageId: "shape",
           data: { name: node.id.name },
         });
       },
