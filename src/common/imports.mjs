@@ -1,35 +1,35 @@
 const LAYER_PATTERNS = {
   queries: [
     {
-      group: ["*/services/*", "*/services"],
+      group: ["**/services/*", "**/services"],
       message: "queries cannot import services (layer violation)",
     },
     {
-      group: ["*/interactors/*", "*/interactors"],
+      group: ["**/interactors/*", "**/interactors"],
       message: "queries cannot import interactors (layer violation)",
     },
     {
-      group: ["*/hooks/*", "*/hooks"],
+      group: ["**/hooks/*", "**/hooks"],
       message: "queries cannot import hooks (layer violation)",
     },
   ],
   services: [
     {
-      group: ["*/interactors/*", "*/interactors"],
+      group: ["**/interactors/*", "**/interactors"],
       message: "services cannot import interactors (layer violation)",
     },
     {
-      group: ["*/hooks/*", "*/hooks"],
+      group: ["**/hooks/*", "**/hooks"],
       message: "services cannot import hooks (layer violation)",
     },
   ],
   interactors: [
     {
-      group: ["*/queries/*", "*/queries"],
+      group: ["**/queries/*", "**/queries"],
       message: "interactors cannot import queries (layer violation)",
     },
     {
-      group: ["*/hooks/*", "*/hooks"],
+      group: ["**/hooks/*", "**/hooks"],
       message: "interactors cannot import hooks (layer violation)",
     },
   ],
@@ -113,25 +113,38 @@ const MAPPING_PATTERNS = [
 
 const PAGE_BOUNDARY_PATTERNS = [
   {
-    group: ["*/queries/*", "*/queries"],
+    group: ["**/queries/*", "**/queries"],
     message:
       "page.tsx can only import interactors, not queries (page-boundary violation)",
   },
   {
-    group: ["*/services/*", "*/services"],
+    group: ["**/services/*", "**/services"],
     message:
       "page.tsx can only import interactors, not services (page-boundary violation)",
   },
 ];
 
+const ROUTE_BOUNDARY_PATTERNS = [
+  {
+    group: ["**/queries/*", "**/queries"],
+    message:
+      "route.ts can only import interactors, not queries (route-boundary violation)",
+  },
+  {
+    group: ["**/services/*", "**/services"],
+    message:
+      "route.ts can only import interactors, not services (route-boundary violation)",
+  },
+];
+
 const HOOKS_BOUNDARY_PATTERNS = [
   {
-    group: ["*/queries/*", "*/queries"],
+    group: ["**/queries/*", "**/queries"],
     message:
       "hooks can only import interactors, not queries (hooks-boundary violation)",
   },
   {
-    group: ["*/services/*", "*/services"],
+    group: ["**/services/*", "**/services"],
     message:
       "hooks can only import interactors, not services (hooks-boundary violation)",
   },
@@ -139,12 +152,12 @@ const HOOKS_BOUNDARY_PATTERNS = [
 
 const COMPONENTS_BOUNDARY_PATTERNS = [
   {
-    group: ["*/queries/*", "*/queries"],
+    group: ["**/queries/*", "**/queries"],
     message:
       "components can only import interactors or hooks, not queries (components-boundary violation)",
   },
   {
-    group: ["*/services/*", "*/services"],
+    group: ["**/services/*", "**/services"],
     message:
       "components can only import interactors or hooks, not services (components-boundary violation)",
   },
@@ -178,6 +191,26 @@ export const pageBoundaryConfigs = [
         {
           patterns: [
             ...PAGE_BOUNDARY_PATTERNS,
+            ...LIB_BOUNDARY_PATTERNS,
+            ...MAPPING_PATTERNS,
+          ],
+        },
+      ],
+    },
+  },
+];
+
+/** Next.js-only: restrict route.ts to only import interactors. */
+export const routeBoundaryConfigs = [
+  {
+    name: "imports/route-boundary",
+    files: ["src/app/**/route.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            ...ROUTE_BOUNDARY_PATTERNS,
             ...LIB_BOUNDARY_PATTERNS,
             ...MAPPING_PATTERNS,
           ],

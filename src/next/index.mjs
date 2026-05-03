@@ -5,6 +5,7 @@ import {
   hooksBoundaryConfigs,
   libBoundaryConfigs,
   pageBoundaryConfigs,
+  routeBoundaryConfigs,
 } from "../common/imports.mjs";
 
 import { directivesConfigs } from "./directives.mjs";
@@ -26,6 +27,7 @@ export const eslintConfig = [
   ...createCommonConfigs("src/features"),
   ...libBoundaryConfigs,
   ...pageBoundaryConfigs,
+  ...routeBoundaryConfigs,
   ...hooksBoundaryConfigs,
   ...componentsBoundaryConfigs,
   ...namingConfigs,
