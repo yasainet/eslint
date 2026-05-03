@@ -162,13 +162,27 @@ function makeConfig(name, files, ...patternArrays) {
   };
 }
 
+// In ESLint flat config, when multiple matching configs set the same rule
+// (`no-restricted-imports`), the later config's options REPLACE the earlier
+// ones — patterns are not merged. Page / hooks / components boundary configs
+// run after libBoundaryConfigs and would silently drop lib + mapping bans
+// unless we re-include those patterns explicitly.
 /** Next.js-only: restrict page.tsx to only import interactors. */
 export const pageBoundaryConfigs = [
   {
     name: "imports/page-boundary",
     files: ["src/app/**/page.tsx"],
     rules: {
-      "no-restricted-imports": ["error", { patterns: PAGE_BOUNDARY_PATTERNS }],
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            ...PAGE_BOUNDARY_PATTERNS,
+            ...LIB_BOUNDARY_PATTERNS,
+            ...MAPPING_PATTERNS,
+          ],
+        },
+      ],
     },
   },
 ];
@@ -179,7 +193,16 @@ export const hooksBoundaryConfigs = [
     name: "imports/hooks-boundary",
     files: ["src/features/**/hooks/*.ts"],
     rules: {
-      "no-restricted-imports": ["error", { patterns: HOOKS_BOUNDARY_PATTERNS }],
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            ...HOOKS_BOUNDARY_PATTERNS,
+            ...LIB_BOUNDARY_PATTERNS,
+            ...MAPPING_PATTERNS,
+          ],
+        },
+      ],
     },
   },
 ];
@@ -192,7 +215,13 @@ export const componentsBoundaryConfigs = [
     rules: {
       "no-restricted-imports": [
         "error",
-        { patterns: COMPONENTS_BOUNDARY_PATTERNS },
+        {
+          patterns: [
+            ...COMPONENTS_BOUNDARY_PATTERNS,
+            ...LIB_BOUNDARY_PATTERNS,
+            ...MAPPING_PATTERNS,
+          ],
+        },
       ],
     },
   },
