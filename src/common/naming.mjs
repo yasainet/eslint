@@ -119,6 +119,25 @@ export function createNamingConfigs(featureRoot, prefixLibMapping) {
       },
     },
     {
+      name: "naming/supabase-select",
+      files: featuresGlob(featureRoot, "**/queries/*.query.ts"),
+      plugins: { local: localPlugin },
+      rules: {
+        "local/supabase-select-typed-columns": "error",
+      },
+    },
+    {
+      name: "naming/supabase-columns-satisfies",
+      files: [
+        ...featuresGlob(featureRoot, "**/queries/*.query.ts"),
+        ...featuresGlob(featureRoot, "**/constants/*.constant.ts"),
+      ],
+      plugins: { local: localPlugin },
+      rules: {
+        "local/supabase-columns-satisfies": "error",
+      },
+    },
+    {
       name: "naming/form-state",
       files: featuresGlob(featureRoot, "**/*.ts"),
       plugins: { local: localPlugin },

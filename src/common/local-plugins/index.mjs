@@ -6,6 +6,8 @@ import { noAnyReturnRule } from "./no-any-return.mjs";
 import { queriesExportRule } from "./queries-export.mjs";
 import { queriesNamespaceImportRule } from "./queries-namespace-import.mjs";
 import { schemaNamingRule } from "./schema-naming.mjs";
+import { supabaseColumnsSatisfiesRule } from "./supabase-columns-satisfies.mjs";
+import { supabaseSelectTypedColumnsRule } from "./supabase-select-typed-columns.mjs";
 
 /** Single plugin object to avoid ESLint "Cannot redefine plugin" errors. */
 export const localPlugin = {
@@ -18,5 +20,7 @@ export const localPlugin = {
     "queries-export": queriesExportRule,
     "queries-namespace-import": queriesNamespaceImportRule,
     "schema-naming": schemaNamingRule,
+    "supabase-columns-satisfies": supabaseColumnsSatisfiesRule,
+    "supabase-select-typed-columns": supabaseSelectTypedColumnsRule,
   },
 };
