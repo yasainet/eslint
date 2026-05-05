@@ -2,19 +2,21 @@
  * Enforce consistent naming for `import * as` namespace imports
  * within feature-based architecture.
  *
- * Convention: import * as {featureName}{Scope}{Layer} from "{path}/{scope}.{layerExt}"
+ * Convention: import * as {featureName}{Scope}{Layer} from "{path}/{layerDir}/{scope}"
+ *
+ * Layer はファイル名 suffix ではなくディレクトリ名 (`queries/` / `services/` 等) から識別する。
  */
 
 /** @type {Record<string, string>} */
-const LAYER_MAP = {
-  query: "Query",
-  service: "Service",
-  domain: "Domain",
-  interactor: "Interactor",
-  util: "Util",
-  type: "Type",
-  schema: "Schema",
-  constant: "Constant",
+const LAYER_DIR_MAP = {
+  queries: "Query",
+  services: "Service",
+  domains: "Domain",
+  interactors: "Interactor",
+  utils: "Util",
+  types: "Type",
+  schemas: "Schema",
+  constants: "Constant",
 };
 
 /** Convert a snake_case or kebab-case string to camelCase. */
@@ -29,8 +31,11 @@ function toPascalCase(str) {
 }
 
 /**
- * Parse import source to extract featureName, scope, and layer.
- * Returns null if the source doesn't match the expected pattern.
+ * Parse import source to extract featureName, scope, and layer:
+ *
+ * - feature root 内の path のみを対象とする (外部 lib / shared / 相対インポートで feature 外に行くものは無視)
+ * - segments は `[feature, layerDir, ..., file]` の形式を想定し、末尾要素を scope として取り出す
+ * - layerDir が LAYER_DIR_MAP に無い場合は対象外
  */
 function parseImportSource(importPath, featureRoot) {
   // Normalize alias: @/features/... → features/...
@@ -46,20 +51,15 @@ function parseImportSource(importPath, featureRoot) {
   if (rootIdx === -1) return null;
 
   const afterRoot = normalized.slice(rootIdx + rootPrefix.length);
-  // Expected: {feature}/{layerDir}/{scope}.{layerExt}
+  // Expected: {feature}/{layerDir}/{scope}
   const segments = afterRoot.split("/");
-  if (segments.length < 2) return null;
+  if (segments.length < 3) return null;
 
   const featureDir = segments[0];
-  const fileName = segments[segments.length - 1].replace(/\.[jt]sx?$/, "");
+  const layerDir = segments[1];
+  const scope = segments[segments.length - 1].replace(/\.[jt]sx?$/, "");
 
-  const dotIdx = fileName.indexOf(".");
-  if (dotIdx === -1) return null;
-
-  const scope = fileName.slice(0, dotIdx);
-  const ext = fileName.slice(dotIdx + 1);
-
-  const layer = LAYER_MAP[ext];
+  const layer = LAYER_DIR_MAP[layerDir];
   if (!layer) return null;
 
   return { featureDir, scope, layer };

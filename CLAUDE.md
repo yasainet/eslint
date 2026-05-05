@@ -40,6 +40,49 @@ src/
 └── deno/     # Deno entry point (entry-point boundary, _utils boundary, _lib boundary)
 ```
 
+## 命名規約 (Phase 5: suffix 廃止 / 2026-05-05)
+
+> [!IMPORTANT]
+> 全 layer で role suffix (`*.lib` / `*.service` / `*.query` / `*.util` / `*.type` / `*.schema` / `*.constant` / `*.interactor`) を **廃止** した。役割は **ディレクトリ名のみ** で宣言する。
+
+### lib/ の命名
+
+`lib/<dir>/` 配下のファイル名は単一トークン (`*` パターン、ドット禁止)。lib の構造は **`index.ts` の有無**で 2 種類に分岐する:
+
+| 種別                | 検出条件                            | プレフィックス登録                | 例                                                         |
+| ------------------- | ----------------------------------- | --------------------------------- | ---------------------------------------------------------- |
+| **single-client**   | `lib/<dir>/index.ts` あり           | `<dir>` のみ (sub-module は除外) | `lib/gallery-dl/{index.ts, parser.ts, types.ts}`           |
+| **multi-client**    | `index.ts` 不在                     | dir 内の全 `<role>.ts`            | `lib/supabase/{admin.ts, server.ts, client.ts, proxy.ts}`  |
+
+- `types.ts` / `proxy.ts` は EXCLUDE_LIST で常に prefix 登録から除外
+- 多重拡張子 (`.test.ts` 等) のファイルも自動除外
+- `lib/<dir>/index.ts` は redundant な `lib/<dir>/<dir>.ts` を回避し、import が `from "@/lib/<dir>"` に短縮される
+- single-client lib では sub-module (e.g., `parser.ts`) は **構造的に queries 層から見えない** (prefix 衝突を起こさない)
+
+### features/ の命名
+
+| layer        | ファイル名                                | 補足                                           |
+| ------------ | ----------------------------------------- | ---------------------------------------------- |
+| `queries/`   | `<lib-prefix>.ts`                         | 1 file = 1 lib への呼び出し集約。lib-boundary lint で他 lib 禁止 |
+| `services/`  | `<lib-prefix>.ts`                         | サービスは複数 lib を組み合わせる orchestration |
+| `interactors/` | `server.ts` / `admin.ts` / `client.ts`  | server/admin は `"use server"` 強制、client は禁止 |
+| `types/`     | `<feature>.ts`                            | feature と同名 1 ファイル                      |
+| `schemas/`   | `<feature>.ts`                            | 同上                                           |
+| `utils/`     | `<feature>.ts`                            | 同上                                           |
+| `constants/` | `<feature>.ts`                            | 同上                                           |
+| `hooks/`     | `use-<verb>.ts`                           | React 慣例の `use-` prefix を許容              |
+
+### shared/ の意味
+
+`features/shared/` は cross-feature な共通モジュール置き場。ファイル名は `@(shared|<lib-prefix>)` を許可する:
+
+- `shared/services/shared.ts` — どの lib にも紐つかない汎用 service
+- `shared/services/supabase.ts` — supabase を呼ぶ shared service
+
+### prefixLibMapping の生成ロジック
+
+`src/common/constants.mjs` の `generatePrefixLibMapping` が ESLint 起動時に `lib/` をスキャンし、上記ルールで prefix → lib path のマッピングを生成する。新しい lib を追加すると **自動的に** queries / services / interactors の許可ファイル名が拡張される。
+
 ## Commands
 
 ```bash
@@ -71,7 +114,34 @@ npm install @yasainet/eslint@latest
 ### 3 層命名刷新（段階実装 - 2026-04-25 整理）
 
 > [!NOTE]
-> Phase 1 ✅ 完了 / Phase 2 ✅ 完了 / Phase 3 🟢 大半解決済 / Phase 4 🔵 保留。アクティブな個別 TODO は本ファイル末尾を参照。
+> Phase 1 ✅ 完了 / Phase 2 ✅ 完了 / Phase 3 🟢 大半解決済 / Phase 4 🔵 保留 / Phase 5 ✅ 完了 (suffix 廃止)。アクティブな個別 TODO は本ファイル末尾を参照。
+
+#### Phase 5: role suffix 完全廃止 ✅ 完了 (2026-05-05, refactor/simplify ブランチ)
+
+**動機:**
+
+- Phase 1-4 で `*.service.ts` / `*.query.ts` 等の suffix を採用したが、Cal.com / PostHog / Bulletproof React など現代 OSS の 75% は **suffix なし + ディレクトリ責務** で動いている
+- 「Rails の規約厳格性 × Bulletproof の簡潔性」のハイブリッドで、suffix を削っても役割表現は失わない
+- supabase だけ `admin.lib.ts / server.lib.ts / proxy.lib.ts` で命名規則が特殊化していた問題が、suffix 廃止で完全消滅 (multi-client lib として自然な姿になる)
+
+**変更内容:**
+
+- 全 layer の `*.<role>.ts` 強制を撤廃。basename は `*` (single-token、ドット禁止) を強制
+- single-client lib の entry を `lib/<dir>/<dir>.ts` (redundant) ではなく `lib/<dir>/index.ts` に統一。import が `from "@/lib/<dir>"` に短縮される
+- `generatePrefixLibMapping` を「dir 名一致 entry 検出」から「`index.ts` 検出」に変更:
+  - `index.ts` あり → single-client (prefix = dir 名のみ、sub-module 自動隠蔽)
+  - `index.ts` なし → multi-client (全 plain `<role>.ts` を登録)
+- `EXCLUDE_LIST` を `["types.ts", "proxy.ts"]` に統一 (lib 内部実装ファイルは prefix から除外)
+- `local/namespace-import-name` の parsing を suffix ベースから layer dir ベースに書き換え
+- `local/queries-namespace-import` の path 検出を suffix なし対応に
+- `next/directives.mjs` の対象 path を `interactors/<role>.ts` に更新
+
+**実装ステータス:**
+
+- ✅ ブランチ: `refactor/simplify`
+- ✅ downloadranking.net で動作検証済 (lint / type-check / knip / build 全 pass)
+- 🟡 publish 未 — main merge + version tag が必要
+- 🟡 他 consuming project への展開: migration script を別途用意する想定
 
 #### 背景
 

@@ -20,23 +20,44 @@ src/
 └── deno/     # Deno entry point (entry-point boundary, _utils boundary, _lib boundary)
 ```
 
-Each entry point enforces a feature-based architecture with the following convention in consuming projects:
+Each entry point enforces a feature-based architecture. **Files do not carry role suffixes — the directory declares the role**:
 
 ```text
 {featureRoot}/
 ├── {feature}/
-│   ├── interactors/    # *.interactor.ts — entry points
-│   ├── services/       # *.service.ts — business logic
-│   ├── queries/        # *.query.ts — data access
-│   ├── types/          # *.type.ts
-│   ├── schemas/        # *.schema.ts
-│   ├── utils/          # *.util.ts
-│   └── constants/      # *.constant.ts
+│   ├── interactors/    # entry points (server.ts / admin.ts / client.ts)
+│   ├── services/       # business logic (server.ts ...)
+│   ├── queries/        # data access (one file per upstream lib: <lib-name>.ts)
+│   ├── types/          # type defs (one file per feature: <feature>.ts)
+│   ├── schemas/        # zod schemas (<feature>.ts)
+│   ├── utils/          # pure helpers (<feature>.ts)
+│   └── constants/      # constants (<feature>.ts)
 ├── shared/             # Cross-feature shared modules
-├── ...
-{libRoot}/              # *.lib.ts — library wrappers (e.g., supabase.lib.ts)
-{utilsRoot}/            # *.util.ts — top-level utilities (e.g., font.util.ts)
+{libRoot}/
+├── {single-client-lib}/index.ts   # SDK wrapper entry (e.g., gallery-dl, fxembed, r2)
+├── {single-client-lib}/types.ts   # raw SDK types
+├── {single-client-lib}/<sub>.ts   # internal sub-modules (parser, etc.) — auto-hidden from queries
+├── {multi-client-lib}/<role>.ts   # one role per file (e.g., supabase: admin / server / client / proxy)
+└── {multi-client-lib}/types.ts
+{utilsRoot}/            # top-level pure utilities (cn.ts / logger.ts ...)
 ```
+
+### single-client vs multi-client lib
+
+| Detected by                                  | Treated as       | Example                                       |
+| -------------------------------------------- | ---------------- | --------------------------------------------- |
+| `lib/<dir>/index.ts` exists                  | single-client    | `lib/gallery-dl/{index.ts, parser.ts, types.ts}` |
+| `lib/<dir>/index.ts` absent                  | multi-client     | `lib/supabase/{admin.ts, server.ts, client.ts, ...}` |
+
+For single-client libs the prefix mapping registers only the directory name, automatically hiding internal sub-modules (e.g., `parser.ts`) from the queries layer. For multi-client libs every plain `<role>.ts` is registered.
+
+### File naming rules
+
+- **No multi-extension suffixes** (`.lib`, `.service`, `.query`, `.util`, `.type`, `.schema`, `.constant`, `.interactor` are forbidden). The directory carries the role.
+- `lib/<dir>/index.ts` for single-client lib entries (avoids `lib/<dir>/<dir>.ts` redundancy).
+- `lib/<dir>/types.ts` and `lib/<dir>/proxy.ts` are excluded from the prefix mapping so queries cannot directly depend on them.
+- `<feature>/{types,schemas,utils,constants}/<feature>.ts` — exactly one file per feature, named after the feature.
+- `<feature>/queries/<lib-name>.ts` — file name must match a registered lib prefix; queries can only import from the matching lib (lib-boundary lint).
 
 ## Setup
 

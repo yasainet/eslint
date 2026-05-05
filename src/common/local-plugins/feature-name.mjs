@@ -113,11 +113,11 @@ export const featureNameRule = {
     // generated types without duplicating the file.
     const computedTypePath = path.join(
       projectRoot,
-      featureRoot.replace(/features$/, "lib/supabase/supabase.type.ts"),
+      featureRoot.replace(/features$/, "lib/supabase/types.ts"),
     );
     const fallbackTypePath = path.join(
       projectRoot,
-      "src/lib/supabase/supabase.type.ts",
+      "src/lib/supabase/types.ts",
     );
     const supabaseTypePath = fs.existsSync(computedTypePath)
       ? computedTypePath
