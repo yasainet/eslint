@@ -2,60 +2,68 @@ import { featuresGlob } from "./constants.mjs";
 import { localPlugin } from "./local-plugins/index.mjs";
 import { checkFile } from "./plugins.mjs";
 
-/** Scope lib naming rules to the lib root derived from the given feature root. */
+/**
+ * Scope lib naming rules to the lib root derived from the given feature root:
+ *
+ * - basename は suffix なしの単一トークン (`*` パターン) を強制する
+ * - 多重拡張子 (`<name>.lib.ts` / `<name>.parser.ts` 等) は禁止 → 役割はディレクトリで宣言する
+ * - types.ts は対象外 (型のみで lib の役割を持たないため check 不要)
+ */
 export function createLibNamingConfigs(featureRoot) {
   const libRoot = featureRoot.replace(/features$/, "lib");
   return [
     {
       name: "naming/lib",
       files: [`${libRoot}/**/*.ts`],
-      ignores: [`${libRoot}/**/*.type.ts`],
       plugins: { "check-file": checkFile },
       rules: {
         "check-file/filename-naming-convention": [
           "error",
-          { "**/*.ts": "*.lib" },
+          { "**/*.ts": "*" },
         ],
       },
     },
   ];
 }
 
-/** Scope utils naming rules to the utils root derived from the given feature root. */
+/**
+ * Scope utils naming rules to the utils root derived from the given feature root:
+ *
+ * - basename は suffix なしの単一トークン (`*` パターン) を強制する
+ * - 多重拡張子は禁止
+ */
 export function createUtilsNamingConfigs(featureRoot) {
   const utilsRoot = featureRoot.replace(/features$/, "utils");
   return [
     {
       name: "naming/top-level-utils",
       files: [`${utilsRoot}/**/*.ts`],
-      ignores: [`${utilsRoot}/**/*.type.ts`],
       plugins: { "check-file": checkFile },
       rules: {
         "check-file/filename-naming-convention": [
           "error",
-          { "**/*.ts": "*.util" },
+          { "**/*.ts": "*" },
         ],
       },
     },
   ];
 }
 
-/** Scope naming rules to the given feature root. */
+/**
+ * Scope naming rules to the given feature root:
+ *
+ * - 全 layer (services / queries / interactors / utils / types / schemas / constants) で suffix を廃止
+ * - ファイル名 (basename) は単一トークン (`*` パターン) を強制し、role はディレクトリで宣言する
+ * - queries / services / interactors のファイル名は prefixLibMapping のキー (lib name) と一致させ、どの lib を呼ぶか明示する
+ * - shared/ 配下では feature 名でなく `shared` または lib name を allowed prefix として許可する
+ */
 export function createNamingConfigs(featureRoot, prefixLibMapping) {
   const prefixes = Object.keys(prefixLibMapping);
   const hasPrefixes = prefixes.length > 0;
-  const prefixPattern = hasPrefixes ? `@(${prefixes.join("|")})` : null;
+  const prefixPattern = hasPrefixes ? `@(${prefixes.join("|")})` : "*";
   const sharedPrefixPattern = hasPrefixes
     ? `@(shared|${prefixes.join("|")})`
     : "shared";
-
-  const servicePattern = prefixPattern
-    ? `${prefixPattern}.service`
-    : "*.service";
-  const queryPattern = prefixPattern ? `${prefixPattern}.query` : "*.query";
-  const interactorPattern = prefixPattern
-    ? `${prefixPattern}.interactor`
-    : "*.interactor";
 
   const configs = [];
 
@@ -86,7 +94,7 @@ export function createNamingConfigs(featureRoot, prefixLibMapping) {
       rules: {
         "check-file/filename-naming-convention": [
           "error",
-          { "**/*.ts": servicePattern },
+          { "**/*.ts": prefixPattern },
         ],
       },
     },
@@ -98,13 +106,13 @@ export function createNamingConfigs(featureRoot, prefixLibMapping) {
       rules: {
         "check-file/filename-naming-convention": [
           "error",
-          { "**/*.ts": queryPattern },
+          { "**/*.ts": prefixPattern },
         ],
       },
     },
     {
       name: "naming/queries-export",
-      files: featuresGlob(featureRoot, "**/queries/*.query.ts"),
+      files: featuresGlob(featureRoot, "**/queries/*.ts"),
       plugins: { local: localPlugin },
       rules: {
         "local/queries-export": "error",
@@ -120,7 +128,7 @@ export function createNamingConfigs(featureRoot, prefixLibMapping) {
     },
     {
       name: "naming/supabase-select",
-      files: featuresGlob(featureRoot, "**/queries/*.query.ts"),
+      files: featuresGlob(featureRoot, "**/queries/*.ts"),
       plugins: { local: localPlugin },
       rules: {
         "local/supabase-select-typed-columns": "error",
@@ -129,8 +137,8 @@ export function createNamingConfigs(featureRoot, prefixLibMapping) {
     {
       name: "naming/supabase-columns-satisfies",
       files: [
-        ...featuresGlob(featureRoot, "**/queries/*.query.ts"),
-        ...featuresGlob(featureRoot, "**/constants/*.constant.ts"),
+        ...featuresGlob(featureRoot, "**/queries/*.ts"),
+        ...featuresGlob(featureRoot, "**/constants/*.ts"),
       ],
       plugins: { local: localPlugin },
       rules: {
@@ -155,7 +163,7 @@ export function createNamingConfigs(featureRoot, prefixLibMapping) {
       rules: {
         "check-file/filename-naming-convention": [
           "error",
-          { "**/*.ts": `${sharedPrefixPattern}.service` },
+          { "**/*.ts": sharedPrefixPattern },
         ],
       },
     },
@@ -166,7 +174,7 @@ export function createNamingConfigs(featureRoot, prefixLibMapping) {
       rules: {
         "check-file/filename-naming-convention": [
           "error",
-          { "**/*.ts": `${sharedPrefixPattern}.query` },
+          { "**/*.ts": sharedPrefixPattern },
         ],
       },
     },
@@ -175,14 +183,13 @@ export function createNamingConfigs(featureRoot, prefixLibMapping) {
   configs.push(
     {
       name: "naming/types",
-      files: featuresGlob(featureRoot, "*/types/*.type.ts"),
+      files: featuresGlob(featureRoot, "*/types/*.ts"),
       ignores: featuresGlob(featureRoot, "shared/types/*.ts"),
       plugins: { "check-file": checkFile },
       rules: {
         "check-file/filename-naming-convention": [
           "error",
           { "**/*/types/*.ts": "<1>" },
-          { ignoreMiddleExtensions: true },
         ],
       },
     },
@@ -193,26 +200,25 @@ export function createNamingConfigs(featureRoot, prefixLibMapping) {
       rules: {
         "check-file/filename-naming-convention": [
           "error",
-          { "**/*.ts": `${sharedPrefixPattern}.type` },
+          { "**/*.ts": sharedPrefixPattern },
         ],
       },
     },
     {
       name: "naming/schemas",
-      files: featuresGlob(featureRoot, "*/schemas/*.schema.ts"),
+      files: featuresGlob(featureRoot, "*/schemas/*.ts"),
       ignores: featuresGlob(featureRoot, "shared/schemas/*.ts"),
       plugins: { "check-file": checkFile },
       rules: {
         "check-file/filename-naming-convention": [
           "error",
           { "**/*/schemas/*.ts": "<1>" },
-          { ignoreMiddleExtensions: true },
         ],
       },
     },
     {
       name: "naming/schema-naming",
-      files: featuresGlob(featureRoot, "**/schemas/*.schema.ts"),
+      files: featuresGlob(featureRoot, "**/schemas/*.ts"),
       plugins: { local: localPlugin },
       rules: {
         "local/schema-naming": "error",
@@ -225,20 +231,19 @@ export function createNamingConfigs(featureRoot, prefixLibMapping) {
       rules: {
         "check-file/filename-naming-convention": [
           "error",
-          { "**/*.ts": `${sharedPrefixPattern}.schema` },
+          { "**/*.ts": sharedPrefixPattern },
         ],
       },
     },
     {
       name: "naming/utils",
-      files: featuresGlob(featureRoot, "*/utils/*.util.ts"),
+      files: featuresGlob(featureRoot, "*/utils/*.ts"),
       ignores: featuresGlob(featureRoot, "shared/utils/*.ts"),
       plugins: { "check-file": checkFile },
       rules: {
         "check-file/filename-naming-convention": [
           "error",
           { "**/*/utils/*.ts": "<1>" },
-          { ignoreMiddleExtensions: true },
         ],
       },
     },
@@ -249,20 +254,19 @@ export function createNamingConfigs(featureRoot, prefixLibMapping) {
       rules: {
         "check-file/filename-naming-convention": [
           "error",
-          { "**/*.ts": `${sharedPrefixPattern}.util` },
+          { "**/*.ts": sharedPrefixPattern },
         ],
       },
     },
     {
       name: "naming/constants",
-      files: featuresGlob(featureRoot, "*/constants/*.constant.ts"),
+      files: featuresGlob(featureRoot, "*/constants/*.ts"),
       ignores: featuresGlob(featureRoot, "shared/constants/*.ts"),
       plugins: { "check-file": checkFile },
       rules: {
         "check-file/filename-naming-convention": [
           "error",
           { "**/*/constants/*.ts": "<1>" },
-          { ignoreMiddleExtensions: true },
         ],
       },
     },
@@ -273,7 +277,7 @@ export function createNamingConfigs(featureRoot, prefixLibMapping) {
       rules: {
         "check-file/filename-naming-convention": [
           "error",
-          { "**/*.ts": `${sharedPrefixPattern}.constant` },
+          { "**/*.ts": sharedPrefixPattern },
         ],
       },
     },
@@ -287,7 +291,7 @@ export function createNamingConfigs(featureRoot, prefixLibMapping) {
     rules: {
       "check-file/filename-naming-convention": [
         "error",
-        { "**/*.ts": interactorPattern },
+        { "**/*.ts": prefixPattern },
       ],
     },
   });
@@ -300,7 +304,7 @@ export function createNamingConfigs(featureRoot, prefixLibMapping) {
       rules: {
         "check-file/filename-naming-convention": [
           "error",
-          { "**/*.ts": `${sharedPrefixPattern}.interactor` },
+          { "**/*.ts": sharedPrefixPattern },
         ],
       },
     },

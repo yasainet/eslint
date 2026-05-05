@@ -1,7 +1,7 @@
 /**
  * Enforce explicit column lists for Supabase `.select()` calls.
  *
- * Apply to `**\/queries/*.query.ts`. `.select()` の引数は次のいずれかでなければならない:
+ * Apply to `**\/queries/*.ts`. `.select()` の引数は次のいずれかでなければならない:
  *
  * - inline string literal（例: `.select("id,url,platform")`）
  * - `*_COLUMNS` という UPPER_SNAKE 命名の identifier（例: `.select(POST_DETAIL_COLUMNS)`）

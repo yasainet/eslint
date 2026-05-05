@@ -62,23 +62,23 @@ const LATERAL_PATTERNS = {
 const CARDINALITY_PATTERNS = {
   server: [
     {
-      group: ["**/services/client.service*", "**/services/admin.service*"],
+      group: ["**/services/client", "**/services/admin"],
       message:
-        "server.interactor can only import server.service (cardinality violation)",
+        "server interactor can only import server service (cardinality violation)",
     },
   ],
   client: [
     {
-      group: ["**/services/server.service*", "**/services/admin.service*"],
+      group: ["**/services/server", "**/services/admin"],
       message:
-        "client.interactor can only import client.service (cardinality violation)",
+        "client interactor can only import client service (cardinality violation)",
     },
   ],
   admin: [
     {
-      group: ["**/services/server.service*", "**/services/client.service*"],
+      group: ["**/services/server", "**/services/client"],
       message:
-        "admin.interactor can only import admin.service (cardinality violation)",
+        "admin interactor can only import admin service (cardinality violation)",
     },
   ],
 };
@@ -90,7 +90,7 @@ function prefixLibPatterns(prefix, mapping) {
     .filter((p) => p !== prefix)
     .map((p) => ({
       group: [`**/lib/${mapping[p]}`, `**/lib/${mapping[p]}/*`],
-      message: `${prefix}.query.ts can only import from lib/${allowedLib}. Use the correct query file for this lib.`,
+      message: `queries/${prefix}.ts can only import from lib/${allowedLib}. Use the correct query file for this lib.`,
     }));
 }
 
@@ -329,7 +329,7 @@ export function createImportsConfigs(
     configs.push(
       makeConfig(
         `queries/${prefix}`,
-        [`${featureRoot}/**/queries/${prefix}.query.ts`],
+        [`${featureRoot}/**/queries/${prefix}.ts`],
         LAYER_PATTERNS.queries,
         LATERAL_PATTERNS.queries,
         patterns,
@@ -401,7 +401,7 @@ export function createImportsConfigs(
     configs.push(
       makeConfig(
         `interactors/${prefix}`,
-        [`${featureRoot}/**/interactors/${prefix}.interactor.ts`],
+        [`${featureRoot}/**/interactors/${prefix}.ts`],
         LAYER_PATTERNS.interactors,
         LATERAL_PATTERNS.interactors,
         CARDINALITY_PATTERNS[prefix],

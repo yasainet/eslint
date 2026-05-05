@@ -20,14 +20,22 @@ function findProjectRoot() {
 
 const PROJECT_ROOT = findProjectRoot();
 
-const EXCLUDE_LIST = ["proxy.lib.ts"];
+/**
+ * Files / basenames that should never become a prefix:
+ *
+ * - `types.ts`: 型定義のみで lib の役割を持たない
+ * - `proxy.ts`: middleware adapter (Next.js の proxy.ts と意味が衝突するため queries から呼ばせない)
+ */
+const EXCLUDE_LIST = ["types.ts", "proxy.ts"];
 
-/** Extract the base name from a .ts filename by stripping all extensions. */
-function baseName(filename) {
-  return filename.replace(/\..*$/, "");
-}
-
-/** Scan lib directory derived from featureRoot and build prefix-to-lib-relative-path mapping. */
+/**
+ * Scan lib directory and build prefix-to-lib-relative-path mapping:
+ *
+ * - single-client lib (`lib/<dir>/index.ts`): prefix = dir 名、entry のみ登録 — 同 dir 内の他ファイル (parser 等 sub-module) は自動除外
+ * - multi-client lib (index.ts なし): dir 内の全 `<role>.ts` を登録 (e.g., supabase の admin / server / client)
+ * - 多重拡張子 (`.test.ts` 等) を持つファイルは sub-module / 非 lib として除外
+ * - types.ts / proxy.ts のような lib として queries から呼ばせたくないものは EXCLUDE_LIST で除外
+ */
 export function generatePrefixLibMapping(featureRoot) {
   const libRoot = featureRoot.replace(/features$/, "lib");
   const libDir = path.join(PROJECT_ROOT, libRoot);
@@ -37,30 +45,35 @@ export function generatePrefixLibMapping(featureRoot) {
     return mapping;
   }
 
+  const isPlainTsFile = (name) =>
+    name.endsWith(".ts") &&
+    name.split(".").length === 2 &&
+    !EXCLUDE_LIST.includes(name);
+
   const entries = fs.readdirSync(libDir, { withFileTypes: true });
 
   for (const entry of entries) {
-    if (EXCLUDE_LIST.includes(entry.name)) {
-      continue;
-    }
-
     if (entry.isDirectory()) {
       const subDir = path.join(libDir, entry.name);
       const subEntries = fs.readdirSync(subDir, { withFileTypes: true });
+      const plainTsFiles = subEntries
+        .filter((e) => e.isFile() && isPlainTsFile(e.name))
+        .map((e) => e.name);
 
-      for (const subEntry of subEntries) {
-        if (
-          subEntry.isFile() &&
-          subEntry.name.endsWith(".lib.ts") &&
-          !EXCLUDE_LIST.includes(subEntry.name)
-        ) {
-          const prefix = baseName(subEntry.name);
-          mapping[prefix] = `${entry.name}/${subEntry.name.replace(".lib.ts", "")}`;
+      if (plainTsFiles.includes("index.ts")) {
+        // single-client lib: index.ts を entry とみなし、prefix = dir 名で登録
+        // 同 dir 内の他ファイル (parser 等) は sub-module として自動除外
+        mapping[entry.name] = `${entry.name}/index`;
+      } else {
+        // multi-client lib: 全 role file を登録 (e.g., supabase の admin / server / client)
+        for (const fileName of plainTsFiles) {
+          const prefix = fileName.replace(/\.ts$/, "");
+          mapping[prefix] = `${entry.name}/${prefix}`;
         }
       }
-    } else if (entry.isFile() && entry.name.endsWith(".lib.ts")) {
-      const prefix = baseName(entry.name);
-      mapping[prefix] = entry.name.replace(".lib.ts", "");
+    } else if (entry.isFile() && isPlainTsFile(entry.name)) {
+      const prefix = entry.name.replace(/\.ts$/, "");
+      mapping[prefix] = prefix;
     }
   }
 

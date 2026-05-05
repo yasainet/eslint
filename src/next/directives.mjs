@@ -2,7 +2,7 @@
 export const directivesConfigs = [
   {
     name: "directives/server-interactor",
-    files: ["src/features/**/interactors/server.interactor.ts"],
+    files: ["src/features/**/interactors/server.ts"],
     rules: {
       "no-restricted-syntax": [
         "error",
@@ -10,14 +10,14 @@ export const directivesConfigs = [
           selector:
             "Program > :first-child:not(ExpressionStatement[expression.value='use server'])",
           message:
-            'server.interactor.ts must start with "use server" directive.',
+            'interactors/server.ts must start with "use server" directive.',
         },
       ],
     },
   },
   {
     name: "directives/admin-interactor",
-    files: ["src/features/**/interactors/admin.interactor.ts"],
+    files: ["src/features/**/interactors/admin.ts"],
     rules: {
       "no-restricted-syntax": [
         "error",
@@ -25,21 +25,21 @@ export const directivesConfigs = [
           selector:
             "Program > :first-child:not(ExpressionStatement[expression.value='use server'])",
           message:
-            'admin.interactor.ts must start with "use server" directive.',
+            'interactors/admin.ts must start with "use server" directive.',
         },
       ],
     },
   },
   {
     name: "directives/client-interactor",
-    files: ["src/features/**/interactors/client.interactor.ts"],
+    files: ["src/features/**/interactors/client.ts"],
     rules: {
       "no-restricted-syntax": [
         "error",
         {
           selector: "ExpressionStatement[expression.value='use server']",
           message:
-            'client.interactor.ts must NOT have "use server" directive. It uses @/lib/supabase/client.',
+            'interactors/client.ts must NOT have "use server" directive. It uses @/lib/supabase/client.',
         },
       ],
     },

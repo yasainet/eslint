@@ -1,9 +1,9 @@
 /**
- * Enforce verb allow list for `queries/*.query.ts` exports.
+ * Enforce verb allow list for `queries/*.ts` exports:
  *
- * The queries layer is the TS-idiomatic translation of Rails 5 actions
- * (index/show -> get, create, update, destroy -> delete). Auth ceremonies
- * (signUp / signIn / signOut) are admitted as industry-standard exceptions.
+ * - The queries layer is the TS-idiomatic translation of Rails 5 actions
+ *   (index/show -> get, create, update, destroy -> delete)
+ * - Auth ceremonies (signUp / signIn / signOut) are admitted as industry-standard exceptions
  */
 
 const QUERIES_ALLOW = /^(get|create|update|delete|signUp|signIn|signOut)([A-Z]|$)/;

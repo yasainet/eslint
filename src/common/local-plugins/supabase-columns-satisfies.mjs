@@ -1,7 +1,7 @@
 /**
  * Enforce `<string literal> as const` for `*_COLUMNS` constant declarations.
  *
- * Apply to `**\/queries/*.query.ts` and `**\/constants/*.constant.ts`.
+ * Apply to `**\/queries/*.ts` and `**\/constants/*.ts`.
  *
  * `*_COLUMNS` 定数は Supabase の `.select()` に直接渡される。`as const` を
  * 外すと TypeScript が `string` に widen し、Supabase の `.select<Query>()`
