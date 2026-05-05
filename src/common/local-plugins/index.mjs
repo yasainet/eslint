@@ -1,6 +1,7 @@
 import { featureNameRule } from "./feature-name.mjs";
 import { formStateNamingRule } from "./form-state-naming.mjs";
 import { importPathStyleRule } from "./import-path-style.mjs";
+import { layoutMainStructuralOnlyRule } from "./layout-main-structural-only.mjs";
 import { namespaceImportNameRule } from "./namespace-import-name.mjs";
 import { noAnyReturnRule } from "./no-any-return.mjs";
 import { queriesExportRule } from "./queries-export.mjs";
@@ -15,6 +16,7 @@ export const localPlugin = {
     "feature-name": featureNameRule,
     "form-state-naming": formStateNamingRule,
     "import-path-style": importPathStyleRule,
+    "layout-main-structural-only": layoutMainStructuralOnlyRule,
     "namespace-import-name": namespaceImportNameRule,
     "no-any-return": noAnyReturnRule,
     "queries-export": queriesExportRule,

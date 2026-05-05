@@ -10,6 +10,7 @@ import {
 
 import { directivesConfigs } from "./directives.mjs";
 import { importPathStyleConfigs } from "./imports.mjs";
+import { layoutsConfigs } from "./layouts.mjs";
 import { namingConfigs } from "./naming.mjs";
 
 const nextEntryPointConfigs = createEntryPointConfigs(
@@ -33,5 +34,6 @@ export const eslintConfig = [
   ...namingConfigs,
   ...directivesConfigs,
   ...importPathStyleConfigs,
+  ...layoutsConfigs,
   ...nextEntryPointConfigs,
 ];
