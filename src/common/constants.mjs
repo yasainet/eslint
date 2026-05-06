@@ -23,10 +23,10 @@ const PROJECT_ROOT = findProjectRoot();
 /**
  * Files / basenames that should never become a prefix:
  *
- * - `types.ts`: 型定義のみで lib の役割を持たない
+ * - `types.ts` / `type.ts`: 型定義のみで lib の役割を持たない (単複どちらの命名でも除外)
  * - `proxy.ts`: middleware adapter (Next.js の proxy.ts と意味が衝突するため queries から呼ばせない)
  */
-const EXCLUDE_LIST = ["types.ts", "proxy.ts"];
+const EXCLUDE_LIST = ["types.ts", "type.ts", "proxy.ts"];
 
 /**
  * Scan lib directory and build prefix-to-lib-relative-path mapping:
@@ -34,7 +34,7 @@ const EXCLUDE_LIST = ["types.ts", "proxy.ts"];
  * - single-client lib (`lib/<dir>/index.ts`): prefix = dir 名、entry のみ登録 — 同 dir 内の他ファイル (parser 等 sub-module) は自動除外
  * - multi-client lib (index.ts なし): dir 内の全 `<role>.ts` を登録 (e.g., supabase の admin / server / client)
  * - 多重拡張子 (`.test.ts` 等) を持つファイルは sub-module / 非 lib として除外
- * - types.ts / proxy.ts のような lib として queries から呼ばせたくないものは EXCLUDE_LIST で除外
+ * - types.ts / type.ts / proxy.ts のような lib として queries から呼ばせたくないものは EXCLUDE_LIST で除外
  */
 export function generatePrefixLibMapping(featureRoot) {
   const libRoot = featureRoot.replace(/features$/, "lib");

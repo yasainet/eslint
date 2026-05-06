@@ -55,7 +55,7 @@ src/
 | **single-client**   | `lib/<dir>/index.ts` あり           | `<dir>` のみ (sub-module は除外) | `lib/gallery-dl/{index.ts, parser.ts, types.ts}`           |
 | **multi-client**    | `index.ts` 不在                     | dir 内の全 `<role>.ts`            | `lib/supabase/{admin.ts, server.ts, client.ts, proxy.ts}`  |
 
-- `types.ts` / `proxy.ts` は EXCLUDE_LIST で常に prefix 登録から除外
+- `types.ts` (複数形) / `type.ts` (単数形) / `proxy.ts` は EXCLUDE_LIST で常に prefix 登録から除外。型ファイルの命名は consuming project の好みに任せる
 - 多重拡張子 (`.test.ts` 等) のファイルも自動除外
 - `lib/<dir>/index.ts` は redundant な `lib/<dir>/<dir>.ts` を回避し、import が `from "@/lib/<dir>"` に短縮される
 - single-client lib では sub-module (e.g., `parser.ts`) は **構造的に queries 層から見えない** (prefix 衝突を起こさない)

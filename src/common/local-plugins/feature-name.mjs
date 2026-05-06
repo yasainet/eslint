@@ -110,18 +110,16 @@ export const featureNameRule = {
     // Prefer the Supabase types file adjacent to `featureRoot` (e.g. `src/lib/...`
     // for `src/features`). Fall back to `src/lib/...` at the project root so that
     // non-`src` feature roots (e.g. `scripts/features`) can reuse the same
-    // generated types without duplicating the file.
-    const computedTypePath = path.join(
-      projectRoot,
-      featureRoot.replace(/features$/, "lib/supabase/types.ts"),
-    );
-    const fallbackTypePath = path.join(
-      projectRoot,
-      "src/lib/supabase/types.ts",
-    );
-    const supabaseTypePath = fs.existsSync(computedTypePath)
-      ? computedTypePath
-      : fallbackTypePath;
+    // generated types without duplicating the file. Both `types.ts` (plural) and
+    // `type.ts` (singular) are accepted to match either naming convention.
+    const candidateTypePaths = [
+      path.join(projectRoot, featureRoot.replace(/features$/, "lib/supabase/types.ts")),
+      path.join(projectRoot, featureRoot.replace(/features$/, "lib/supabase/type.ts")),
+      path.join(projectRoot, "src/lib/supabase/types.ts"),
+      path.join(projectRoot, "src/lib/supabase/type.ts"),
+    ];
+    const supabaseTypePath =
+      candidateTypePaths.find((p) => fs.existsSync(p)) ?? candidateTypePaths[0];
 
     const tableNames = extractTableNames(supabaseTypePath);
     const allowedNames = ["shared", "auth", ...tableNames.map(toKebab)];
