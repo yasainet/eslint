@@ -25,7 +25,7 @@ Each entry point enforces a feature-based architecture. **Files do not carry rol
 ```text
 {featureRoot}/
 ├── {feature}/
-│   ├── interactors/    # entry points (server.ts / admin.ts / client.ts)
+│   ├── entries/        # entry points called from page.tsx / route.ts / hooks (server.ts / admin.ts / client.ts)
 │   ├── services/       # business logic (server.ts ...)
 │   ├── queries/        # data access (one file per upstream lib: <lib-name>.ts)
 │   ├── types/          # type defs (one file per feature: <feature>.ts)
@@ -53,7 +53,7 @@ For single-client libs the prefix mapping registers only the directory name, aut
 
 ### File naming rules
 
-- **No multi-extension suffixes** (`.lib`, `.service`, `.query`, `.util`, `.type`, `.schema`, `.constant`, `.interactor` are forbidden). The directory carries the role.
+- **No multi-extension suffixes** (`.lib`, `.service`, `.query`, `.util`, `.type`, `.schema`, `.constant`, `.entry` are forbidden). The directory carries the role.
 - `lib/<dir>/index.ts` for single-client lib entries (avoids `lib/<dir>/<dir>.ts` redundancy).
 - `lib/<dir>/types.ts` and `lib/<dir>/proxy.ts` are excluded from the prefix mapping so queries cannot directly depend on them.
 - `<feature>/{types,schemas,utils,constants}/<feature>.ts` — exactly one file per feature, named after the feature.

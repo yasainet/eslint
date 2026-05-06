@@ -40,10 +40,11 @@ src/
 └── deno/     # Deno entry point (entry-point boundary, _utils boundary, _lib boundary)
 ```
 
-## 命名規約 (Phase 5: suffix 廃止 / 2026-05-05)
+## 命名規約 (Phase 6: interactors → entries / 2026-05-06)
 
 > [!IMPORTANT]
-> 全 layer で role suffix (`*.lib` / `*.service` / `*.query` / `*.util` / `*.type` / `*.schema` / `*.constant` / `*.interactor`) を **廃止** した。役割は **ディレクトリ名のみ** で宣言する。
+> 全 layer で role suffix (`*.lib` / `*.service` / `*.query` / `*.util` / `*.type` / `*.schema` / `*.constant` / `*.entry`) を **廃止** した。役割は **ディレクトリ名のみ** で宣言する。
+> **Phase 6 (2026-05-06)**: `interactors/` を `entries/` にリネーム。「外界 (page.tsx / route.ts / hooks) から呼ばれる入口」という責務を直接表す命名に統一。
 
 ### lib/ の命名
 
@@ -65,7 +66,7 @@ src/
 | ------------ | ----------------------------------------- | ---------------------------------------------- |
 | `queries/`   | `<lib-prefix>.ts`                         | 1 file = 1 lib への呼び出し集約。lib-boundary lint で他 lib 禁止 |
 | `services/`  | `<lib-prefix>.ts`                         | サービスは複数 lib を組み合わせる orchestration |
-| `interactors/` | `server.ts` / `admin.ts` / `client.ts`  | server/admin は `"use server"` 強制、client は禁止 |
+| `entries/`   | `server.ts` / `admin.ts` / `client.ts`    | server/admin は `"use server"` 強制、client は禁止。page.tsx / route.ts / hooks から呼ばれる入口 |
 | `types/`     | `<feature>.ts`                            | feature と同名 1 ファイル                      |
 | `schemas/`   | `<feature>.ts`                            | 同上                                           |
 | `utils/`     | `<feature>.ts`                            | 同上                                           |
@@ -81,7 +82,7 @@ src/
 
 ### prefixLibMapping の生成ロジック
 
-`src/common/constants.mjs` の `generatePrefixLibMapping` が ESLint 起動時に `lib/` をスキャンし、上記ルールで prefix → lib path のマッピングを生成する。新しい lib を追加すると **自動的に** queries / services / interactors の許可ファイル名が拡張される。
+`src/common/constants.mjs` の `generatePrefixLibMapping` が ESLint 起動時に `lib/` をスキャンし、上記ルールで prefix → lib path のマッピングを生成する。新しい lib を追加すると **自動的に** queries / services / entries の許可ファイル名が拡張される。
 
 ## Commands
 

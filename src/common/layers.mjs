@@ -11,7 +11,7 @@ import { localPlugin } from "./local-plugins/index.mjs";
 export function createLayersConfigs(featureRoot, { typeAware = true } = {}) {
   const loggerSelector = "CallExpression[callee.object.name='logger']";
   const loggerMessage =
-    "logger is not allowed outside interactors. Logging belongs in interactors.";
+    "logger is not allowed outside entries. Logging belongs in entries.";
 
   const noAnyReturnConfig = {
     name: "layers/no-any-return",
@@ -26,11 +26,11 @@ export function createLayersConfigs(featureRoot, { typeAware = true } = {}) {
   };
 
   return [
-    // Logger/console: all features except interactors
+    // Logger/console: all features except entries
     {
       name: "layers/logger",
       files: [`${featureRoot}/**/*.ts`],
-      ignores: [`${featureRoot}/**/interactors/*.ts`],
+      ignores: [`${featureRoot}/**/entries/*.ts`],
       rules: {
         "no-console": "error",
         "no-restricted-syntax": [
@@ -49,7 +49,7 @@ export function createLayersConfigs(featureRoot, { typeAware = true } = {}) {
           {
             selector: "TryStatement",
             message:
-              "try-catch is not allowed in queries. Error handling belongs in interactors.",
+              "try-catch is not allowed in queries. Error handling belongs in entries.",
           },
           {
             selector: "IfStatement",
@@ -84,7 +84,7 @@ export function createLayersConfigs(featureRoot, { typeAware = true } = {}) {
           {
             selector: "ThrowStatement",
             message:
-              "throw is not allowed in queries. Queries must return Supabase's { data, error } shape as-is. Error handling belongs in interactors.",
+              "throw is not allowed in queries. Queries must return Supabase's { data, error } shape as-is. Error handling belongs in entries.",
           },
           { selector: loggerSelector, message: loggerMessage },
         ],
@@ -104,20 +104,20 @@ export function createLayersConfigs(featureRoot, { typeAware = true } = {}) {
           {
             selector: "TryStatement",
             message:
-              "try-catch is not allowed in services. Error handling belongs in interactors.",
+              "try-catch is not allowed in services. Error handling belongs in entries.",
           },
           { selector: loggerSelector, message: loggerMessage },
           {
             selector:
               "LogicalExpression[operator='??'][left.type='ChainExpression'][left.expression.property.name='message'][right.type='Literal']",
             message:
-              "Dead fallback for error message. If you reached this branch the error is known — return the error directly. Unhandled exceptions belong in interactors.",
+              "Dead fallback for error message. If you reached this branch the error is known — return the error directly. Unhandled exceptions belong in entries.",
           },
           {
             selector:
               "LogicalExpression[operator='??'][left.type='MemberExpression'][left.property.name='error'][right.type='ObjectExpression']",
             message:
-              "Dead fallback for nullable error. Check `if (error)` and return the error directly. Unhandled exceptions belong in interactors.",
+              "Dead fallback for nullable error. Check `if (error)` and return the error directly. Unhandled exceptions belong in entries.",
           },
         ],
       },

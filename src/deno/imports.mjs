@@ -40,17 +40,17 @@ export const denoImportsConfigs = [
             {
               group: ["**/services/*", "**/services"],
               message:
-                "Entry points must not import services directly. Import from interactors instead.",
+                "Top-level files must not import services directly. Import from entries instead.",
             },
             {
               group: ["**/queries/*", "**/queries"],
               message:
-                "Entry points must not import queries directly. Import from interactors instead.",
+                "Top-level files must not import queries directly. Import from entries instead.",
             },
             {
               group: ["*/_lib/*", "*/_lib/**"],
               message:
-                "Entry points must not import _lib/ directly. Import from interactors instead.",
+                "Top-level files must not import _lib/ directly. Import from entries instead.",
             },
           ],
         },

@@ -12,7 +12,7 @@ const LAYER_DIR_MAP = {
   queries: "Query",
   services: "Service",
   domains: "Domain",
-  interactors: "Interactor",
+  entries: "Entry",
   utils: "Util",
   types: "Type",
   schemas: "Schema",

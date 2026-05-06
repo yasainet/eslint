@@ -5,8 +5,8 @@ const LAYER_PATTERNS = {
       message: "queries cannot import services (layer violation)",
     },
     {
-      group: ["**/interactors/*", "**/interactors"],
-      message: "queries cannot import interactors (layer violation)",
+      group: ["**/entries/*", "**/entries"],
+      message: "queries cannot import entries (layer violation)",
     },
     {
       group: ["**/hooks/*", "**/hooks"],
@@ -15,22 +15,22 @@ const LAYER_PATTERNS = {
   ],
   services: [
     {
-      group: ["**/interactors/*", "**/interactors"],
-      message: "services cannot import interactors (layer violation)",
+      group: ["**/entries/*", "**/entries"],
+      message: "services cannot import entries (layer violation)",
     },
     {
       group: ["**/hooks/*", "**/hooks"],
       message: "services cannot import hooks (layer violation)",
     },
   ],
-  interactors: [
+  entries: [
     {
       group: ["**/queries/*", "**/queries"],
-      message: "interactors cannot import queries (layer violation)",
+      message: "entries cannot import queries (layer violation)",
     },
     {
       group: ["**/hooks/*", "**/hooks"],
-      message: "interactors cannot import hooks (layer violation)",
+      message: "entries cannot import hooks (layer violation)",
     },
   ],
 };
@@ -50,11 +50,11 @@ const LATERAL_PATTERNS = {
         "services cannot import other feature's services (lateral violation)",
     },
   ],
-  interactors: [
+  entries: [
     {
-      group: ["@/features/*/interactors/*", "@/features/*/interactors"],
+      group: ["@/features/*/entries/*", "@/features/*/entries"],
       message:
-        "interactors cannot import other feature's interactors (lateral violation)",
+        "entries cannot import other feature's entries (lateral violation)",
     },
   ],
 };
@@ -64,21 +64,21 @@ const CARDINALITY_PATTERNS = {
     {
       group: ["**/services/client", "**/services/admin"],
       message:
-        "server interactor can only import server service (cardinality violation)",
+        "server entry can only import server service (cardinality violation)",
     },
   ],
   client: [
     {
       group: ["**/services/server", "**/services/admin"],
       message:
-        "client interactor can only import client service (cardinality violation)",
+        "client entry can only import client service (cardinality violation)",
     },
   ],
   admin: [
     {
       group: ["**/services/server", "**/services/client"],
       message:
-        "admin interactor can only import admin service (cardinality violation)",
+        "admin entry can only import admin service (cardinality violation)",
     },
   ],
 };
@@ -115,12 +115,12 @@ const PAGE_BOUNDARY_PATTERNS = [
   {
     group: ["**/queries/*", "**/queries"],
     message:
-      "page.tsx can only import interactors, not queries (page-boundary violation)",
+      "page.tsx can only import entries, not queries (page-boundary violation)",
   },
   {
     group: ["**/services/*", "**/services"],
     message:
-      "page.tsx can only import interactors, not services (page-boundary violation)",
+      "page.tsx can only import entries, not services (page-boundary violation)",
   },
 ];
 
@@ -128,12 +128,12 @@ const ROUTE_BOUNDARY_PATTERNS = [
   {
     group: ["**/queries/*", "**/queries"],
     message:
-      "route.ts can only import interactors, not queries (route-boundary violation)",
+      "route.ts can only import entries, not queries (route-boundary violation)",
   },
   {
     group: ["**/services/*", "**/services"],
     message:
-      "route.ts can only import interactors, not services (route-boundary violation)",
+      "route.ts can only import entries, not services (route-boundary violation)",
   },
 ];
 
@@ -141,12 +141,12 @@ const HOOKS_BOUNDARY_PATTERNS = [
   {
     group: ["**/queries/*", "**/queries"],
     message:
-      "hooks can only import interactors, not queries (hooks-boundary violation)",
+      "hooks can only import entries, not queries (hooks-boundary violation)",
   },
   {
     group: ["**/services/*", "**/services"],
     message:
-      "hooks can only import interactors, not services (hooks-boundary violation)",
+      "hooks can only import entries, not services (hooks-boundary violation)",
   },
 ];
 
@@ -154,12 +154,12 @@ const COMPONENTS_BOUNDARY_PATTERNS = [
   {
     group: ["**/queries/*", "**/queries"],
     message:
-      "components can only import interactors or hooks, not queries (components-boundary violation)",
+      "components can only import entries or hooks, not queries (components-boundary violation)",
   },
   {
     group: ["**/services/*", "**/services"],
     message:
-      "components can only import interactors or hooks, not services (components-boundary violation)",
+      "components can only import entries or hooks, not services (components-boundary violation)",
   },
 ];
 
@@ -180,7 +180,7 @@ function makeConfig(name, files, ...patternArrays) {
 // ones — patterns are not merged. Page / hooks / components boundary configs
 // run after libBoundaryConfigs and would silently drop lib + mapping bans
 // unless we re-include those patterns explicitly.
-/** Next.js-only: restrict page.tsx to only import interactors. */
+/** Next.js-only: restrict page.tsx to only import entries. */
 export const pageBoundaryConfigs = [
   {
     name: "imports/page-boundary",
@@ -200,7 +200,7 @@ export const pageBoundaryConfigs = [
   },
 ];
 
-/** Next.js-only: restrict route.ts to only import interactors. */
+/** Next.js-only: restrict route.ts to only import entries. */
 export const routeBoundaryConfigs = [
   {
     name: "imports/route-boundary",
@@ -220,7 +220,7 @@ export const routeBoundaryConfigs = [
   },
 ];
 
-/** Next.js-only: restrict hooks to only import interactors (not queries or services). */
+/** Next.js-only: restrict hooks to only import entries (not queries or services). */
 export const hooksBoundaryConfigs = [
   {
     name: "imports/hooks-boundary",
@@ -240,7 +240,7 @@ export const hooksBoundaryConfigs = [
   },
 ];
 
-/** Next.js-only: restrict components to only import interactors or hooks (not queries or services). */
+/** Next.js-only: restrict components to only import entries or hooks (not queries or services). */
 export const componentsBoundaryConfigs = [
   {
     name: "imports/components-boundary",
@@ -350,10 +350,10 @@ export function createImportsConfigs(
 
   configs.push(
     makeConfig(
-      "interactors",
-      [`${featureRoot}/**/interactors/*.ts`],
-      LAYER_PATTERNS.interactors,
-      LATERAL_PATTERNS.interactors,
+      "entries",
+      [`${featureRoot}/**/entries/*.ts`],
+      LAYER_PATTERNS.entries,
+      LATERAL_PATTERNS.entries,
       LIB_BOUNDARY_PATTERNS,
       MAPPING_PATTERNS,
     ),
@@ -376,7 +376,7 @@ export function createImportsConfigs(
     ignores: [
       `${featureRoot}/**/services/*.ts`,
       `${featureRoot}/**/queries/*.ts`,
-      `${featureRoot}/**/interactors/*.ts`,
+      `${featureRoot}/**/entries/*.ts`,
       `${featureRoot}/**/utils/*.ts`,
       `${featureRoot}/**/types/*.ts`,
     ],
@@ -400,10 +400,10 @@ export function createImportsConfigs(
   for (const prefix of ["server", "client", "admin"]) {
     configs.push(
       makeConfig(
-        `interactors/${prefix}`,
-        [`${featureRoot}/**/interactors/${prefix}.ts`],
-        LAYER_PATTERNS.interactors,
-        LATERAL_PATTERNS.interactors,
+        `entries/${prefix}`,
+        [`${featureRoot}/**/entries/${prefix}.ts`],
+        LAYER_PATTERNS.entries,
+        LATERAL_PATTERNS.entries,
         CARDINALITY_PATTERNS[prefix],
         LIB_BOUNDARY_PATTERNS,
         MAPPING_PATTERNS,

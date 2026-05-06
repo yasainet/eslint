@@ -52,9 +52,9 @@ export function createUtilsNamingConfigs(featureRoot) {
 /**
  * Scope naming rules to the given feature root:
  *
- * - 全 layer (services / queries / interactors / utils / types / schemas / constants) で suffix を廃止
+ * - 全 layer (services / queries / entries / utils / types / schemas / constants) で suffix を廃止
  * - ファイル名 (basename) は単一トークン (`*` パターン) を強制し、role はディレクトリで宣言する
- * - queries / services / interactors のファイル名は prefixLibMapping のキー (lib name) と一致させ、どの lib を呼ぶか明示する
+ * - queries / services / entries のファイル名は prefixLibMapping のキー (lib name) と一致させ、どの lib を呼ぶか明示する
  * - shared/ 配下では feature 名でなく `shared` または lib name を allowed prefix として許可する
  */
 export function createNamingConfigs(featureRoot, prefixLibMapping) {
@@ -284,9 +284,9 @@ export function createNamingConfigs(featureRoot, prefixLibMapping) {
   );
 
   configs.push({
-    name: "naming/interactors",
-    files: featuresGlob(featureRoot, "**/interactors/*.ts"),
-    ignores: featuresGlob(featureRoot, "shared/interactors/*.ts"),
+    name: "naming/entries",
+    files: featuresGlob(featureRoot, "**/entries/*.ts"),
+    ignores: featuresGlob(featureRoot, "shared/entries/*.ts"),
     plugins: { "check-file": checkFile },
     rules: {
       "check-file/filename-naming-convention": [
@@ -298,8 +298,8 @@ export function createNamingConfigs(featureRoot, prefixLibMapping) {
 
   configs.push(
     {
-      name: "naming/interactors-shared",
-      files: featuresGlob(featureRoot, "shared/interactors/*.ts"),
+      name: "naming/entries-shared",
+      files: featuresGlob(featureRoot, "shared/entries/*.ts"),
       plugins: { "check-file": checkFile },
       rules: {
         "check-file/filename-naming-convention": [
