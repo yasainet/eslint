@@ -94,7 +94,7 @@ export function createLayersConfigs(featureRoot, { typeAware = true } = {}) {
     // into their public API. Uses type-aware inspection of the inferred
     // return type so unannotated functions are still checked.
     ...(typeAware ? [noAnyReturnConfig] : []),
-    // Services: try-catch + logger + dead error fallbacks
+    // Services: try-catch + logger + throw + dead error fallbacks
     {
       name: "layers/services",
       files: [`${featureRoot}/**/services/*.ts`],
@@ -105,6 +105,11 @@ export function createLayersConfigs(featureRoot, { typeAware = true } = {}) {
             selector: "TryStatement",
             message:
               "try-catch is not allowed in services. Error handling belongs in entries.",
+          },
+          {
+            selector: "ThrowStatement",
+            message:
+              "throw is not allowed in services. Communicate failures via T | null / { data, error } / empty default. Native exceptions from libs auto-propagate to entry's catch.",
           },
           { selector: loggerSelector, message: loggerMessage },
           {
