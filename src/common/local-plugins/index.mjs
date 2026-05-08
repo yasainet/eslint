@@ -1,3 +1,4 @@
+import { entryTemplateRule } from "./entry-template.mjs";
 import { featureNameRule } from "./feature-name.mjs";
 import { formStateNamingRule } from "./form-state-naming.mjs";
 import { importPathStyleRule } from "./import-path-style.mjs";
@@ -13,6 +14,7 @@ import { supabaseSelectTypedColumnsRule } from "./supabase-select-typed-columns.
 /** Single plugin object to avoid ESLint "Cannot redefine plugin" errors. */
 export const localPlugin = {
   rules: {
+    "entry-template": entryTemplateRule,
     "feature-name": featureNameRule,
     "form-state-naming": formStateNamingRule,
     "import-path-style": importPathStyleRule,

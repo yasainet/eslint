@@ -296,6 +296,15 @@ export function createNamingConfigs(featureRoot, prefixLibMapping) {
     },
   });
 
+  configs.push({
+    name: "naming/entry-template",
+    files: featuresGlob(featureRoot, "**/entries/*.ts"),
+    plugins: { local: localPlugin },
+    rules: {
+      "local/entry-template": "error",
+    },
+  });
+
   configs.push(
     {
       name: "naming/entries-shared",
