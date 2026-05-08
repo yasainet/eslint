@@ -6,6 +6,7 @@ import {
   libBoundaryConfigs,
   pageBoundaryConfigs,
   routeBoundaryConfigs,
+  sitemapBoundaryConfigs,
 } from "../common/imports.mjs";
 
 import { directivesConfigs } from "./directives.mjs";
@@ -29,6 +30,7 @@ export const eslintConfig = [
   ...libBoundaryConfigs,
   ...pageBoundaryConfigs,
   ...routeBoundaryConfigs,
+  ...sitemapBoundaryConfigs,
   ...hooksBoundaryConfigs,
   ...componentsBoundaryConfigs,
   ...namingConfigs,

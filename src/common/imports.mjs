@@ -137,6 +137,19 @@ const ROUTE_BOUNDARY_PATTERNS = [
   },
 ];
 
+const SITEMAP_BOUNDARY_PATTERNS = [
+  {
+    group: ["**/queries/*", "**/queries"],
+    message:
+      "sitemap.ts can only import entries, not queries (sitemap-boundary violation)",
+  },
+  {
+    group: ["**/services/*", "**/services"],
+    message:
+      "sitemap.ts can only import entries, not services (sitemap-boundary violation)",
+  },
+];
+
 const HOOKS_BOUNDARY_PATTERNS = [
   {
     group: ["**/queries/*", "**/queries"],
@@ -220,6 +233,26 @@ export const routeBoundaryConfigs = [
   },
 ];
 
+/** Next.js-only: restrict sitemap.ts to only import entries. */
+export const sitemapBoundaryConfigs = [
+  {
+    name: "imports/sitemap-boundary",
+    files: ["src/app/sitemap.ts", "src/app/**/sitemap.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            ...SITEMAP_BOUNDARY_PATTERNS,
+            ...LIB_BOUNDARY_PATTERNS,
+            ...MAPPING_PATTERNS,
+          ],
+        },
+      ],
+    },
+  },
+];
+
 /** Next.js-only: restrict hooks to only import entries (not queries or services). */
 export const hooksBoundaryConfigs = [
   {
@@ -271,7 +304,6 @@ export const libBoundaryConfigs = [
     ignores: [
       "src/lib/**",
       "src/proxy.ts",
-      "src/app/sitemap.ts",
       "src/app/**/route.ts",
       "src/features/**",
     ],
