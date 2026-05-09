@@ -1,9 +1,21 @@
 /**
- * Enforce the canonical entry template for `**\/entries/*.ts` exports:
+ * Enforce the canonical entry template for `**\/entries/*.ts` exports.
  *
- * - body must be a single try/catch
+ * Two body shapes are accepted:
+ *
+ * - **Pattern A** (read / mutation entries): body is a single try/catch.
+ * - **Pattern B** (redirect entries): body contains exactly one try/catch and
+ *   ends with a terminal Next.js navigation call (`redirect`, `notFound`,
+ *   `permanentRedirect`) — placed *outside* try/catch per the Next.js docs,
+ *   since these helpers throw `NEXT_REDIRECT` / `NEXT_NOT_FOUND` and must not
+ *   be intercepted by the entry's own catch. Pattern B does not require a
+ *   `return { data, error: null }` in the try block (success is the redirect).
+ *
+ * Both patterns share the same try/catch contract:
+ *
  * - try first statement: `logger.info(<obj>, "Start <funcName>")`
  * - try success return preceded by: `logger.info(<obj>, "Success <funcName>")`
+ *   (Pattern A only — Pattern B's success path terminates via redirect)
  * - try failed branch (when present): `logger.error(<obj>, "Failed <funcName>")`
  *   followed by a return with the proper error shape
  * - catch param: `error: unknown`
@@ -18,13 +30,49 @@
  */
 
 const CATCH_RETURN_MESSAGE = "An unexpected error occurred";
+const TERMINAL_CALLEES = new Set([
+  "redirect",
+  "permanentRedirect",
+  "notFound",
+]);
+
+/**
+ * Param identifier names that are excluded from log propagation. These hold
+ * secrets that must never be written to logs (Vercel logs are forwarded to
+ * external drains, so treating them as sensitive is the conservative default).
+ */
+const REDACT_PARAM_NAMES = new Set([
+  "password",
+  "newPassword",
+  "currentPassword",
+]);
+
+/**
+ * Param TypeScript type names that are excluded from log propagation. Supabase
+ * credential types contain `password` as a field; logging the whole param leaks
+ * the secret. Listed types are matched on the type annotation's identifier
+ * name (no type-info resolution; aliases must match by name).
+ */
+const REDACT_PARAM_TYPES = new Set([
+  "SignUpWithPasswordCredentials",
+  "SignInWithPasswordCredentials",
+]);
+
+function isRedactedParamType(param) {
+  const ann = param.typeAnnotation?.typeAnnotation;
+  if (ann?.type !== "TSTypeReference") return false;
+  const name = ann.typeName;
+  if (name?.type !== "Identifier") return false;
+  return REDACT_PARAM_TYPES.has(name.name);
+}
 
 function getInputArgNames(params) {
   const names = [];
   for (const p of params) {
-    if (p.type === "Identifier") {
-      names.push(p.name);
-    }
+    if (p.type !== "Identifier") continue;
+    if (REDACT_PARAM_NAMES.has(p.name)) continue;
+    if (isRedactedParamType(p)) continue;
+    names.push(p.name);
   }
   return names;
 }
@@ -192,7 +240,76 @@ function getReturnErrorMessageLiteral(ret) {
   return null;
 }
 
-function checkTryBlock(context, tryBlock, funcName, inputArgNames) {
+function isTerminalCallExpression(node) {
+  if (node?.type !== "CallExpression") return false;
+  const callee = node.callee;
+  return callee.type === "Identifier" && TERMINAL_CALLEES.has(callee.name);
+}
+
+function isTerminalStatement(stmt) {
+  if (!stmt) return false;
+  if (
+    stmt.type === "ExpressionStatement" &&
+    isTerminalCallExpression(stmt.expression)
+  ) {
+    return true;
+  }
+  if (
+    stmt.type === "ReturnStatement" &&
+    isTerminalCallExpression(stmt.argument)
+  ) {
+    return true;
+  }
+  return false;
+}
+
+function endsWithTerminal(node) {
+  if (!node) return false;
+  if (isTerminalStatement(node)) return true;
+  if (node.type === "BlockStatement") {
+    return statementsEndWithTerminal(node.body);
+  }
+  if (node.type === "IfStatement") {
+    if (!node.alternate) return false;
+    return (
+      endsWithTerminal(node.consequent) && endsWithTerminal(node.alternate)
+    );
+  }
+  if (node.type === "SwitchStatement") {
+    if (node.cases.length === 0) return false;
+    return node.cases.every((c, i) => caseEndsWithTerminal(c, node.cases, i));
+  }
+  return false;
+}
+
+function caseEndsWithTerminal(switchCase, allCases, idx) {
+  // Empty consequent = fallthrough; inherit next case's terminator.
+  if (switchCase.consequent.length === 0) {
+    const next = allCases[idx + 1];
+    if (!next) return false;
+    return caseEndsWithTerminal(next, allCases, idx + 1);
+  }
+  return statementsEndWithTerminal(switchCase.consequent);
+}
+
+function statementsEndWithTerminal(body) {
+  const last = body[body.length - 1];
+  return endsWithTerminal(last);
+}
+
+function classifyBody(body) {
+  const tryStatements = body.filter((s) => s.type === "TryStatement");
+  if (tryStatements.length !== 1) return { kind: "invalid" };
+  if (body.length === 1 && body[0].type === "TryStatement") {
+    return { kind: "A", tryStmt: body[0] };
+  }
+  if (statementsEndWithTerminal(body)) {
+    return { kind: "B", tryStmt: tryStatements[0] };
+  }
+  return { kind: "invalid" };
+}
+
+function checkTryBlock(context, tryBlock, funcName, inputArgNames, options) {
   if (tryBlock.body.length === 0) {
     context.report({ node: tryBlock, messageId: "tryEmpty", data: { funcName } });
     return;
@@ -262,7 +379,7 @@ function checkTryBlock(context, tryBlock, funcName, inputArgNames) {
     }
   }
 
-  if (!successFound) {
+  if (!successFound && options?.requireSuccessReturn !== false) {
     context.report({
       node: tryBlock,
       messageId: "trySuccessReturnMissing",
@@ -407,7 +524,7 @@ export const entryTemplateRule = {
     },
     messages: {
       bodyNotTryCatch:
-        "entry '{{ funcName }}' must have a single try/catch as its body.",
+        "entry '{{ funcName }}' body must be either a single try/catch (Pattern A) or a try/catch followed by a terminal navigation call such as `redirect(...)` / `notFound(...)` (Pattern B).",
       tryEmpty: "entry '{{ funcName }}' try block is empty.",
       tryMissingStartLog:
         "entry '{{ funcName }}' try block must start with `logger.info(<obj>, \"Start {{ funcName }}\")`.",
@@ -451,7 +568,8 @@ export const entryTemplateRule = {
         const inputArgNames = getInputArgNames(decl.params);
 
         const body = decl.body.body;
-        if (body.length !== 1 || body[0].type !== "TryStatement") {
+        const classification = classifyBody(body);
+        if (classification.kind === "invalid") {
           context.report({
             node: decl.id,
             messageId: "bodyNotTryCatch",
@@ -459,8 +577,10 @@ export const entryTemplateRule = {
           });
           return;
         }
-        const tryStmt = body[0];
-        checkTryBlock(context, tryStmt.block, funcName, inputArgNames);
+        const tryStmt = classification.tryStmt;
+        checkTryBlock(context, tryStmt.block, funcName, inputArgNames, {
+          requireSuccessReturn: classification.kind === "A",
+        });
         if (tryStmt.handler) {
           checkCatchClause(context, tryStmt.handler, funcName, inputArgNames);
         }
