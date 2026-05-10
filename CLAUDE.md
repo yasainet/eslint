@@ -44,7 +44,7 @@ src/
 
 - `no-restricted-classes` forbids margin (`m-*`, `mt-*`, ...) so spacing is controlled by padding/gap on the parent. Exceptions: `mx-auto`, `m*-auto`, negative margins (`-mt-*`), variant-prefixed (`first:mt-0`).
 - `enforce-consistent-class-order`, `enforce-consistent-important-position`, `no-conflicting-classes`, `no-deprecated-classes`, `no-duplicate-classes`, `no-unnecessary-whitespace` are enabled with defaults.
-- `entryPoint` is hardcoded to `src/app/globals.css` (Next.js v4 CSS-first config). Override in the consuming project's eslint.config.mjs if the path differs.
+- `entryPoint` is auto-resolved to the consuming project's `src/app/globals.css` by walking up from this module (mirroring the `findProjectRoot` pattern in `common/rules.mjs` and `common/constants.mjs`). The plugin's relative-path resolution is `cwd`-based and breaks under LSP servers (vscode-eslint, Zed) where `cwd` is the edited file's directory; passing an absolute path makes resolution `cwd`-independent. Override in the consuming project's eslint.config.mjs if the file lives elsewhere.
 
 ## 命名規約 (Phase 6: interactors → entries / 2026-05-06)
 

@@ -1,4 +1,31 @@
+import { existsSync } from "node:fs";
+import { dirname, join, sep } from "node:path";
+
 import betterTailwindcss from "eslint-plugin-better-tailwindcss";
+
+// `eslint-plugin-better-tailwindcss` resolves a relative `entryPoint` against
+// the linter's `cwd`, which under LSP servers (vscode-eslint, Zed) is often
+// the edited file's directory rather than the consumer's project root and
+// breaks resolution. Mirror the `findProjectRoot` pattern from
+// `common/rules.mjs` and `common/constants.mjs`: walk up from this module
+// outside of `node_modules` and locate `src/app/globals.css`, then pass the
+// absolute path so resolution is cwd-independent. Falls back to the relative
+// path when not found, preserving the previous CLI-only behavior.
+const findEntryPoint = (start) => {
+  let dir = start;
+  while (dir !== dirname(dir)) {
+    if (!dir.split(sep).includes("node_modules")) {
+      const candidate = join(dir, "src/app/globals.css");
+      if (existsSync(candidate)) {
+        return candidate;
+      }
+    }
+    dir = dirname(dir);
+  }
+  return "src/app/globals.css";
+};
+
+const entryPoint = findEntryPoint(import.meta.dirname);
 
 /**
  * Tailwind CSS v4 lint rules:
@@ -9,9 +36,9 @@ import betterTailwindcss from "eslint-plugin-better-tailwindcss";
  *   (`-space-x-2`) remain allowed for intentional overlap
  * - class order, deprecated classes, conflicts, duplicates, and whitespace
  *   are enforced via `eslint-plugin-better-tailwindcss`
- * - `entryPoint` points at the consuming project's CSS-first Tailwind config
- *   (`src/app/globals.css`). Override in the project's eslint.config.mjs if
- *   the path differs.
+ * - `entryPoint` is auto-resolved to the consuming project's
+ *   `src/app/globals.css` via walk-up from this module. Override in the
+ *   project's eslint.config.mjs if the file lives elsewhere.
  */
 export const tailwindcssConfigs = [
   {
@@ -20,7 +47,7 @@ export const tailwindcssConfigs = [
     plugins: { "better-tailwindcss": betterTailwindcss },
     settings: {
       "better-tailwindcss": {
-        entryPoint: "src/app/globals.css",
+        entryPoint,
       },
     },
     rules: {
