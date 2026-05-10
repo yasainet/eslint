@@ -33,10 +33,18 @@ Shared ESLint flat config that enforces feature-based architecture.
 ```text
 src/
 ├── common/   # Shared rules for all environments
-├── next/     # Next.js-specific rules (hooks, components, directives)
+├── next/     # Next.js-specific rules (hooks, components, directives, tailwindcss)
 ├── node/     # Node.js CLI scripts (scripts/features, scripts/commands)
 └── deno/     # Deno entry point (entry-point boundary, _utils boundary, _lib boundary)
 ```
+
+## Tailwind CSS rules (next entry only)
+
+`src/next/tailwindcss.mjs` ships a curated set of `eslint-plugin-better-tailwindcss` rules:
+
+- `no-restricted-classes` forbids margin (`m-*`, `mt-*`, ...) so spacing is controlled by padding/gap on the parent. Exceptions: `mx-auto`, `m*-auto`, negative margins (`-mt-*`), variant-prefixed (`first:mt-0`).
+- `enforce-consistent-class-order`, `enforce-consistent-important-position`, `no-conflicting-classes`, `no-deprecated-classes`, `no-duplicate-classes`, `no-unnecessary-whitespace` are enabled with defaults.
+- `entryPoint` is hardcoded to `src/app/globals.css` (Next.js v4 CSS-first config). Override in the consuming project's eslint.config.mjs if the path differs.
 
 ## 命名規約 (Phase 6: interactors → entries / 2026-05-06)
 

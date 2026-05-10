@@ -13,6 +13,7 @@ import { directivesConfigs } from "./directives.mjs";
 import { importPathStyleConfigs } from "./imports.mjs";
 import { layoutsConfigs } from "./layouts.mjs";
 import { namingConfigs } from "./naming.mjs";
+import { tailwindcssConfigs } from "./tailwindcss.mjs";
 
 const nextEntryPointConfigs = createEntryPointConfigs(
   ["src/app/**/*.ts", "src/app/**/*.tsx"],
@@ -37,5 +38,6 @@ export const eslintConfig = [
   ...directivesConfigs,
   ...importPathStyleConfigs,
   ...layoutsConfigs,
+  ...tailwindcssConfigs,
   ...nextEntryPointConfigs,
 ];
