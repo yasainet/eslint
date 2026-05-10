@@ -4,6 +4,9 @@ import betterTailwindcss from "eslint-plugin-better-tailwindcss";
  * Tailwind CSS v4 lint rules:
  *
  * - margin is forbidden; spacing is controlled by padding/gap on the parent
+ * - `space-x-*` / `space-y-*` are also banned because they apply margin to
+ *   children under the hood. Use `flex/grid + gap` instead. Negative variants
+ *   (`-space-x-2`) remain allowed for intentional overlap
  * - class order, deprecated classes, conflicts, duplicates, and whitespace
  *   are enforced via `eslint-plugin-better-tailwindcss`
  * - `entryPoint` points at the consuming project's CSS-first Tailwind config
@@ -34,6 +37,11 @@ export const tailwindcssConfigs = [
               pattern: "^(?!mx-auto$)m[trblxy]?-(?!auto$)[^-\\s]+$",
               message:
                 "Avoid margin; control spacing with padding/gap (exceptions: mx-auto, -mt-*)",
+            },
+            {
+              pattern: "^space-[xy]-[^-\\s]+$",
+              message:
+                "Avoid space-x/space-y (uses margin internally); use flex/grid + gap",
             },
           ],
         },
