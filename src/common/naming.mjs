@@ -305,6 +305,15 @@ export function createNamingConfigs(featureRoot, prefixLibMapping) {
     },
   });
 
+  configs.push({
+    name: "naming/entry-single-service-call",
+    files: featuresGlob(featureRoot, "**/entries/*.ts"),
+    plugins: { local: localPlugin },
+    rules: {
+      "local/entry-single-service-call": "error",
+    },
+  });
+
   configs.push(
     {
       name: "naming/entries-shared",

@@ -56,6 +56,16 @@ const LATERAL_PATTERNS = {
       message:
         "entries cannot import other feature's entries (lateral violation)",
     },
+    {
+      group: [
+        "@/features/*/services/*",
+        "@/features/*/services",
+        "!@/features/shared/services/*",
+        "!@/features/shared/services",
+      ],
+      message:
+        "entries cannot import other feature's services. Use the same feature's service (1:1) or move orchestration into the service layer. `shared/services/*` is exempt for cross-cutting side effects (notifications etc.).",
+    },
   ],
 };
 
