@@ -13,6 +13,11 @@ export function createLayersConfigs(featureRoot, { typeAware = true } = {}) {
   const loggerMessage =
     "logger is not allowed outside entries. Logging belongs in entries.";
 
+  const aliasDynamicImportSelector =
+    "ImportExpression[source.type='Literal'][source.value=/^@\\//]";
+  const aliasDynamicImportMessage =
+    "Dynamic imports of `@/` aliased paths are not allowed in features layers. They bypass prefix-lib and lateral cardinality (e.g. `await import('@/lib/supabase/admin')` from queries/server.ts escapes the lib-boundary check). Create the correct queries/<prefix>.ts or services/<prefix>.ts file instead. External npm packages can still be lazy-loaded for cold-start optimization.";
+
   const noAnyReturnConfig = {
     name: "layers/no-any-return",
     files: [
@@ -87,6 +92,10 @@ export function createLayersConfigs(featureRoot, { typeAware = true } = {}) {
               "throw is not allowed in queries. Queries must return Supabase's { data, error } shape as-is. Error handling belongs in entries.",
           },
           { selector: loggerSelector, message: loggerMessage },
+          {
+            selector: aliasDynamicImportSelector,
+            message: aliasDynamicImportMessage,
+          },
         ],
       },
     },
@@ -123,6 +132,24 @@ export function createLayersConfigs(featureRoot, { typeAware = true } = {}) {
               "LogicalExpression[operator='??'][left.type='MemberExpression'][left.property.name='error'][right.type='ObjectExpression']",
             message:
               "Dead fallback for nullable error. Check `if (error)` and return the error directly. Unhandled exceptions belong in entries.",
+          },
+          {
+            selector: aliasDynamicImportSelector,
+            message: aliasDynamicImportMessage,
+          },
+        ],
+      },
+    },
+    // Entries: ban dynamic `@/` imports that bypass cardinality / lateral rules
+    {
+      name: "layers/entries",
+      files: [`${featureRoot}/**/entries/*.ts`],
+      rules: {
+        "no-restricted-syntax": [
+          "error",
+          {
+            selector: aliasDynamicImportSelector,
+            message: aliasDynamicImportMessage,
           },
         ],
       },
