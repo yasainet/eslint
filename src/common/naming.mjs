@@ -151,6 +151,7 @@ export function createNamingConfigs(featureRoot, prefixLibMapping) {
       plugins: { local: localPlugin },
       rules: {
         "local/form-state-naming": "error",
+        "local/form-state-shape": "error",
       },
     },
   );

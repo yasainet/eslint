@@ -2,6 +2,7 @@ import { entrySingleServiceCallRule } from "./entry-single-service-call.mjs";
 import { entryTemplateRule } from "./entry-template.mjs";
 import { featureNameRule } from "./feature-name.mjs";
 import { formStateNamingRule } from "./form-state-naming.mjs";
+import { formStateShapeRule } from "./form-state-shape.mjs";
 import { importPathStyleRule } from "./import-path-style.mjs";
 import { layoutMainStructuralOnlyRule } from "./layout-main-structural-only.mjs";
 import { namespaceImportNameRule } from "./namespace-import-name.mjs";
@@ -19,6 +20,7 @@ export const localPlugin = {
     "entry-template": entryTemplateRule,
     "feature-name": featureNameRule,
     "form-state-naming": formStateNamingRule,
+    "form-state-shape": formStateShapeRule,
     "import-path-style": importPathStyleRule,
     "layout-main-structural-only": layoutMainStructuralOnlyRule,
     "namespace-import-name": namespaceImportNameRule,
