@@ -46,7 +46,9 @@ export const namingConfigs = [
   {
     name: "naming/components-pascal-case",
     files: ["src/components/**/*.tsx"],
-    ignores: ["src/components/shared/ui/**"],
+    // index.tsx は directory entry の慣例として PASCAL_CASE 強制から外す。
+    // 例: components/shared/layouts/Header/index.tsx
+    ignores: ["src/components/shared/ui/**", "src/components/**/index.tsx"],
     plugins: { "check-file": checkFile },
     rules: {
       "check-file/filename-naming-convention": [
