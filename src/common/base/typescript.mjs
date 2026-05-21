@@ -3,7 +3,7 @@ import { dirname, join, sep } from "node:path";
 
 import tseslint from "typescript-eslint";
 
-import { simpleImportSortPlugin, stylistic } from "./plugins.mjs";
+import { simpleImportSortPlugin, stylistic } from "../_internal/plugins.mjs";
 
 const findProjectRoot = (start) => {
   let dir = start;
@@ -84,7 +84,7 @@ const typeAwareRulesOff = Object.fromEntries(
   Object.keys(typeAwareTypeScriptRules).map((rule) => [rule, "off"]),
 );
 
-export function createRulesConfigs({
+export function createTypescriptConfigs({
   typeAware = true,
   files = ["**/*.ts", "**/*.tsx"],
 } = {}) {

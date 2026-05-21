@@ -1,4 +1,4 @@
-import { localPlugin } from "../common/local-plugins/index.mjs";
+import { localPlugin } from "../../common/local-plugins/index.mjs";
 
 export const layoutsConfigs = [
   {

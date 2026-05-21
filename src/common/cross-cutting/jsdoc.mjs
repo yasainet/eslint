@@ -1,8 +1,8 @@
 import jsdocPlugin from "eslint-plugin-jsdoc";
 
-import { featuresGlob } from "./constants.mjs";
+import { featuresGlob } from "../_internal/constants.mjs";
 
-export function createJsdocConfigs(featureRoot) {
+export function createJsdocConfigs({ featureRoot }) {
   return [
     {
       name: "jsdoc",

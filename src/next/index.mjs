@@ -1,18 +1,17 @@
-import { createEntryPointConfigs } from "../common/entry-points.mjs";
+import { createEntryPointConfigs } from "../common/boundaries/entry-point.mjs";
 import { createCommonConfigs } from "../common/index.mjs";
-import {
-  componentsBoundaryConfigs,
-  hooksBoundaryConfigs,
-  libBoundaryConfigs,
-  pageBoundaryConfigs,
-  routeBoundaryConfigs,
-  sitemapBoundaryConfigs,
-} from "../common/imports.mjs";
 
+import { componentsBoundaryConfigs } from "./boundaries/components.mjs";
+import { hooksBoundaryConfigs } from "./boundaries/hooks.mjs";
+import { libBoundaryConfigs } from "./boundaries/lib.mjs";
+import { pageBoundaryConfigs } from "./boundaries/page.mjs";
+import { routeBoundaryConfigs } from "./boundaries/route.mjs";
+import { sitemapBoundaryConfigs } from "./boundaries/sitemap.mjs";
 import { directivesConfigs } from "./directives.mjs";
 import { importPathStyleConfigs } from "./imports.mjs";
-import { layoutsConfigs } from "./layouts.mjs";
-import { namingConfigs } from "./naming.mjs";
+import { componentsLayerConfigs } from "./layers/components.mjs";
+import { hooksLayerConfigs } from "./layers/hooks.mjs";
+import { layoutsConfigs } from "./layers/layouts.mjs";
 import { tailwindcssConfigs } from "./tailwindcss.mjs";
 
 const nextEntryPointConfigs = createEntryPointConfigs(
@@ -31,7 +30,8 @@ export const eslintConfig = [
   ...sitemapBoundaryConfigs,
   ...hooksBoundaryConfigs,
   ...componentsBoundaryConfigs,
-  ...namingConfigs,
+  ...hooksLayerConfigs,
+  ...componentsLayerConfigs,
   ...directivesConfigs,
   ...importPathStyleConfigs,
   ...layoutsConfigs,

@@ -1,10 +1,13 @@
-import { createEntryPointConfigs } from "../common/entry-points.mjs";
+import { createEntryPointConfigs } from "../common/boundaries/entry-point.mjs";
 import { createCommonConfigs } from "../common/index.mjs";
-import { denoImportsConfigs } from "./imports.mjs";
+
+import { denoEntryPointConfigs } from "./boundaries/entry-point.mjs";
+import { denoLibBoundaryConfigs } from "./boundaries/lib.mjs";
+import { denoUtilsBoundaryConfigs } from "./boundaries/utils.mjs";
 
 const FEATURE_ROOT = "supabase/functions/_features";
 
-const denoEntryPointConfigs = createEntryPointConfigs(
+const denoNamespaceImportConfigs = createEntryPointConfigs(
   ["supabase/functions/**/*.ts"],
   ["supabase/functions/_*/**"],
 );
@@ -15,6 +18,8 @@ export const eslintConfig = [
     typeAware: false,
     rulesFiles: ["supabase/functions/**/*.ts"],
   }),
-  ...denoImportsConfigs,
+  ...denoLibBoundaryConfigs,
   ...denoEntryPointConfigs,
+  ...denoUtilsBoundaryConfigs,
+  ...denoNamespaceImportConfigs,
 ];
