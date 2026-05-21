@@ -3,7 +3,6 @@ import { denoLocalPlugin } from "./local-plugins/index.mjs";
 const FUNCTIONS_ROOT = "supabase/functions";
 const FEATURE_ROOT = "supabase/functions/_features";
 
-/** Deno-specific import restriction rules. */
 export const denoImportsConfigs = [
   {
     name: "deno/lib-boundary",

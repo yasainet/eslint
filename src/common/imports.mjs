@@ -198,12 +198,6 @@ function makeConfig(name, files, ...patternArrays) {
   };
 }
 
-// In ESLint flat config, when multiple matching configs set the same rule
-// (`no-restricted-imports`), the later config's options REPLACE the earlier
-// ones — patterns are not merged. Page / hooks / components boundary configs
-// run after libBoundaryConfigs and would silently drop lib + mapping bans
-// unless we re-include those patterns explicitly.
-/** Next.js-only: restrict page.tsx to only import entries. */
 export const pageBoundaryConfigs = [
   {
     name: "imports/page-boundary",
@@ -223,7 +217,6 @@ export const pageBoundaryConfigs = [
   },
 ];
 
-/** Next.js-only: restrict route.ts to only import entries. */
 export const routeBoundaryConfigs = [
   {
     name: "imports/route-boundary",
@@ -243,7 +236,6 @@ export const routeBoundaryConfigs = [
   },
 ];
 
-/** Next.js-only: restrict sitemap.ts to only import entries. */
 export const sitemapBoundaryConfigs = [
   {
     name: "imports/sitemap-boundary",
@@ -263,7 +255,6 @@ export const sitemapBoundaryConfigs = [
   },
 ];
 
-/** Next.js-only: restrict hooks to only import entries (not queries or services). */
 export const hooksBoundaryConfigs = [
   {
     name: "imports/hooks-boundary",
@@ -283,7 +274,6 @@ export const hooksBoundaryConfigs = [
   },
 ];
 
-/** Next.js-only: restrict components to only import entries or hooks (not queries or services). */
 export const componentsBoundaryConfigs = [
   {
     name: "imports/components-boundary",
@@ -303,10 +293,6 @@ export const componentsBoundaryConfigs = [
   },
 ];
 
-/**
- * Next.js-only: restrict @/lib imports and mapping imports outside features.
- * Per-feature subdir rules live in createImportsConfigs to avoid clobbering each other.
- */
 export const libBoundaryConfigs = [
   {
     name: "imports/lib-boundary",
@@ -326,7 +312,6 @@ export const libBoundaryConfigs = [
   },
 ];
 
-/** Scope import restriction rules to the given feature root. */
 export function createImportsConfigs(
   featureRoot,
   prefixLibMapping,
@@ -410,8 +395,6 @@ export function createImportsConfigs(
     ),
   );
 
-  // Catch-all for feature subdirs without a per-layer config
-  // (constants, hooks, schemas). lib-boundary + mapping ban.
   configs.push({
     name: "imports/feature-other",
     files: [`${featureRoot}/**/*.ts`],
@@ -430,7 +413,6 @@ export function createImportsConfigs(
     },
   });
 
-  // Types: mapping ban only. lib is allowed (Database/Tables type imports).
   configs.push({
     name: "imports/feature-types",
     files: [`${featureRoot}/**/types/*.ts`],

@@ -1,37 +1,3 @@
-/**
- * Enforce the canonical `{ data, error: { message } }` shape for FormState types.
- *
- * Targets `TSInterfaceDeclaration` and `TSTypeAliasDeclaration` whose name ends
- * with `FormState`. Required shape:
- *
- * ```ts
- * interface XxxFormState {
- *   data: T | null;            // T may be any type; `data: null` literal also OK
- *   error: { message: string } | null;
- * }
- * ```
- *
- * Why this shape:
- *
- * - Single uniform shape lets entry / hook / UI be templated and lint-checked.
- * - Forbids `code` / `status` / similar discriminator fields that tend to grow
- *   defensive branches (e.g. `error.code === "unauthenticated"`) which usually
- *   indicate a missing upstream guard (route gate, button conditional render),
- *   not a legitimate need for in-action discrimination.
- * - Discriminated unions (`{ data: T; error: null } | { data: null; error: ... }`)
- *   are rejected for the same reason — they leak shape complexity into hooks
- *   (`useActionState<T | null>`), components (`state?.error`), and entries.
- *
- * Future extension when Stripe / payment libraries actually need `code` / `status`:
- *
- * - a) Add a `// allow-error-code: <reason>` comment opt-out to this rule, so
- *      individual FormStates can justify their extra field on the previous line.
- * - b) Change the rule to whitelist a fixed set of allowed extra fields (enum
- *      of standard error codes shared across the codebase).
- *
- * Until that need materializes, this rule is strict (no opt-out) per YAGNI.
- */
-
 const FORM_STATE_SUFFIX = "FormState";
 
 function isNullLiteralType(node) {

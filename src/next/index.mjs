@@ -19,10 +19,7 @@ const nextEntryPointConfigs = createEntryPointConfigs(
   ["src/app/**/*.ts", "src/app/**/*.tsx"],
 );
 
-/** Next.js ESLint flat config entry point. */
 export const eslintConfig = [
-  // shadcn/ui generated components live directly under `src/components/shared/ui/`.
-  // Files in `custom/` are user-authored and remain linted.
   {
     name: "rules/ignore-shadcn-ui",
     ignores: ["src/components/shared/ui/*.{ts,tsx}"],

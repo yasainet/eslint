@@ -1,13 +1,3 @@
-/**
- * Enforce {Verb}{Subject}FormState pattern for FormState type names.
- *
- * Targets TSInterfaceDeclaration and TSTypeAliasDeclaration whose name ends
- * with "FormState". Requires at least two PascalCase words before FormState
- * (e.g. SignInFormState, CreateCommentFormState) so the verb prefix is never
- * omitted. Single-noun names like "ContactFormState" are forbidden — rename
- * to "CreateContactFormState" to make intent explicit.
- */
-
 const FORM_STATE_ALLOW = /^[A-Z][a-z]+[A-Z]\w*FormState$/;
 
 function reportIfInvalid(context, idNode) {

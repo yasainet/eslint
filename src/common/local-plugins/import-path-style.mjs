@@ -1,10 +1,5 @@
 import path from "path";
 
-/**
- * Enforce import path style within features:
- * - Same-feature imports must use relative paths
- * - Cross-feature imports must use @/ alias
- */
 export const importPathStyleRule = {
   meta: {
     type: "problem",
@@ -48,7 +43,6 @@ export const importPathStyleRule = {
       if (!source || typeof source.value !== "string") return;
       const importPath = source.value;
 
-      // Same-feature alias should be a relative path for consistency.
       if (
         importPath.startsWith(sameFeaturePrefix) ||
         importPath === sameFeatureExact
@@ -61,7 +55,6 @@ export const importPathStyleRule = {
         return;
       }
 
-      // Cross-feature relative path should use @/ alias for clarity.
       if (importPath.startsWith(".")) {
         const resolved = path.resolve(path.dirname(filename), importPath);
         if (

@@ -1,12 +1,5 @@
 import ts from "typescript";
 
-/**
- * Exported function の return type が any を含んでいる場合に error:
- *
- * - typescript-eslint の type checker を使って inferred type まで見る
- * - queries / services の API 境界を any 汚染から守ることで、domain shape が型で保証される
- * - Promise<any>, Promise<{ data: any }>, Array<any> など nested も展開して検査する
- */
 export const noAnyReturnRule = {
   meta: {
     type: "problem",
@@ -41,7 +34,6 @@ export const noAnyReturnRule = {
       return checker.getReturnTypeOfSignature(signature);
     };
 
-    // `any` を type tree 全体で検出する (Promise<any>, { a: any }, any[] 等を展開)
     const containsAny = (type, seen = new Set()) => {
       if (!type) return false;
       if (seen.has(type)) return false;

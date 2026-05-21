@@ -1,13 +1,3 @@
-/**
- * Enforce namespace imports for files under `queries/`:
- *
- * - Value imports must use `import * as xxxQuery from "..."` so that the
- *   `naming/namespace-import-name` rule can guarantee a single canonical
- *   binding (e.g. `comicsServerQuery.getComics`)
- * - Type-only imports are exempted because they have no runtime presence
- * - 検出は path に `/queries/<name>` が含まれることのみで行い、suffix には依存しない
- */
-
 const QUERIES_PATH = /\/queries\/[^/]+$/;
 
 export const queriesNamespaceImportRule = {

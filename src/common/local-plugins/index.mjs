@@ -13,7 +13,6 @@ import { schemaNamingRule } from "./schema-naming.mjs";
 import { supabaseColumnsSatisfiesRule } from "./supabase-columns-satisfies.mjs";
 import { supabaseSelectTypedColumnsRule } from "./supabase-select-typed-columns.mjs";
 
-/** Single plugin object to avoid ESLint "Cannot redefine plugin" errors. */
 export const localPlugin = {
   rules: {
     "entry-single-service-call": entrySingleServiceCallRule,

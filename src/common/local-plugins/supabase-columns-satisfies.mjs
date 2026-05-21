@@ -1,27 +1,3 @@
-/**
- * Enforce `<string literal> as const` for `*_COLUMNS` constant declarations.
- *
- * Apply to `**\/queries/*.ts` and `**\/constants/*.ts`.
- *
- * `*_COLUMNS` 定数は Supabase の `.select()` に直接渡される。`as const` を
- * 外すと TypeScript が `string` に widen し、Supabase の `.select<Query>()`
- * が literal を parse できなくなって row 型推論が壊れる（戻り値が
- * `GenericStringError` になる）。
- *
- * Allowed:
- *   const POST_DETAIL_COLUMNS = "id,url,platform" as const;
- *
- * Banned:
- *   const POST_DETAIL_COLUMNS = "id,url,platform";              // string に widen
- *   const POST_DETAIL_COLUMNS = ["id", "url"] as const;         // 配列
- *   const POST_DETAIL_COLUMNS = [...] as const satisfies ...;   // 配列 + satisfies
- *   const POST_DETAIL_COLUMNS = `id,${col}`;                    // template literal
- *
- * Why: シンプルな string literal を `as const` で保つだけで、Supabase の
- * 型推論（row 型 / column 名タイポ検出）はすべて自動で効く。runtime helper
- * （`joinColumns` 等）は不要。
- */
-
 const COLUMNS_NAME = /^[A-Z][A-Z0-9_]*_COLUMNS$/;
 
 function isStringAsConst(initNode) {

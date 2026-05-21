@@ -1,33 +1,3 @@
-/**
- * Enforce 1:1 entry-to-service mapping for `**\/entries/*.ts` exports.
- *
- * Why: services are the orchestration layer (they may combine multiple queries
- * and other features' queries). entries should be a thin wrapper that calls a
- * single service function and normalizes the return shape into
- * `{ data, error }`. If an entry calls more than one service, orchestration is
- * leaking up into the entry layer.
- *
- * Detection rule:
- *
- * - For every exported async `FunctionDeclaration` in an entries file, count
- *   `CallExpression`s whose callee is a `MemberExpression` of the form
- *   `<binding>.<method>(...)` where `<binding>` matches the namespace import
- *   naming convention `*Service` (e.g. `articlesServerService`,
- *   `usersClientService`).
- * - More than one such call inside the same exported function is an error.
- *
- * Exception (C-3):
- *
- * - Bindings starting with `shared` (e.g. `sharedDiscordService`,
- *   `sharedResendService`) are EXCLUDED from the count. These represent
- *   cross-cutting side-effect abstractions (Discord / Resend / Slack
- *   notifications) that don't fit the entry-service 1:1 model and are allowed
- *   to be invoked from entries directly.
- *
- * The rule reports the 2nd and later violations (the 1st call is permitted),
- * so the fix surface is the redundant calls.
- */
-
 const SERVICE_BINDING_REGEX = /Service$/;
 
 function isServiceCall(node) {

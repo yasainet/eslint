@@ -1,13 +1,5 @@
 import { localPlugin } from "./local-plugins/index.mjs";
 
-/**
- * Scope layer rules to the given feature root:
- *
- * - `typeAware: true` (default) includes `layers/no-any-return`, which uses
- *   the TypeScript checker to inspect inferred return types
- * - `typeAware: false` skips it for environments where the checker cannot run
- *   (e.g., Deno files outside the project tsconfig)
- */
 export function createLayersConfigs(featureRoot, { typeAware = true } = {}) {
   const loggerSelector = "CallExpression[callee.object.name='logger']";
   const loggerMessage =
@@ -31,7 +23,6 @@ export function createLayersConfigs(featureRoot, { typeAware = true } = {}) {
   };
 
   return [
-    // Logger/console: all features except entries
     {
       name: "layers/logger",
       files: [`${featureRoot}/**/*.ts`],
@@ -44,7 +35,6 @@ export function createLayersConfigs(featureRoot, { typeAware = true } = {}) {
         ],
       },
     },
-    // Queries: try-catch + if + loops + logger
     {
       name: "layers/queries",
       files: [`${featureRoot}/**/queries/*.ts`],
@@ -99,11 +89,7 @@ export function createLayersConfigs(featureRoot, { typeAware = true } = {}) {
         ],
       },
     },
-    // Boundary type safety: queries & services must not leak `any`
-    // into their public API. Uses type-aware inspection of the inferred
-    // return type so unannotated functions are still checked.
     ...(typeAware ? [noAnyReturnConfig] : []),
-    // Services: try-catch + logger + throw + dead error fallbacks
     {
       name: "layers/services",
       files: [`${featureRoot}/**/services/*.ts`],
@@ -140,7 +126,6 @@ export function createLayersConfigs(featureRoot, { typeAware = true } = {}) {
         ],
       },
     },
-    // Entries: ban dynamic `@/` imports that bypass cardinality / lateral rules
     {
       name: "layers/entries",
       files: [`${featureRoot}/**/entries/*.ts`],

@@ -1,4 +1,3 @@
-/** Ban `import * as` at entry points. */
 export function createEntryPointConfigs(entryPointFiles, entryPointIgnores = []) {
   return [
     {

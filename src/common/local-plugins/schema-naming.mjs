@@ -1,9 +1,3 @@
-/**
- * Enforce that exported variables in schema files use camelCase with a "Schema" suffix.
- * e.g., `export const userSchema = z.object(...)` is valid.
- *       `export const UserSchema = ...` or `export const user = ...` are invalid.
- * `export type` declarations are ignored (used for `z.infer` types).
- */
 export const schemaNamingRule = {
   meta: {
     type: "problem",

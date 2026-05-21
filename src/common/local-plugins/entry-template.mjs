@@ -1,58 +1,12 @@
-/**
- * Enforce the canonical entry template for `**\/entries/*.ts` exports.
- *
- * Two body shapes are accepted:
- *
- * - **Pattern A** (read / mutation entries): body is a single try/catch.
- * - **Pattern B** (redirect entries): body contains exactly one try/catch and
- *   ends with a terminal Next.js navigation call (`redirect`, `notFound`,
- *   `permanentRedirect`) — placed *outside* try/catch per the Next.js docs,
- *   since these helpers throw `NEXT_REDIRECT` / `NEXT_NOT_FOUND` and must not
- *   be intercepted by the entry's own catch. Pattern B does not require a
- *   `return { data, error: null }` in the try block (success is the redirect).
- *
- * Both patterns share the same try/catch contract:
- *
- * - try first statement: `logger.info(<obj>, "Start <funcName>")`
- * - try success return preceded by: `logger.info(<obj>, "Success <funcName>")`
- *   (Pattern A only — Pattern B's success path terminates via redirect)
- * - try failed branch (when present): `logger.error(<obj>, "Failed <funcName>")`
- *   followed by a return with the proper error shape
- * - catch param: `error: unknown`
- * - catch first statement: `logger.error(<obj>, "Unexpected error in <funcName>")`
- * - catch return error.message must be the literal "An unexpected error occurred"
- * - every log object must include the `err` key first (when applicable) and
- *   propagate all function input parameters as values
- *
- * Why one rule with many messageIds: each invariant is a small rule
- * conceptually, but they share the same structural traversal and access to
- * funcName / inputArgs. Splitting would duplicate the AST walk.
- */
-
 const CATCH_RETURN_MESSAGE = "An unexpected error occurred";
-const TERMINAL_CALLEES = new Set([
-  "redirect",
-  "permanentRedirect",
-  "notFound",
-]);
+const TERMINAL_CALLEES = new Set(["redirect", "permanentRedirect", "notFound"]);
 
-/**
- * Param identifier names that are excluded from log propagation. These hold
- * secrets that must never be written to logs (Vercel logs are forwarded to
- * external drains, so treating them as sensitive is the conservative default).
- */
 const REDACT_PARAM_NAMES = new Set([
   "password",
   "newPassword",
   "currentPassword",
 ]);
 
-/**
- * Param TypeScript type names that are excluded from log propagation. Supabase
- * credential types contain `password` as a field; logging the whole param leaks
- * the secret. Listed types are matched on the type annotation's identifier
- * name (no type-info resolution; aliases must match by name).
- */
 const REDACT_PARAM_TYPES = new Set([
   "SignUpWithPasswordCredentials",
   "SignInWithPasswordCredentials",
@@ -91,7 +45,8 @@ function isLoggerCall(node, level) {
 
 function getStringLiteralArg(callExpr, index) {
   const arg = callExpr.arguments[index];
-  if (arg?.type === "Literal" && typeof arg.value === "string") return arg.value;
+  if (arg?.type === "Literal" && typeof arg.value === "string")
+    return arg.value;
   return null;
 }
 
@@ -112,7 +67,10 @@ function objectContainsValue(objExpr, identifierName) {
     ) {
       return true;
     }
-    if (prop.value.type === "Identifier" && prop.value.name === identifierName) {
+    if (
+      prop.value.type === "Identifier" &&
+      prop.value.name === identifierName
+    ) {
       return true;
     }
   }
@@ -124,10 +82,10 @@ function firstPropertyIsErrKey(objExpr, errorIdentifierName) {
   const first = objExpr.properties[0];
   if (first.type !== "Property") return false;
   if (first.key.type !== "Identifier" || first.key.name !== "err") return false;
-  // value must be the catch error identifier (or any Identifier — we accept both
-  // `err: error` and `err: result.error` since Failed Pattern C uses MemberExpression)
   if (first.value.type === "Identifier") {
-    return errorIdentifierName ? first.value.name === errorIdentifierName : true;
+    return errorIdentifierName
+      ? first.value.name === errorIdentifierName
+      : true;
   }
   if (first.value.type === "MemberExpression") return true;
   return false;
@@ -201,7 +159,6 @@ function checkLogCall({
 }
 
 function isReturnDataErrorNull(ret) {
-  // `return { data: ..., error: null }` (data shorthand or explicit)
   const arg = ret.argument;
   if (arg?.type !== "ObjectExpression") return false;
   let hasData = false;
@@ -230,8 +187,12 @@ function getReturnErrorMessageLiteral(ret) {
     if (prop.value.type !== "ObjectExpression") return null;
     for (const inner of prop.value.properties) {
       if (inner.type !== "Property") continue;
-      if (inner.key.type !== "Identifier" || inner.key.name !== "message") continue;
-      if (inner.value.type === "Literal" && typeof inner.value.value === "string") {
+      if (inner.key.type !== "Identifier" || inner.key.name !== "message")
+        continue;
+      if (
+        inner.value.type === "Literal" &&
+        typeof inner.value.value === "string"
+      ) {
         return inner.value.value;
       }
       return "<non-literal>";
@@ -283,7 +244,6 @@ function endsWithTerminal(node) {
 }
 
 function caseEndsWithTerminal(switchCase, allCases, idx) {
-  // Empty consequent = fallthrough; inherit next case's terminator.
   if (switchCase.consequent.length === 0) {
     const next = allCases[idx + 1];
     if (!next) return false;
@@ -311,11 +271,14 @@ function classifyBody(body) {
 
 function checkTryBlock(context, tryBlock, funcName, inputArgNames, options) {
   if (tryBlock.body.length === 0) {
-    context.report({ node: tryBlock, messageId: "tryEmpty", data: { funcName } });
+    context.report({
+      node: tryBlock,
+      messageId: "tryEmpty",
+      data: { funcName },
+    });
     return;
   }
 
-  // Start log: first statement
   const first = tryBlock.body[0];
   if (!isExpressionStatementWithLoggerCall(first, "info")) {
     context.report({
@@ -337,16 +300,12 @@ function checkTryBlock(context, tryBlock, funcName, inputArgNames, options) {
     });
   }
 
-  // Walk body to find Success returns and Failed branches
   let successFound = false;
   for (let i = 0; i < tryBlock.body.length; i++) {
     const stmt = tryBlock.body[i];
 
-    // Success log + return
     if (stmt.type === "ReturnStatement" && isReturnDataErrorNull(stmt)) {
       successFound = true;
-      // The previous non-ExpressionStatement non-IfStatement statement should be
-      // the Success log. Walk back to find it.
       const prev = findPrecedingLoggerCall(tryBlock.body, i);
       if (
         !prev ||
@@ -373,7 +332,6 @@ function checkTryBlock(context, tryBlock, funcName, inputArgNames, options) {
       }
     }
 
-    // Failed branches inside if statements
     if (stmt.type === "IfStatement") {
       checkFailedBranch(context, stmt, funcName, inputArgNames);
     }
@@ -396,7 +354,6 @@ function findPrecedingLoggerCall(body, returnIndex) {
       s.type === "ExpressionStatement" &&
       s.expression.type === "AwaitExpression"
     ) {
-      // `await revalidatePath(...)` etc — keep walking
       continue;
     }
     if (s.type === "ExpressionStatement") {
@@ -409,16 +366,13 @@ function findPrecedingLoggerCall(body, returnIndex) {
 }
 
 function checkFailedBranch(context, ifStmt, funcName, inputArgNames) {
-  // We only validate IFs that look like Failed branches: contain a return whose
-  // error.message is a string literal (not the catch's "An unexpected ..." literal).
   const consequent = ifStmt.consequent;
   if (consequent.type !== "BlockStatement") return;
   const ret = consequent.body.find((s) => s.type === "ReturnStatement");
   if (!ret) return;
   const errMsg = getReturnErrorMessageLiteral(ret);
-  if (errMsg === null) return; // not a Failed-shaped return; skip
+  if (errMsg === null) return;
 
-  // Must have logger.error("Failed <funcName>") preceding the return
   const idx = consequent.body.indexOf(ret);
   let loggerCall = null;
   for (let j = 0; j < idx; j++) {
@@ -440,7 +394,7 @@ function checkFailedBranch(context, ifStmt, funcName, inputArgNames) {
     return;
   }
 
-  const isPatternC = errMsg === "<non-literal>"; // .message access
+  const isPatternC = errMsg === "<non-literal>";
   checkLogCall({
     context,
     callExpr: loggerCall,
@@ -471,7 +425,11 @@ function checkCatchClause(context, handler, funcName, inputArgNames) {
   }
   const block = handler.body;
   if (block.body.length === 0) {
-    context.report({ node: block, messageId: "catchEmpty", data: { funcName } });
+    context.report({
+      node: block,
+      messageId: "catchEmpty",
+      data: { funcName },
+    });
     return;
   }
   const first = block.body[0];
@@ -495,7 +453,6 @@ function checkCatchClause(context, handler, funcName, inputArgNames) {
     });
   }
 
-  // Last statement must be a return whose error.message is the catch literal
   const last = block.body[block.body.length - 1];
   if (last?.type !== "ReturnStatement") {
     context.report({
@@ -510,7 +467,11 @@ function checkCatchClause(context, handler, funcName, inputArgNames) {
     context.report({
       node: last,
       messageId: "catchWrongReturnMessage",
-      data: { funcName, expected: CATCH_RETURN_MESSAGE, actual: msg ?? "<missing>" },
+      data: {
+        funcName,
+        expected: CATCH_RETURN_MESSAGE,
+        actual: msg ?? "<missing>",
+      },
     });
   }
 }

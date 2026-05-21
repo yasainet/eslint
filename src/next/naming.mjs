@@ -1,6 +1,5 @@
 import { checkFile } from "../common/plugins.mjs";
 
-/** Next.js-specific naming convention configs for hooks and components. */
 export const namingConfigs = [
   {
     name: "naming/hooks",
@@ -46,8 +45,6 @@ export const namingConfigs = [
   {
     name: "naming/components-pascal-case",
     files: ["src/components/**/*.tsx"],
-    // index.tsx は directory entry の慣例として PASCAL_CASE 強制から外す。
-    // 例: components/shared/layouts/Header/index.tsx
     ignores: ["src/components/shared/ui/**", "src/components/**/index.tsx"],
     plugins: { "check-file": checkFile },
     rules: {

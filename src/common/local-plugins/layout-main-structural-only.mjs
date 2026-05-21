@@ -1,24 +1,3 @@
-/**
- * Forbid decoration utility classes on the `<main>` element.
- *
- * Design philosophy: `app/**\/layout.tsx` の `<main>` は Header / Footer の
- * 縦積みを受け持つ構造スロット。装飾（余白・間隔）は page.tsx 側の Container 等が
- * 持つべき。main に padding / margin / gap を直接当てると、page 全体に暗黙の
- * オフセットが生まれ、page ごとの調整余地が失われる。
- *
- * Disallowed Tailwind token prefixes (case-sensitive):
- *
- * - `p`, `m`, `py`, `px`, `pt`, `pb`, `pl`, `pr`, `my`, `mx`, `mt`, `mb`, `ml`, `mr` — padding / margin
- * - `space-x`, `space-y` — sibling spacing
- * - `gap` — flex / grid gap
- *
- * Allowed: structural utilities (`flex`, `flex-1`, `flex-col`, `min-h-*`,
- * `block`, `relative`, etc.)
- *
- * className value forms supported: string Literal, TemplateLiteral,
- * `cn(...)` / `clsx(...)` style CallExpression args (string args only).
- */
-
 const DISALLOWED_TOKEN = /^(?:[pm][xytrbl]?-|space-[xy]-|gap-)/;
 
 function collectStringLiterals(node, out) {

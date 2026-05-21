@@ -1,11 +1,6 @@
 import fs from "fs";
 import path from "path";
 
-/**
- * Extract table names from Supabase generated types file.
- * Looks for top-level keys under `Tables: {` inside the `public` schema.
- * Uses brace counting to handle deeply nested type definitions.
- */
 function extractTableNames(supabaseTypePath) {
   if (!fs.existsSync(supabaseTypePath)) {
     return [];
@@ -13,7 +8,6 @@ function extractTableNames(supabaseTypePath) {
 
   const content = fs.readFileSync(supabaseTypePath, "utf-8");
 
-  // Find `public:` excluding `graphql_public:` via negative lookbehind
   const publicMatch = /(?<!\w)public:\s*\{/.exec(content);
   if (!publicMatch) {
     return [];
@@ -25,13 +19,11 @@ function extractTableNames(supabaseTypePath) {
     return [];
   }
 
-  // Find the opening brace of `Tables: {`
   const braceStart = content.indexOf("{", tablesIdx + tablesLabel.length);
   if (braceStart === -1) {
     return [];
   }
 
-  // Extract the Tables block using brace counting
   let depth = 0;
   let blockEnd = -1;
   for (let i = braceStart; i < content.length; i++) {
@@ -46,14 +38,12 @@ function extractTableNames(supabaseTypePath) {
     return [];
   }
 
-  // Extract top-level keys (depth 0) inside the Tables block
   const tablesBlock = content.slice(braceStart + 1, blockEnd);
   const names = [];
   depth = 0;
   const keyRegex = /(\w+)\s*:/g;
   let match;
   while ((match = keyRegex.exec(tablesBlock)) !== null) {
-    // Count braces before this match to determine depth
     const preceding = tablesBlock.slice(0, match.index);
     let d = 0;
     for (const ch of preceding) {
@@ -67,15 +57,10 @@ function extractTableNames(supabaseTypePath) {
   return names;
 }
 
-/** Convert snake_case to kebab-case. */
 function toKebab(name) {
   return name.replace(/_/g, "-");
 }
 
-/**
- * Enforce that feature directory names match allowed values:
- * "shared", "auth", plus Supabase table names converted to kebab-case.
- */
 export const featureNameRule = {
   meta: {
     type: "problem",
@@ -107,14 +92,15 @@ export const featureNameRule = {
     if (!featureName) return {};
 
     const projectRoot = filename.slice(0, rootIdx).replace(/\/src$/, "");
-    // Prefer the Supabase types file adjacent to `featureRoot` (e.g. `src/lib/...`
-    // for `src/features`). Fall back to `src/lib/...` at the project root so that
-    // non-`src` feature roots (e.g. `scripts/features`) can reuse the same
-    // generated types without duplicating the file. Both `types.ts` (plural) and
-    // `type.ts` (singular) are accepted to match either naming convention.
     const candidateTypePaths = [
-      path.join(projectRoot, featureRoot.replace(/features$/, "lib/supabase/types.ts")),
-      path.join(projectRoot, featureRoot.replace(/features$/, "lib/supabase/type.ts")),
+      path.join(
+        projectRoot,
+        featureRoot.replace(/features$/, "lib/supabase/types.ts"),
+      ),
+      path.join(
+        projectRoot,
+        featureRoot.replace(/features$/, "lib/supabase/type.ts"),
+      ),
       path.join(projectRoot, "src/lib/supabase/types.ts"),
       path.join(projectRoot, "src/lib/supabase/type.ts"),
     ];

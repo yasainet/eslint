@@ -1,35 +1,3 @@
-/**
- * Enforce explicit column lists for Supabase `.select()` calls.
- *
- * Apply to `**\/queries/*.ts`. `.select()` の引数は次のいずれかでなければならない:
- *
- * - inline string literal（例: `.select("id,url,platform")`）
- * - `*_COLUMNS` という UPPER_SNAKE 命名の identifier（例: `.select(POST_DETAIL_COLUMNS)`）
- *
- * `*_COLUMNS` 定数は companion rule `supabase-columns-satisfies` で
- * `<string literal> as const` の形が強制される。これにより:
- *
- * - Supabase の `.select()` は literal string を parse して row 型を推論できる
- * - 存在しない column 名は Supabase の型推論が `SelectQueryError` として弾く（compile time）
- * - runtime helper（`joinColumns`）は不要
- *
- * Banned:
- *   .select()                    implicit "all columns"
- *   .select("*")                 silent exposure of new schema columns
- *   .select(`${x},y`)            dynamic concatenation
- *   .select(cols.join(","))      runtime expression
- *   .select(someVar)             non-conforming variable
- *
- * Allowed:
- *   .select("id,url,platform")        inline literal
- *   .select(POST_DETAIL_COLUMNS)      *_COLUMNS named constant
- *
- * Why: column lists must be (1) statically analyzable for grep / review,
- * (2) literal so Supabase can infer the row shape, (3) never silently grow
- * on schema additions. For column-level access control, use Postgres views
- * (`from("posts_public")`).
- */
-
 const COLUMNS_NAME = /^[A-Z][A-Z0-9_]*_COLUMNS$/;
 
 export const supabaseSelectTypedColumnsRule = {

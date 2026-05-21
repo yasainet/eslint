@@ -5,7 +5,6 @@ const nodeEntryPointConfigs = createEntryPointConfigs(
   ["scripts/commands/*.ts"],
 );
 
-/** Node.js ESLint flat config entry point. */
 export const eslintConfig = [
   ...createCommonConfigs("scripts/features", { banAliasImports: true }),
   ...nodeEntryPointConfigs,

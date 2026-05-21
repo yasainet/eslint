@@ -2,13 +2,6 @@ import { featuresGlob } from "./constants.mjs";
 import { localPlugin } from "./local-plugins/index.mjs";
 import { checkFile } from "./plugins.mjs";
 
-/**
- * Scope lib naming rules to the lib root derived from the given feature root:
- *
- * - basename は suffix なしの単一トークン (`*` パターン) を強制する
- * - 多重拡張子 (`<name>.lib.ts` / `<name>.parser.ts` 等) は禁止 → 役割はディレクトリで宣言する
- * - types.ts は対象外 (型のみで lib の役割を持たないため check 不要)
- */
 export function createLibNamingConfigs(featureRoot) {
   const libRoot = featureRoot.replace(/features$/, "lib");
   return [
@@ -26,12 +19,6 @@ export function createLibNamingConfigs(featureRoot) {
   ];
 }
 
-/**
- * Scope utils naming rules to the utils root derived from the given feature root:
- *
- * - basename は suffix なしの単一トークン (`*` パターン) を強制する
- * - 多重拡張子は禁止
- */
 export function createUtilsNamingConfigs(featureRoot) {
   const utilsRoot = featureRoot.replace(/features$/, "utils");
   return [
@@ -49,14 +36,6 @@ export function createUtilsNamingConfigs(featureRoot) {
   ];
 }
 
-/**
- * Scope naming rules to the given feature root:
- *
- * - 全 layer (services / queries / entries / utils / types / schemas / constants) で suffix を廃止
- * - ファイル名 (basename) は単一トークン (`*` パターン) を強制し、role はディレクトリで宣言する
- * - queries / services / entries のファイル名は prefixLibMapping のキー (lib name) と一致させ、どの lib を呼ぶか明示する
- * - shared/ 配下では feature 名でなく `shared` または lib name を allowed prefix として許可する
- */
 export function createNamingConfigs(featureRoot, prefixLibMapping) {
   const prefixes = Object.keys(prefixLibMapping);
   const hasPrefixes = prefixes.length > 0;
