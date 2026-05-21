@@ -4,11 +4,13 @@ Shared ESLint configuration for Next.js, Node.js and Deno.
 
 ## Entry Points
 
-| Entry                   | Feature Root                   | Entry Points            | Description                   |
-| ----------------------- | ------------------------------ | ----------------------- | ----------------------------- |
-| `@yasainet/eslint/next` | `src/features/`                | -                       | Common rules + Next.js        |
-| `@yasainet/eslint/node` | `scripts/features/`            | `scripts/commands/*.ts` | Common rules (CLI scripts)    |
-| `@yasainet/eslint/deno` | `supabase/functions/features/` | -                       | Common rules (Edge Functions) |
+- `@yasainet/eslint/next` — Common rules + Next.js
+  - Feature Root: `src/features/`
+- `@yasainet/eslint/node` — Common rules for CLI scripts
+  - Feature Root: `scripts/features/`
+  - Entry Points: `scripts/commands/*.ts`
+- `@yasainet/eslint/deno` — Common rules for Edge Functions
+  - Feature Root: `supabase/functions/features/`
 
 ## Architecture
 

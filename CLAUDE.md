@@ -55,10 +55,12 @@ featureRoot の位置は entry point によって異なる:
 `lib/<dir>/` 配下のファイル名は単一トークン (`*` パターン、ドット禁止)。
 lib の構造は `index.ts` の有無で 2 種類に分岐する:
 
-| 種別          | 検出条件                  | プレフィックス登録               | 例                                                        |
-| ------------- | ------------------------- | -------------------------------- | --------------------------------------------------------- |
-| single-client | `lib/<dir>/index.ts` あり | `<dir>` のみ (sub-module は除外) | `lib/gallery-dl/{index.ts, parser.ts, types.ts}`          |
-| multi-client  | `index.ts` 不在           | dir 内の全 `<role>.ts`           | `lib/supabase/{admin.ts, server.ts, client.ts, proxy.ts}` |
+- single-client — `lib/<dir>/index.ts` あり
+  - prefix 登録: `<dir>` のみ (sub-module は除外)
+  - 例: `lib/gallery-dl/{index.ts, parser.ts, types.ts}`
+- multi-client — `index.ts` 不在
+  - prefix 登録: dir 内の全 `<role>.ts`
+  - 例: `lib/supabase/{admin.ts, server.ts, client.ts, proxy.ts}`
 
 - `types.ts` / `type.ts` / `proxy.ts` は EXCLUDE_LIST で常に prefix 登録から除外
   - 型ファイルの命名は consuming project の好みに任せる
@@ -69,16 +71,17 @@ lib の構造は `index.ts` の有無で 2 種類に分岐する:
 
 ### features/ の命名
 
-| layer        | ファイル名                             | 補足                                                                    |
-| ------------ | -------------------------------------- | ----------------------------------------------------------------------- |
-| `queries/`   | `<lib-prefix>.ts`                      | 1 file = 1 lib への呼び出し集約。lib-boundary lint で他 lib import 禁止 |
-| `services/`  | `<lib-prefix>.ts`                      | 複数 lib を組み合わせる orchestration                                   |
-| `entries/`   | `server.ts` / `admin.ts` / `client.ts` | server/admin は `"use server"` 強制、client は禁止                      |
-| `types/`     | `<feature>.ts`                         | feature と同名 1 ファイル                                               |
-| `schemas/`   | `<feature>.ts`                         | 同上                                                                    |
-| `utils/`     | `<feature>.ts`                         | 同上                                                                    |
-| `constants/` | `<feature>.ts`                         | 同上                                                                    |
-| `hooks/`     | `use-<verb>.ts`                        | React 慣例の `use-` prefix を許容                                       |
+- `queries/` — `<lib-prefix>.ts`
+  - 1 file = 1 lib への呼び出し集約
+  - lib-boundary lint で他 lib import 禁止
+- `services/` — `<lib-prefix>.ts`
+  - 複数 lib を組み合わせる orchestration
+- `entries/` — `server.ts` / `admin.ts` / `client.ts`
+  - server / admin は `"use server"` 強制、client は禁止
+- `types/` / `schemas/` / `utils/` / `constants/` — `<feature>.ts`
+  - feature と同名 1 ファイル
+- `hooks/` — `use-<verb>.ts`
+  - React 慣例の `use-` prefix を許容
 
 `entries/` は外界 (page.tsx / route.ts / hooks) から呼ばれる入口という責務を直接表す命名。
 
@@ -91,9 +94,11 @@ lib の構造は `index.ts` の有無で 2 種類に分岐する:
 
 ### prefixLibMapping の自動生成
 
-`src/common/constants.mjs` の `generatePrefixLibMapping` が ESLint 起動時に `lib/` をスキャンし、
-上記ルールで prefix → lib path のマッピングを自動生成する。
-新しい lib を追加すると自動的に queries / services / entries の許可ファイル名が拡張される。
+ESLint 起動時に `lib/` を自動スキャンして prefix → lib path mapping を生成する:
+
+- スキャナ: `src/common/_internal/constants.mjs` の `generatePrefixLibMapping`
+- ルール: 上記「lib/ の命名」セクションに従う
+- 効果: 新規 lib 追加で queries / services / entries の許可ファイル名が自動拡張される
 
 ### Tailwind CSS (next entry only)
 
@@ -119,6 +124,24 @@ lib の構造は `index.ts` の有無で 2 種類に分岐する:
   - LSP server (vscode-eslint, Zed) では cwd が編集中ファイルの directory になり破綻する
 - 検証は consuming project で `npm pack` して動作確認する
   - `npm link` は禁止 (symlink が duplicate plugin error を引き起こす)
+
+## src/ Folder Taxonomy
+
+新規 rule を追加するときの置き場所判断 (target 基準):
+
+- `_internal/` — private 実装詳細 (constants, plugins, selectors, import-patterns)。consumer から見えない
+- `base/` — 全ファイル対象の generic rule (TypeScript syntactic / type-aware)
+- `layers/<layer>.mjs` — features 内部の階層単位
+  - 種類: queries / services / entries / utils / constants / schemas / types / lib / top-level-utils
+  - 1 layer の全制約 (naming + syntax + imports + local rules) を 1 file に集約
+- `boundaries/<surface>.mjs` — 外界 → features の入口で enforce する契約
+  - next: page / route / sitemap / hooks / components / lib
+  - deno: lib / utils / entry-point
+- `cross-cutting/` — 複数 layer に跨る規約
+  - 例 (naming): feature-name / namespace-import / form-state
+  - 例 (rule): logger / jsdoc / no-any-return / supabase-columns-satisfies
+
+新規 rule の glob が単一 layer に閉じるなら `layers/`、跨ぐなら `cross-cutting/`、外界の caller surface なら `boundaries/` に置く。
 
 ## Commands
 
