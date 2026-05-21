@@ -1,83 +1,86 @@
 # CLAUDE.md
 
-Shared ESLint flat config that enforces feature-based architecture.
+Shared ESLint flat config used across @yasainet's Next.js / Supabase projects.
 
-## Project Overview
+## Why You Are Reading This
 
-`@yasainet/eslint` provides three entry points: `@yasainet/eslint/next`, `@yasainet/eslint/node`, `@yasainet/eslint/deno`
+- このファイルは consuming project の Claude Code が実装前に読む想定で書かれている
+- consuming project = `@yasainet/eslint` を install している Next.js / Supabase / Node.js / Deno プロジェクト
+- ここに書かれた規約に従わないと ESLint が error を返す → error message を自己修正の手がかりに使え
+- このリポジトリ自体を修正する Claude は `## When Modifying This Package` セクションを参照せよ
 
-### 思想的背景
+## Philosophy
 
-このプロジェクトは **ESLint を Claude Code の羅針盤とする** という思想で設計されている。
+このプロジェクトは ESLint を Claude Code の羅針盤とするという思想で設計されている。
 
-- 人間はファジーに指示する（厳密に指示できるならコードを書いた方が早い）
+- 人間はファジーに指示する (厳密に指示できるならコードを書いた方が早い)
 - Claude Code はファジーな指示から既存コードベースを参照して実装する
 - しかし人間が意図しないアーキテクチャを採用することも日常茶飯事
 - ESLint で規約を機械的に enforce することで、Claude は error message から再帰的に自己修正する
-- **ファジー入力 × 決定論的検証 = 再現性のあるアウトプット**（production ML システムの定石）
+- ファジー入力 × 決定論的検証 = 再現性のあるアウトプット (production ML システムの定石)
 
-## Tech Stack
+## Architecture Rules
 
-- ESLint 9 flat config (ESM only, `.mjs`)
-- No build step, no test framework — verify by running `npm install` in a consuming project
-- Code comments and JSDoc descriptions in English
+consuming project で実装するときに守るべき規約。ESLint が enforce するので、これを破ると lint error になる。
 
-## Environment Architecture
-
-- **Local development**: `npm install` in a consuming Next.js or Node.js project to verify config behavior
-- **CI/CD**: GitHub Actions triggers on `v*` tags to publish to npm
-- **npm**: Published as `@yasainet/eslint`, consumed via `npm install @yasainet/eslint`
-
-## Directory Structure
+### Directory Structure
 
 ```text
-src/
-├── common/   # Shared rules for all environments
-├── next/     # Next.js-specific rules (hooks, components, directives, tailwindcss)
-├── node/     # Node.js CLI scripts (scripts/features, scripts/commands)
-└── deno/     # Deno entry point (entry-point boundary, _utils boundary, _lib boundary)
+{featureRoot}/
+├── {feature}/
+│   ├── entries/        # 外界 (page.tsx / route.ts / hooks) から呼ばれる入口
+│   ├── services/       # 複数 lib を組み合わせる orchestration
+│   ├── queries/        # data access (1 file = 1 lib)
+│   ├── types/          # 型定義
+│   ├── schemas/        # zod schemas
+│   ├── utils/          # pure helpers
+│   ├── constants/      # 定数
+│   └── hooks/          # use-<verb>.ts
+└── shared/             # cross-feature 共通モジュール
+{libRoot}/
+├── {single-client-lib}/index.ts
+└── {multi-client-lib}/<role>.ts
 ```
 
-## Tailwind CSS rules (next entry only)
+featureRoot の位置は entry point によって異なる:
 
-`src/next/tailwindcss.mjs` ships a curated set of `eslint-plugin-better-tailwindcss` rules:
-
-- `no-restricted-classes` forbids margin (`m-*`, `mt-*`, ...) so spacing is controlled by padding/gap on the parent. Exceptions: `mx-auto`, `m*-auto`, negative margins (`-mt-*`), variant-prefixed (`first:mt-0`).
-- `enforce-consistent-class-order`, `enforce-consistent-important-position`, `no-conflicting-classes`, `no-deprecated-classes`, `no-duplicate-classes`, `no-unnecessary-whitespace` are enabled with defaults.
-- `entryPoint` is auto-resolved to the consuming project's `src/app/globals.css` by walking up from this module (mirroring the `findProjectRoot` pattern in `common/rules.mjs` and `common/constants.mjs`). The plugin's relative-path resolution is `cwd`-based and breaks under LSP servers (vscode-eslint, Zed) where `cwd` is the edited file's directory; passing an absolute path makes resolution `cwd`-independent. Override in the consuming project's eslint.config.mjs if the file lives elsewhere.
-
-## 命名規約 (Phase 6: interactors → entries / 2026-05-06)
-
-> [!IMPORTANT]
-> 全 layer で role suffix (`*.lib` / `*.service` / `*.query` / `*.util` / `*.type` / `*.schema` / `*.constant` / `*.entry`) を **廃止** した。役割は **ディレクトリ名のみ** で宣言する。
-> **Phase 6 (2026-05-06)**: `interactors/` を `entries/` にリネーム。「外界 (page.tsx / route.ts / hooks) から呼ばれる入口」という責務を直接表す命名に統一。
+| Entry                   | featureRoot                    |
+| ----------------------- | ------------------------------ |
+| `@yasainet/eslint/next` | `src/features/`                |
+| `@yasainet/eslint/node` | `scripts/features/`            |
+| `@yasainet/eslint/deno` | `supabase/functions/features/` |
 
 ### lib/ の命名
 
-`lib/<dir>/` 配下のファイル名は単一トークン (`*` パターン、ドット禁止)。lib の構造は **`index.ts` の有無**で 2 種類に分岐する:
+`lib/<dir>/` 配下のファイル名は単一トークン (`*` パターン、ドット禁止)。
+lib の構造は `index.ts` の有無で 2 種類に分岐する:
 
-| 種別              | 検出条件                  | プレフィックス登録               | 例                                                        |
-| ----------------- | ------------------------- | -------------------------------- | --------------------------------------------------------- |
-| **single-client** | `lib/<dir>/index.ts` あり | `<dir>` のみ (sub-module は除外) | `lib/gallery-dl/{index.ts, parser.ts, types.ts}`          |
-| **multi-client**  | `index.ts` 不在           | dir 内の全 `<role>.ts`           | `lib/supabase/{admin.ts, server.ts, client.ts, proxy.ts}` |
+| 種別          | 検出条件                  | プレフィックス登録               | 例                                                        |
+| ------------- | ------------------------- | -------------------------------- | --------------------------------------------------------- |
+| single-client | `lib/<dir>/index.ts` あり | `<dir>` のみ (sub-module は除外) | `lib/gallery-dl/{index.ts, parser.ts, types.ts}`          |
+| multi-client  | `index.ts` 不在           | dir 内の全 `<role>.ts`           | `lib/supabase/{admin.ts, server.ts, client.ts, proxy.ts}` |
 
-- `types.ts` (複数形) / `type.ts` (単数形) / `proxy.ts` は EXCLUDE_LIST で常に prefix 登録から除外。型ファイルの命名は consuming project の好みに任せる
+- `types.ts` / `type.ts` / `proxy.ts` は EXCLUDE_LIST で常に prefix 登録から除外
+  - 型ファイルの命名は consuming project の好みに任せる
 - 多重拡張子 (`.test.ts` 等) のファイルも自動除外
+- single-client lib の sub-module (e.g., `parser.ts`) は構造的に queries 層から見えない (prefix 衝突を起こさない)
+  - Why: single-client の SDK 内部実装を feature 層に漏らさない
 - `lib/<dir>/index.ts` は redundant な `lib/<dir>/<dir>.ts` を回避し、import が `from "@/lib/<dir>"` に短縮される
-- single-client lib では sub-module (e.g., `parser.ts`) は **構造的に queries 層から見えない** (prefix 衝突を起こさない)
 
 ### features/ の命名
 
-| layer        | ファイル名                             | 補足                                                                                             |
-| ------------ | -------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| `queries/`   | `<lib-prefix>.ts`                      | 1 file = 1 lib への呼び出し集約。lib-boundary lint で他 lib 禁止                                 |
-| `services/`  | `<lib-prefix>.ts`                      | サービスは複数 lib を組み合わせる orchestration                                                  |
-| `entries/`   | `server.ts` / `admin.ts` / `client.ts` | server/admin は `"use server"` 強制、client は禁止。page.tsx / route.ts / hooks から呼ばれる入口 |
-| `types/`     | `<feature>.ts`                         | feature と同名 1 ファイル                                                                        |
-| `schemas/`   | `<feature>.ts`                         | 同上                                                                                             |
-| `utils/`     | `<feature>.ts`                         | 同上                                                                                             |
-| `constants/` | `<feature>.ts`                         | 同上                                                                                             |
-| `hooks/`     | `use-<verb>.ts`                        | React 慣例の `use-` prefix を許容                                                                |
+| layer        | ファイル名                             | 補足                                                                    |
+| ------------ | -------------------------------------- | ----------------------------------------------------------------------- |
+| `queries/`   | `<lib-prefix>.ts`                      | 1 file = 1 lib への呼び出し集約。lib-boundary lint で他 lib import 禁止 |
+| `services/`  | `<lib-prefix>.ts`                      | 複数 lib を組み合わせる orchestration                                   |
+| `entries/`   | `server.ts` / `admin.ts` / `client.ts` | server/admin は `"use server"` 強制、client は禁止                      |
+| `types/`     | `<feature>.ts`                         | feature と同名 1 ファイル                                               |
+| `schemas/`   | `<feature>.ts`                         | 同上                                                                    |
+| `utils/`     | `<feature>.ts`                         | 同上                                                                    |
+| `constants/` | `<feature>.ts`                         | 同上                                                                    |
+| `hooks/`     | `use-<verb>.ts`                        | React 慣例の `use-` prefix を許容                                       |
+
+`entries/` は外界 (page.tsx / route.ts / hooks) から呼ばれる入口という責務を直接表す命名。
 
 ### shared/ の意味
 
@@ -86,32 +89,85 @@ src/
 - `shared/services/shared.ts` — どの lib にも紐つかない汎用 service
 - `shared/services/supabase.ts` — supabase を呼ぶ shared service
 
-### prefixLibMapping の生成ロジック
+### prefixLibMapping の自動生成
 
-`src/common/constants.mjs` の `generatePrefixLibMapping` が ESLint 起動時に `lib/` をスキャンし、上記ルールで prefix → lib path のマッピングを生成する。新しい lib を追加すると **自動的に** queries / services / entries の許可ファイル名が拡張される。
+`src/common/constants.mjs` の `generatePrefixLibMapping` が ESLint 起動時に `lib/` をスキャンし、
+上記ルールで prefix → lib path のマッピングを自動生成する。
+新しい lib を追加すると自動的に queries / services / entries の許可ファイル名が拡張される。
+
+### Tailwind CSS (next entry only)
+
+- `m-*` (margin) 系クラスは禁止。spacing は親要素の padding / gap で制御せよ
+  - 例外: `mx-auto` / `m*-auto` / 負の margin (`-mt-*`) / variant-prefixed (`first:mt-0`)
+  - Why: margin は親要素の layout を侵食し、子コンポーネントを portable でなくする
+- 以下も enforce される:
+  - `enforce-consistent-class-order`
+  - `enforce-consistent-important-position`
+  - `no-conflicting-classes`
+  - `no-deprecated-classes`
+  - `no-duplicate-classes`
+  - `no-unnecessary-whitespace`
+
+## When Modifying This Package
+
+このリポジトリ (`@yasainet/eslint`) 自体を修正するときの注意。consuming project の Claude は読まなくて良い。
+
+- ESLint 9 flat config / ESM only (`.mjs`) / no build step / no test framework
+- Code comments / JSDoc は英語
+- Tailwind CSS の `entryPoint` は consuming project の `src/app/globals.css` を絶対パスで auto-resolve する
+  - Why: plugin の relative-path 解決は `cwd`-based
+  - LSP server (vscode-eslint, Zed) では cwd が編集中ファイルの directory になり破綻する
+- 検証は consuming project で `npm pack` して動作確認する
+  - `npm link` は禁止 (symlink が duplicate plugin error を引き起こす)
 
 ## Commands
 
+依存インストール (no build / no test):
+
 ```bash
-npm install   # Install dependencies (no build or test commands)
+npm install
+```
+
+Release (patch): `/bump` skill が patch version の git tag を作成して push する。CI が npm publish する。
+
+Release (minor / major): 手動で tag を作成 & push する。
+
+```bash
+git tag vX.Y.0
+git push --tags
 ```
 
 ## Verification
+
+Module exports の sanity check (このリポジトリ内で):
 
 ```bash
 node -e "import('./src/next/index.mjs').then(m => console.log('next:', Object.keys(m)))"
 node -e "import('./src/node/index.mjs').then(m => console.log('node:', Object.keys(m)))"
 ```
 
-## Testing in Consuming Projects
+consuming project での動作確認 → publish の流れ。
+Claude は consuming project から呼び出されているケースが多いため、`cd` を明示すること。
 
-`npm link` is not suitable — symlinks cause duplicate plugin errors (e.g., "Cannot redefine plugin @typescript-eslint"). Use `npm pack` instead:
+1. このリポジトリで local pack を生成:
 
-```bash
-# Pack the local package, then install the tarball in the consuming project
-cd ~/Projects/eslint && npm pack --pack-destination /tmp
-cd ~/Projects/<project> && npm install /tmp/yasainet-eslint-*.tgz
+   ```bash
+   cd ~/Projects/eslint && npm pack --pack-destination /tmp
+   ```
 
-# After testing, revert to the registry version
-npm install @yasainet/eslint@latest
-```
+2. consuming project で tarball を install:
+
+   ```bash
+   cd ~/Projects/<project> && npm install /tmp/yasainet-eslint-*.tgz
+   ```
+
+3. consuming project で実装に対する lint 動作を確認する (期待通り error / pass するか)
+
+4. 問題なければ release。`cd ~/Projects/eslint` してから `/bump` を実行する (patch bump)。
+   - minor / major の場合は `Commands` セクションを参照。
+
+5. consuming project を registry の最新版に update:
+
+   ```bash
+   cd ~/Projects/<project> && npm install @yasainet/eslint@latest
+   ```
