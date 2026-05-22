@@ -95,13 +95,8 @@ export const featureNameRule = {
     const candidateTypePaths = [
       path.join(
         projectRoot,
-        featureRoot.replace(/features$/, "lib/supabase/types.ts"),
-      ),
-      path.join(
-        projectRoot,
         featureRoot.replace(/features$/, "lib/supabase/type.ts"),
       ),
-      path.join(projectRoot, "src/lib/supabase/types.ts"),
       path.join(projectRoot, "src/lib/supabase/type.ts"),
     ];
     const supabaseTypePath =

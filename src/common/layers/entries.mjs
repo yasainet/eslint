@@ -39,6 +39,16 @@ const LATERAL_PATTERNS = [
   },
 ];
 
+/**
+ * supabase の execution context を跨ぐ import を防ぐ cardinality 制約:
+ *
+ * - entries/<context>.ts は同名 services/<context> のみ呼べる
+ * - 防ぐ runtime 問題:
+ *   - entries/server.ts が services/client.ts を呼ぶ
+ *   - server context で lib/supabase/client を呼ぶ
+ * - server / client / admin は supabase 固有
+ * - 他 lib (r2 / stripe 等) は対象外
+ */
 const CARDINALITY_PATTERNS = {
   server: [
     {
