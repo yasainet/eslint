@@ -32,6 +32,9 @@
   "publishConfig": {
     "access": "public"
   },
+  "scripts": {
+    "docs": "node scripts/generate-rules-catalog.mjs"
+  },
   "dependencies": {
     "@stylistic/eslint-plugin": "^5.9.0",
     "eslint-plugin-better-tailwindcss": "^4.1.1",
