@@ -8,7 +8,10 @@ import { simpleImportSortPlugin, stylistic } from "../_internal/plugins.mjs";
 const findProjectRoot = (start) => {
   let dir = start;
   while (dir !== dirname(dir)) {
-    if (!dir.split(sep).includes("node_modules") && existsSync(join(dir, "tsconfig.json"))) {
+    if (
+      !dir.split(sep).includes("node_modules") &&
+      existsSync(join(dir, "tsconfig.json"))
+    ) {
       return dir;
     }
     dir = dirname(dir);
@@ -26,6 +29,7 @@ const sharedRulesConfig = {
   },
   rules: {
     "no-console": "warn",
+
     "no-irregular-whitespace": [
       "warn",
       {
@@ -35,19 +39,21 @@ const sharedRulesConfig = {
         skipTemplates: false,
       },
     ],
-    "simple-import-sort/imports": "warn",
-    "simple-import-sort/exports": "warn",
-    "@stylistic/quotes": ["warn", "double", { avoidEscape: true }],
     "no-unreachable": "error",
-    "no-unreachable-loop": "error",
-    "no-useless-return": "error",
     "no-constant-condition": "error",
     "no-constant-binary-expression": "error",
     "no-dupe-else-if": "error",
     "no-self-assign": "error",
-    "no-self-compare": "error",
     "no-useless-catch": "error",
     "no-fallthrough": "error",
+
+    "no-unreachable-loop": "error",
+    "no-useless-return": "error",
+    "no-self-compare": "error",
+
+    "simple-import-sort/imports": "warn",
+    "simple-import-sort/exports": "warn",
+    "@stylistic/quotes": ["warn", "double", { avoidEscape: true }],
   },
 };
 
