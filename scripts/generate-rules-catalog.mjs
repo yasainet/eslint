@@ -13,19 +13,6 @@ const ENTRIES = [
   { name: "deno", path: "src/deno/index.mjs" },
 ];
 
-const SKIP_DIRS = new Set(["_internal", "local-plugins", "node_modules"]);
-const SKIP_BASENAMES = new Set(["index.mjs"]);
-
-const SAMPLE_CONTEXT = {
-  featureRoot: "src/features",
-  prefixLibMapping: {
-    server: "supabase/server",
-    client: "supabase/client",
-    admin: "supabase/admin",
-  },
-  typeAware: true,
-};
-
 const PRINCIPLES = [
   {
     id: "P1",
@@ -176,70 +163,6 @@ function localPluginMessages(name, config) {
   return Object.values(messages);
 }
 
-function walkSource(dir, accumulator = []) {
-  const entries = fs.readdirSync(dir, { withFileTypes: true });
-  for (const entry of entries) {
-    if (entry.isDirectory()) {
-      if (SKIP_DIRS.has(entry.name)) continue;
-      walkSource(path.join(dir, entry.name), accumulator);
-    } else if (entry.isFile()) {
-      if (!entry.name.endsWith(".mjs")) continue;
-      if (SKIP_BASENAMES.has(entry.name)) continue;
-      accumulator.push(path.join(dir, entry.name));
-    }
-  }
-  return accumulator;
-}
-
-function tryInvoke(fn) {
-  const attempts = [
-    () => fn(SAMPLE_CONTEXT),
-    () => fn(SAMPLE_CONTEXT.featureRoot),
-    () => fn(["src/features/**/*.ts"]),
-    () => fn(["src/features/**/*.ts"], []),
-    () => fn({ featureRoot: SAMPLE_CONTEXT.featureRoot }),
-    () => fn(),
-  ];
-  for (const attempt of attempts) {
-    try {
-      const result = attempt();
-      if (Array.isArray(result)) return result;
-    } catch {
-      // try next variant
-    }
-  }
-  return null;
-}
-
-async function buildLocationTable() {
-  const map = new Map();
-  const files = walkSource(path.join(PROJECT_ROOT, "src"));
-  for (const filePath of files) {
-    let module;
-    try {
-      module = await import(pathToFileURL(filePath).href);
-    } catch {
-      continue;
-    }
-    for (const value of Object.values(module)) {
-      let configs = null;
-      if (Array.isArray(value)) {
-        configs = value;
-      } else if (typeof value === "function") {
-        configs = tryInvoke(value);
-      }
-      if (!Array.isArray(configs)) continue;
-      const relative = path.relative(PROJECT_ROOT, filePath);
-      for (const config of configs) {
-        if (config?.name && !map.has(config.name)) {
-          map.set(config.name, relative);
-        }
-      }
-    }
-  }
-  return map;
-}
-
 async function loadEntryConfigs() {
   const result = [];
   for (const entry of ENTRIES) {
@@ -347,10 +270,8 @@ function scopeLabel(entrySet) {
   return all.filter((name) => entrySet.has(name)).join(", ");
 }
 
-function renderRule(info, locationByName) {
+function renderRule(info) {
   const lines = [`### ${info.name} (${scopeLabel(info.entries)})`, ""];
-  const location = locationByName.get(info.name) ?? "(inline)";
-  lines.push(`- Location: ${location}`);
   lines.push(`- Target: ${formatTarget(info.config)}`);
   const messages = collectMessages(info.config.rules, info.config);
   if (messages.length > 0) {
@@ -369,7 +290,7 @@ function renderRule(info, locationByName) {
   return lines;
 }
 
-function renderMarkdown(aggregated, locationByName) {
+function renderMarkdown(aggregated) {
   const byPrinciple = new Map(PRINCIPLES.map((p) => [p.id, []]));
   const unmapped = [];
   for (const info of aggregated.values()) {
@@ -416,7 +337,7 @@ function renderMarkdown(aggregated, locationByName) {
     lines.push(p.desc);
     lines.push("");
     for (const info of list) {
-      lines.push(...renderRule(info, locationByName));
+      lines.push(...renderRule(info));
     }
   }
 
@@ -424,10 +345,9 @@ function renderMarkdown(aggregated, locationByName) {
 }
 
 async function main() {
-  const locationByName = await buildLocationTable();
   const entries = await loadEntryConfigs();
   const aggregated = aggregateRules(entries);
-  const { markdown, unmapped } = renderMarkdown(aggregated, locationByName);
+  const { markdown, unmapped } = renderMarkdown(aggregated);
   const outPath = path.join(PROJECT_ROOT, "docs/rules.md");
   fs.writeFileSync(outPath, markdown);
   console.log(`Generated: ${path.relative(PROJECT_ROOT, outPath)}`);
