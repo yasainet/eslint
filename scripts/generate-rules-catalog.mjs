@@ -26,48 +26,155 @@ const SAMPLE_CONTEXT = {
   typeAware: true,
 };
 
-const STANDARD_DESCRIPTIONS = {
-  "no-console": "console 呼び出しを禁止",
-  "no-constant-binary-expression": "定数の二項演算を禁止",
-  "no-constant-condition": "定数条件を禁止",
-  "no-dupe-else-if": "else-if の重複条件を禁止",
-  "no-fallthrough": "switch の fall-through を禁止",
-  "no-irregular-whitespace": "不正な空白文字を禁止",
-  "no-self-assign": "自己代入を禁止",
-  "no-self-compare": "自己比較を禁止",
-  "no-unreachable": "到達不能コードを禁止",
-  "no-unreachable-loop": "到達不能ループを禁止",
-  "no-useless-catch": "無意味な catch を禁止",
-  "no-useless-return": "無意味な return を禁止",
-  "no-restricted-globals": "指定 global の使用を禁止",
-  "@typescript-eslint/no-namespace": "TypeScript namespace 構文を禁止",
-  "@typescript-eslint/no-explicit-any": "any 型の明示使用を禁止",
-  "@typescript-eslint/no-unused-vars": "未使用変数を禁止",
-  "@typescript-eslint/consistent-type-imports": "type import を強制",
-  "@typescript-eslint/no-import-type-side-effects": "type import の副作用を禁止",
-  "@typescript-eslint/no-unnecessary-condition": "不要な条件式を禁止",
-  "@typescript-eslint/no-floating-promises": "浮いた Promise (await 漏れ) を禁止",
-  "@typescript-eslint/no-misused-promises": "誤った文脈での Promise 利用を禁止",
-  "@typescript-eslint/await-thenable": "await の対象が thenable であることを強制",
-  "@typescript-eslint/require-await": "async 関数に await を必須化",
-  "@typescript-eslint/no-unsafe-argument": "any 引数の受け渡しを禁止",
-  "@typescript-eslint/no-unsafe-assignment": "any からの代入を禁止",
-  "@typescript-eslint/no-unsafe-call": "any 値の関数呼び出しを禁止",
-  "@typescript-eslint/no-unsafe-member-access": "any 値へのメンバアクセスを禁止",
-  "@typescript-eslint/no-unsafe-return": "any 値の return を禁止",
-  "@stylistic/quotes": "引用符スタイルを統一",
-  "simple-import-sort/imports": "import 文の整列を強制",
-  "simple-import-sort/exports": "export 文の整列を強制",
-  "jsdoc/require-jsdoc": "JSDoc の付与を強制",
-  "jsdoc/require-description": "JSDoc に description を必須化",
-  "better-tailwindcss/no-restricted-classes": "禁止 Tailwind class を制限",
-  "better-tailwindcss/enforce-consistent-class-order": "Tailwind class 順を統一",
-  "better-tailwindcss/enforce-consistent-important-position": "`!important` の位置を統一",
-  "better-tailwindcss/no-conflicting-classes": "競合する Tailwind class を禁止",
-  "better-tailwindcss/no-deprecated-classes": "非推奨 Tailwind class を禁止",
-  "better-tailwindcss/no-duplicate-classes": "重複した Tailwind class を禁止",
-  "better-tailwindcss/no-unnecessary-whitespace": "不要な空白を禁止",
+const PRINCIPLES = [
+  {
+    id: "P1",
+    title: "import 規律",
+    desc: "依存は entries → services → queries → lib の単方向。cardinality (context 整合) と import 表記 (relative/alias, namespace/named) も含む。",
+  },
+  {
+    id: "P2",
+    title: "boundary は entries 経由",
+    desc: "外界 surface (page / route / hooks / sitemap / components, deno top-level) は entries のみ import 可。",
+  },
+  {
+    id: "P3",
+    title: "ファイル名規則",
+    desc: "layer ごとに prefix / case を強制する。",
+  },
+  {
+    id: "P4",
+    title: "命名・型規約",
+    desc: "layer ごとの export 名と FormState 型の命名・shape を強制する。",
+  },
+  {
+    id: "P5",
+    title: "entry / directive 構造",
+    desc: "entry の try/catch + log 構造と use server / client directive を強制する。",
+  },
+  {
+    id: "P6",
+    title: "layer 内 syntax / 型制約",
+    desc: "layer ごとに禁止構文 (try / throw / loop / logger 等) と Supabase 型安全を強制する。",
+  },
+  {
+    id: "P7",
+    title: "環境 / ファイル種別制約",
+    desc: "実行環境と拡張子 (.ts / .tsx) の制約。",
+  },
+  {
+    id: "P8",
+    title: "汎用 TS / style / UI",
+    desc: "全ファイル共通の TypeScript / 整形 / Tailwind / layout 規律。",
+  },
+  {
+    id: "OTHER",
+    title: "その他 (非ルール)",
+    desc: "lint ルールではない除外設定など。原則に割り当てられないルールもここに集約される。",
+  },
+];
+
+const RULE_PRINCIPLE = {
+  "imports/queries": "P1",
+  "imports/services": "P1",
+  "imports/entries": "P1",
+  "imports/entries/server": "P1",
+  "imports/entries/client": "P1",
+  "imports/entries/admin": "P1",
+  "imports/lib-boundary": "P1",
+  "imports/utils": "P1",
+  "imports/feature-other": "P1",
+  "imports/feature-types": "P1",
+  "imports/path-style": "P1",
+  "naming/queries-namespace-import": "P1",
+  "naming/namespace-import-name": "P1",
+  "deno/lib-boundary": "P1",
+  "deno/utils-boundary": "P1",
+  "imports/page-boundary": "P2",
+  "imports/route-boundary": "P2",
+  "imports/hooks-boundary": "P2",
+  "imports/sitemap-boundary": "P2",
+  "imports/components-boundary": "P2",
+  "deno/entry-point": "P2",
+  "naming/queries": "P3",
+  "naming/queries-shared": "P3",
+  "naming/services": "P3",
+  "naming/services-shared": "P3",
+  "naming/entries": "P3",
+  "naming/entries-shared": "P3",
+  "naming/constants": "P3",
+  "naming/constants-shared": "P3",
+  "naming/schemas": "P3",
+  "naming/schemas-shared": "P3",
+  "naming/types": "P3",
+  "naming/types-shared": "P3",
+  "naming/utils": "P3",
+  "naming/utils-shared": "P3",
+  "naming/top-level-utils": "P3",
+  "naming/lib": "P3",
+  "naming/hooks": "P3",
+  "naming/components-pascal-case": "P3",
+  "naming/feature-name": "P3",
+  "naming/queries-export": "P4",
+  "naming/hooks-export": "P4",
+  "naming/schema-naming": "P4",
+  "naming/form-state": "P4",
+  "naming/entry-template": "P5",
+  "naming/entry-single-service-call": "P5",
+  "directives/server-entry": "P5",
+  "directives/admin-entry": "P5",
+  "directives/client-entry": "P5",
+  "directives/hooks": "P5",
+  "entry-points/no-namespace-import": "P5",
+  "layers/queries": "P6",
+  "layers/services": "P6",
+  "layers/entries": "P6",
+  "layers/logger": "P6",
+  "layers/no-any-return": "P6",
+  "naming/supabase-columns-satisfies": "P6",
+  "naming/supabase-select": "P6",
+  "imports/ban-alias": "P7",
+  "naming/features-ts-only": "P7",
+  "naming/components-tsx-only": "P7",
+  "deno/flat-entry-point": "P7",
+  "rules/shared": "P8",
+  "rules/typescript": "P8",
+  jsdoc: "P8",
+  "tailwindcss/rules": "P8",
+  "layouts/main-structural-only": "P8",
+  "rules/ignore-shadcn-ui": "OTHER",
 };
+
+const LOCAL_PLUGIN_PREFIXES = ["local", "deno-local"];
+
+function externalRuleDocUrl(name) {
+  if (name.startsWith("@typescript-eslint/")) {
+    return `https://typescript-eslint.io/rules/${name.slice("@typescript-eslint/".length)}`;
+  }
+  if (name.startsWith("@stylistic/")) {
+    return `https://eslint.style/rules/${name.slice("@stylistic/".length)}`;
+  }
+  if (name.startsWith("simple-import-sort/")) {
+    return "https://github.com/lydell/eslint-plugin-simple-import-sort";
+  }
+  if (name.startsWith("jsdoc/")) {
+    return `https://github.com/gajus/eslint-plugin-jsdoc/blob/main/docs/rules/${name.slice("jsdoc/".length)}.md`;
+  }
+  if (name.startsWith("better-tailwindcss/")) {
+    return `https://github.com/schoero/eslint-plugin-better-tailwindcss/blob/main/docs/rules/${name.slice("better-tailwindcss/".length)}.md`;
+  }
+  return `https://eslint.org/docs/latest/rules/${name}`;
+}
+
+function localPluginMessages(name, config) {
+  const slash = name.indexOf("/");
+  const pluginKey = name.slice(0, slash);
+  const ruleName = name.slice(slash + 1);
+  const messages =
+    config?.plugins?.[pluginKey]?.rules?.[ruleName]?.meta?.messages;
+  if (!messages) return null;
+  return Object.values(messages);
+}
 
 function walkSource(dir, accumulator = []) {
   const entries = fs.readdirSync(dir, { withFileTypes: true });
@@ -150,26 +257,26 @@ async function loadEntryConfigs() {
   return result;
 }
 
-function describeRule(name, value) {
+function describeRule(name, value, config) {
   const options = Array.isArray(value) ? value.slice(1) : [];
 
   if (name === "no-restricted-syntax") {
     return options.flatMap((opt) => {
-      if (typeof opt === "string") return [`- \`${opt}\``];
-      if (opt?.message) return [`- ${opt.message}`];
+      if (typeof opt === "string") return [`\`${opt}\``];
+      if (opt?.message) return [opt.message];
       return [];
     });
   }
 
   if (name === "no-restricted-imports") {
     const opt = options[0];
-    if (opt?.patterns) {
-      return opt.patterns.map((p) => `- ${p.message ?? JSON.stringify(p)}`);
-    }
-    if (opt?.paths) {
-      return opt.paths.map((p) => `- ${p.message ?? JSON.stringify(p)}`);
-    }
-    return [];
+    const list = opt?.patterns ?? opt?.paths ?? [];
+    return list.map((p) => p.message ?? JSON.stringify(p));
+  }
+
+  if (name === "better-tailwindcss/no-restricted-classes") {
+    const opt = options[0];
+    return (opt?.restrict ?? []).map((r) => r.message ?? JSON.stringify(r));
   }
 
   if (name === "check-file/filename-naming-convention") {
@@ -177,27 +284,27 @@ function describeRule(name, value) {
     if (opt) {
       return Object.entries(opt).map(
         ([glob, pattern]) =>
-          `- ファイル名を \`${pattern}\` に強制 (適用: \`${glob}\`)`,
+          `ファイル名を \`${pattern}\` に強制 (適用: \`${glob}\`)`,
       );
     }
     return [];
   }
 
-  if (name.startsWith("local/") || name.includes("-local/")) {
-    return [`- \`${name}\` (local plugin)`];
+  const pluginKey = name.includes("/") ? name.slice(0, name.indexOf("/")) : "";
+  if (LOCAL_PLUGIN_PREFIXES.includes(pluginKey)) {
+    const messages = localPluginMessages(name, config);
+    if (messages) return messages;
+    return [`\`${name}\` (local plugin)`];
   }
 
-  const standard = STANDARD_DESCRIPTIONS[name];
-  if (standard) return [`- ${standard}`];
-
-  return [`- \`${name}\` (unhandled)`];
+  return [`[\`${name}\`](${externalRuleDocUrl(name)})`];
 }
 
-function extractEnforces(rules) {
+function collectMessages(rules, config) {
   const out = [];
   if (!rules) return out;
   for (const [ruleName, ruleValue] of Object.entries(rules)) {
-    out.push(...describeRule(ruleName, ruleValue));
+    out.push(...describeRule(ruleName, ruleValue, config));
   }
   return out;
 }
@@ -218,52 +325,122 @@ function formatTarget(config) {
   return parts.join(" / ");
 }
 
-function renderMarkdown(entries, locationByName) {
+function aggregateRules(entries) {
+  const map = new Map();
+  for (const entry of entries) {
+    for (const config of entry.configs) {
+      if (!config?.name) continue;
+      let info = map.get(config.name);
+      if (!info) {
+        info = { name: config.name, config, entries: new Set() };
+        map.set(config.name, info);
+      }
+      info.entries.add(entry.name);
+    }
+  }
+  return map;
+}
+
+function scopeLabel(entrySet) {
+  const all = ENTRIES.map((e) => e.name);
+  if (all.every((name) => entrySet.has(name))) return "全 entry";
+  return all.filter((name) => entrySet.has(name)).join(", ");
+}
+
+function renderRule(info, locationByName) {
+  const lines = [`### ${info.name} (${scopeLabel(info.entries)})`, ""];
+  const location = locationByName.get(info.name) ?? "(inline)";
+  lines.push(`- Location: ${location}`);
+  lines.push(`- Target: ${formatTarget(info.config)}`);
+  const messages = collectMessages(info.config.rules, info.config);
+  if (messages.length > 0) {
+    lines.push("- Messages:");
+    for (const message of messages) {
+      const parts = message.split("\n");
+      lines.push(`  - ${parts[0]}`);
+      for (let i = 1; i < parts.length; i++) {
+        lines.push(`    ${parts[i]}`);
+      }
+    }
+  } else {
+    lines.push("- Messages: (none)");
+  }
+  lines.push("");
+  return lines;
+}
+
+function renderMarkdown(aggregated, locationByName) {
+  const byPrinciple = new Map(PRINCIPLES.map((p) => [p.id, []]));
+  const unmapped = [];
+  for (const info of aggregated.values()) {
+    const pid = RULE_PRINCIPLE[info.name];
+    if (pid && byPrinciple.has(pid)) {
+      byPrinciple.get(pid).push(info);
+    } else {
+      unmapped.push(info.name);
+      byPrinciple.get("OTHER").push(info);
+    }
+  }
+  for (const list of byPrinciple.values()) {
+    list.sort((a, b) => a.name.localeCompare(b.name));
+  }
+
   const lines = [
     "# Rules Catalog",
     "",
     "> [!NOTE]",
     "> このファイルは `scripts/generate-rules-catalog.mjs` により自動生成。",
     "> 手動編集禁止。再生成は `npm run docs`。",
+    "> 自前ルールは ESLint の実 message を転記。外部ルールは公式ドキュメントへリンク。",
     "",
+    "> [!NOTE]",
+    "> ルールは原則 (P1〜P8) ごとに整理。人間はまず原則サマリを読む。",
+    "> 同一ルールが複数 entry で共通の場合は 1 度だけ掲載し scope で示す。",
+    "> 丸めの基準: 対象と意図の両方が既存原則の延長なら丸める。両方独立なら新設。",
+    "",
+    "## 原則サマリ",
+    "",
+    "| # | 原則 | ルール数 |",
+    "| --- | --- | --- |",
   ];
+  for (const p of PRINCIPLES) {
+    lines.push(`| ${p.id} | ${p.title} | ${byPrinciple.get(p.id).length} |`);
+  }
+  lines.push("");
 
-  for (const entry of entries) {
-    lines.push(`## ${entry.name} (\`${entry.path}\`)`);
+  for (const p of PRINCIPLES) {
+    const list = byPrinciple.get(p.id);
+    if (list.length === 0) continue;
+    lines.push(`## ${p.id} ${p.title}`);
     lines.push("");
-    for (const config of entry.configs) {
-      if (!config?.name) continue;
-      lines.push(`### ${config.name}`);
-      lines.push("");
-      const location =
-        locationByName.get(config.name) ?? `${entry.path} (inline)`;
-      lines.push(`- Location: ${location}`);
-      lines.push(`- Target: ${formatTarget(config)}`);
-      const enforces = extractEnforces(config.rules);
-      if (enforces.length > 0) {
-        lines.push("- Enforces:");
-        for (const line of enforces) {
-          lines.push(`  ${line}`);
-        }
-      } else {
-        lines.push("- Enforces: (none)");
-      }
-      lines.push("");
+    lines.push(p.desc);
+    lines.push("");
+    for (const info of list) {
+      lines.push(...renderRule(info, locationByName));
     }
   }
 
-  return lines.join("\n");
+  return { markdown: lines.join("\n"), unmapped };
 }
 
 async function main() {
   const locationByName = await buildLocationTable();
   const entries = await loadEntryConfigs();
-  const markdown = renderMarkdown(entries, locationByName);
+  const aggregated = aggregateRules(entries);
+  const { markdown, unmapped } = renderMarkdown(aggregated, locationByName);
   const outPath = path.join(PROJECT_ROOT, "docs/rules.md");
   fs.writeFileSync(outPath, markdown);
-  const total = entries.reduce((n, e) => n + e.configs.length, 0);
   console.log(`Generated: ${path.relative(PROJECT_ROOT, outPath)}`);
-  console.log(`  ${total} configs across ${entries.length} entries`);
+  console.log(
+    `  ${aggregated.size} unique rules across ${entries.length} entries`,
+  );
+  if (unmapped.length > 0) {
+    console.warn(
+      `  WARNING: ${unmapped.length} rule(s) not mapped to a principle (placed in OTHER):`,
+    );
+    for (const name of unmapped) console.warn(`    - ${name}`);
+    console.warn("  → RULE_PRINCIPLE に原則を割り当ててください。");
+  }
 }
 
 main().catch((err) => {

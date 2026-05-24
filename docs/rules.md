@@ -1,1366 +1,685 @@
 # Rules Catalog
 
-> [!NOTE]
-> このファイルは `scripts/generate-rules-catalog.mjs` により自動生成。
-> 手動編集禁止。再生成は `npm run docs`。
-
-## next (`src/next/index.mjs`)
-
-### rules/ignore-shadcn-ui
-
-- Location: src/next/index.mjs (inline)
-- Target: ignores: `src/components/shared/ui/*.{ts,tsx}`
-- Enforces: (none)
-
-### rules/shared
-
-- Location: src/common/base/typescript.mjs
-- Target: (global)
-- Enforces:
-  - console 呼び出しを禁止
-  - 不正な空白文字を禁止
-  - import 文の整列を強制
-  - export 文の整列を強制
-  - 引用符スタイルを統一
-  - 到達不能コードを禁止
-  - 到達不能ループを禁止
-  - 無意味な return を禁止
-  - 定数条件を禁止
-  - 定数の二項演算を禁止
-  - else-if の重複条件を禁止
-  - 自己代入を禁止
-  - 自己比較を禁止
-  - 無意味な catch を禁止
-  - switch の fall-through を禁止
-
-### rules/typescript
-
-- Location: src/common/base/typescript.mjs
-- Target: files: `**/*.ts`, `**/*.tsx`
-- Enforces:
-  - 未使用変数を禁止
-  - type import を強制
-  - any 型の明示使用を禁止
-  - 不要な条件式を禁止
-  - 浮いた Promise (await 漏れ) を禁止
-  - 誤った文脈での Promise 利用を禁止
-  - await の対象が thenable であることを強制
-  - async 関数に await を必須化
-  - any からの代入を禁止
-  - any 値の関数呼び出しを禁止
-  - any 値へのメンバアクセスを禁止
-  - any 引数の受け渡しを禁止
-  - any 値の return を禁止
-
-### naming/feature-name
-
-- Location: src/common/cross-cutting/feature-name.mjs
-- Target: files: `src/features/**/*.ts`
-- Enforces:
-  - `local/feature-name` (local plugin)
-
-### naming/namespace-import-name
-
-- Location: src/common/cross-cutting/namespace-import.mjs
-- Target: files: `src/features/**/*.ts`
-- Enforces:
-  - `local/namespace-import-name` (local plugin)
-
-### naming/queries-namespace-import
-
-- Location: src/common/cross-cutting/namespace-import.mjs
-- Target: files: `src/features/**/*.ts`
-- Enforces:
-  - `local/queries-namespace-import` (local plugin)
-
-### naming/services
-
-- Location: src/common/layers/services.mjs
-- Target: files: `src/features/**/services/*.ts` / ignores: `src/features/shared/services/*.ts`
-- Enforces:
-  - ファイル名を `*` に強制 (適用: `**/*.ts`)
-
-### naming/services-shared
-
-- Location: src/common/layers/services.mjs
-- Target: files: `src/features/shared/services/*.ts`
-- Enforces:
-  - ファイル名を `shared` に強制 (適用: `**/*.ts`)
-
-### layers/services
-
-- Location: src/common/layers/services.mjs
-- Target: files: `src/features/**/services/*.ts`
-- Enforces:
-  - try-catch is not allowed in services. Error handling belongs in entries.
-  - throw is not allowed in services. Communicate failures via T | null / { data, error } / empty default. Native exceptions from libs auto-propagate to entry's catch.
-  - logger is not allowed outside entries. Logging belongs in entries.
-  - Dead fallback for error message. If you reached this branch the error is known — return the error directly. Unhandled exceptions belong in entries.
-  - Dead fallback for nullable error. Check `if (error)` and return the error directly. Unhandled exceptions belong in entries.
-  - Dynamic imports of `@/` aliased paths are not allowed in features layers. They bypass prefix-lib and lateral cardinality (e.g. `await import('@/lib/supabase/admin')` from queries/server.ts escapes the lib-boundary check). Create the correct queries/<prefix>.ts or services/<prefix>.ts file instead. External npm packages can still be lazy-loaded for cold-start optimization.
-
-### imports/services
-
-- Location: src/common/layers/services.mjs
-- Target: files: `src/features/**/services/*.ts`
-- Enforces:
-  - services cannot import entries (layer violation)
-  - services cannot import hooks (layer violation)
-  - services cannot import other feature's services (lateral violation)
-  - lib/* can only be imported from queries (lib-boundary violation)
-
-### naming/queries
-
-- Location: src/common/layers/queries.mjs
-- Target: files: `src/features/**/queries/*.ts` / ignores: `src/features/shared/queries/*.ts`
-- Enforces:
-  - ファイル名を `*` に強制 (適用: `**/*.ts`)
-
-### naming/queries-shared
-
-- Location: src/common/layers/queries.mjs
-- Target: files: `src/features/shared/queries/*.ts`
-- Enforces:
-  - ファイル名を `shared` に強制 (適用: `**/*.ts`)
-
-### naming/queries-export
-
-- Location: src/common/layers/queries.mjs
-- Target: files: `src/features/**/queries/*.ts`
-- Enforces:
-  - `local/queries-export` (local plugin)
-
-### naming/supabase-select
-
-- Location: src/common/layers/queries.mjs
-- Target: files: `src/features/**/queries/*.ts`
-- Enforces:
-  - `local/supabase-select-typed-columns` (local plugin)
-
-### layers/queries
-
-- Location: src/common/layers/queries.mjs
-- Target: files: `src/features/**/queries/*.ts`
-- Enforces:
-  - try-catch is not allowed in queries. Error handling belongs in entries.
-  - if statements are not allowed in queries. Conditional logic belongs in services.
-  - Loops are not allowed in queries. Queries should be thin CRUD wrappers — iteration belongs in services.
-  - Loops are not allowed in queries. Queries should be thin CRUD wrappers — iteration belongs in services.
-  - Loops are not allowed in queries. Queries should be thin CRUD wrappers — iteration belongs in services.
-  - Loops are not allowed in queries. Queries should be thin CRUD wrappers — iteration belongs in services.
-  - Loops are not allowed in queries. Queries should be thin CRUD wrappers — iteration belongs in services.
-  - throw is not allowed in queries. Queries must return Supabase's { data, error } shape as-is. Error handling belongs in entries.
-  - logger is not allowed outside entries. Logging belongs in entries.
-  - Dynamic imports of `@/` aliased paths are not allowed in features layers. They bypass prefix-lib and lateral cardinality (e.g. `await import('@/lib/supabase/admin')` from queries/server.ts escapes the lib-boundary check). Create the correct queries/<prefix>.ts or services/<prefix>.ts file instead. External npm packages can still be lazy-loaded for cold-start optimization.
-
-### imports/queries
-
-- Location: src/common/layers/queries.mjs
-- Target: files: `src/features/**/queries/*.ts`
-- Enforces:
-  - queries cannot import services (layer violation)
-  - queries cannot import entries (layer violation)
-  - queries cannot import hooks (layer violation)
-  - queries cannot import other feature's queries (lateral violation)
-  - Mapping functions are only allowed in services. Snake/camel conversion belongs at the service boundary.
-
-### naming/form-state
-
-- Location: src/common/cross-cutting/form-state.mjs
-- Target: files: `src/features/**/*.ts`
-- Enforces:
-  - `local/form-state-naming` (local plugin)
-  - `local/form-state-shape` (local plugin)
-
-### naming/supabase-columns-satisfies
-
-- Location: src/common/cross-cutting/supabase-columns-satisfies.mjs
-- Target: files: `src/features/**/queries/*.ts`, `src/features/**/constants/*.ts`
-- Enforces:
-  - `local/supabase-columns-satisfies` (local plugin)
-
-### naming/lib
-
-- Location: src/common/layers/lib.mjs
-- Target: files: `src/lib/**/*.ts`
-- Enforces:
-  - ファイル名を `*` に強制 (適用: `**/*.ts`)
-
-### naming/top-level-utils
-
-- Location: src/common/layers/top-level-utils.mjs
-- Target: files: `src/utils/**/*.ts`
-- Enforces:
-  - ファイル名を `*` に強制 (適用: `**/*.ts`)
-
-### naming/types
-
-- Location: src/common/layers/types.mjs
-- Target: files: `src/features/*/types/*.ts` / ignores: `src/features/shared/types/*.ts`
-- Enforces:
-  - ファイル名を `<1>` に強制 (適用: `**/*/types/*.ts`)
-
-### naming/types-shared
-
-- Location: src/common/layers/types.mjs
-- Target: files: `src/features/shared/types/*.ts`
-- Enforces:
-  - ファイル名を `shared` に強制 (適用: `**/*.ts`)
-
-### imports/feature-types
-
-- Location: src/common/layers/types.mjs
-- Target: files: `src/features/**/types/*.ts`
-- Enforces:
-  - Mapping functions are only allowed in services. Snake/camel conversion belongs at the service boundary.
-
-### naming/schemas
-
-- Location: src/common/layers/schemas.mjs
-- Target: files: `src/features/*/schemas/*.ts` / ignores: `src/features/shared/schemas/*.ts`
-- Enforces:
-  - ファイル名を `<1>` に強制 (適用: `**/*/schemas/*.ts`)
-
-### naming/schemas-shared
-
-- Location: src/common/layers/schemas.mjs
-- Target: files: `src/features/shared/schemas/*.ts`
-- Enforces:
-  - ファイル名を `shared` に強制 (適用: `**/*.ts`)
-
-### naming/schema-naming
-
-- Location: src/common/layers/schemas.mjs
-- Target: files: `src/features/**/schemas/*.ts`
-- Enforces:
-  - `local/schema-naming` (local plugin)
-
-### naming/utils
-
-- Location: src/common/layers/utils.mjs
-- Target: files: `src/features/*/utils/*.ts` / ignores: `src/features/shared/utils/*.ts`
-- Enforces:
-  - ファイル名を `<1>` に強制 (適用: `**/*/utils/*.ts`)
-
-### naming/utils-shared
-
-- Location: src/common/layers/utils.mjs
-- Target: files: `src/features/shared/utils/*.ts`
-- Enforces:
-  - ファイル名を `shared` に強制 (適用: `**/*.ts`)
-
-### imports/utils
-
-- Location: src/common/layers/utils.mjs
-- Target: files: `src/features/**/utils/*.ts`
-- Enforces:
-  - lib/* can only be imported from queries (lib-boundary violation)
-  - Mapping functions are only allowed in services. Snake/camel conversion belongs at the service boundary.
-
-### naming/constants
-
-- Location: src/common/layers/constants.mjs
-- Target: files: `src/features/*/constants/*.ts` / ignores: `src/features/shared/constants/*.ts`
-- Enforces:
-  - ファイル名を `<1>` に強制 (適用: `**/*/constants/*.ts`)
-
-### naming/constants-shared
-
-- Location: src/common/layers/constants.mjs
-- Target: files: `src/features/shared/constants/*.ts`
-- Enforces:
-  - ファイル名を `shared` に強制 (適用: `**/*.ts`)
-
-### naming/entries
-
-- Location: src/common/layers/entries.mjs
-- Target: files: `src/features/**/entries/*.ts` / ignores: `src/features/shared/entries/*.ts`
-- Enforces:
-  - ファイル名を `*` に強制 (適用: `**/*.ts`)
-
-### naming/entries-shared
-
-- Location: src/common/layers/entries.mjs
-- Target: files: `src/features/shared/entries/*.ts`
-- Enforces:
-  - ファイル名を `shared` に強制 (適用: `**/*.ts`)
-
-### naming/entry-template
-
-- Location: src/common/layers/entries.mjs
-- Target: files: `src/features/**/entries/*.ts`
-- Enforces:
-  - `local/entry-template` (local plugin)
-
-### naming/entry-single-service-call
-
-- Location: src/common/layers/entries.mjs
-- Target: files: `src/features/**/entries/*.ts`
-- Enforces:
-  - `local/entry-single-service-call` (local plugin)
-
-### layers/entries
-
-- Location: src/common/layers/entries.mjs
-- Target: files: `src/features/**/entries/*.ts`
-- Enforces:
-  - Dynamic imports of `@/` aliased paths are not allowed in features layers. They bypass prefix-lib and lateral cardinality (e.g. `await import('@/lib/supabase/admin')` from queries/server.ts escapes the lib-boundary check). Create the correct queries/<prefix>.ts or services/<prefix>.ts file instead. External npm packages can still be lazy-loaded for cold-start optimization.
-
-### imports/entries
-
-- Location: src/common/layers/entries.mjs
-- Target: files: `src/features/**/entries/*.ts`
-- Enforces:
-  - entries cannot import queries (layer violation)
-  - entries cannot import hooks (layer violation)
-  - entries cannot import other feature's entries (lateral violation)
-  - entries cannot import other feature's services. Use the same feature's service (1:1) or move orchestration into the service layer. `shared/services/*` is exempt for cross-cutting side effects (notifications etc.).
-  - lib/* can only be imported from queries (lib-boundary violation)
-  - Mapping functions are only allowed in services. Snake/camel conversion belongs at the service boundary.
-
-### imports/entries/server
-
-- Location: src/common/layers/entries.mjs
-- Target: files: `src/features/**/entries/server.ts`
-- Enforces:
-  - entries cannot import queries (layer violation)
-  - entries cannot import hooks (layer violation)
-  - entries cannot import other feature's entries (lateral violation)
-  - entries cannot import other feature's services. Use the same feature's service (1:1) or move orchestration into the service layer. `shared/services/*` is exempt for cross-cutting side effects (notifications etc.).
-  - server entry can only import server service (cardinality violation)
-  - lib/* can only be imported from queries (lib-boundary violation)
-  - Mapping functions are only allowed in services. Snake/camel conversion belongs at the service boundary.
-
-### imports/entries/client
-
-- Location: src/common/layers/entries.mjs
-- Target: files: `src/features/**/entries/client.ts`
-- Enforces:
-  - entries cannot import queries (layer violation)
-  - entries cannot import hooks (layer violation)
-  - entries cannot import other feature's entries (lateral violation)
-  - entries cannot import other feature's services. Use the same feature's service (1:1) or move orchestration into the service layer. `shared/services/*` is exempt for cross-cutting side effects (notifications etc.).
-  - client entry can only import client service (cardinality violation)
-  - lib/* can only be imported from queries (lib-boundary violation)
-  - Mapping functions are only allowed in services. Snake/camel conversion belongs at the service boundary.
-
-### imports/entries/admin
-
-- Location: src/common/layers/entries.mjs
-- Target: files: `src/features/**/entries/admin.ts`
-- Enforces:
-  - entries cannot import queries (layer violation)
-  - entries cannot import hooks (layer violation)
-  - entries cannot import other feature's entries (lateral violation)
-  - entries cannot import other feature's services. Use the same feature's service (1:1) or move orchestration into the service layer. `shared/services/*` is exempt for cross-cutting side effects (notifications etc.).
-  - admin entry can only import admin service (cardinality violation)
-  - lib/* can only be imported from queries (lib-boundary violation)
-  - Mapping functions are only allowed in services. Snake/camel conversion belongs at the service boundary.
-
-### naming/features-ts-only
-
-- Location: src/common/cross-cutting/features-ts-only.mjs
-- Target: files: `src/features/**/*.tsx`
-- Enforces:
-  - features/ must only contain .ts files. Components belong in src/components/.
-
-### layers/logger
-
-- Location: src/common/cross-cutting/logger.mjs
-- Target: files: `src/features/**/*.ts` / ignores: `src/features/**/entries/*.ts`
-- Enforces:
-  - console 呼び出しを禁止
-  - logger is not allowed outside entries. Logging belongs in entries.
-
-### layers/no-any-return
-
-- Location: src/common/cross-cutting/no-any-return.mjs
-- Target: files: `src/features/**/queries/*.ts`, `src/features/**/services/*.ts`
-- Enforces:
-  - `local/no-any-return` (local plugin)
-
-### imports/feature-other
-
-- Location: src/common/cross-cutting/feature-default-imports.mjs
-- Target: files: `src/features/**/*.ts` / ignores: `src/features/**/services/*.ts`, `src/features/**/queries/*.ts`, `src/features/**/entries/*.ts`, `src/features/**/utils/*.ts`, `src/features/**/types/*.ts`
-- Enforces:
-  - lib/* can only be imported from queries (lib-boundary violation)
-  - Mapping functions are only allowed in services. Snake/camel conversion belongs at the service boundary.
-
-### jsdoc
-
-- Location: src/common/cross-cutting/jsdoc.mjs
-- Target: files: `src/features/**/queries/*.ts`, `src/features/**/services*/*.ts`, `src/features/**/utils*/*.ts`
-- Enforces:
-  - JSDoc の付与を強制
-  - JSDoc に description を必須化
-
-### imports/lib-boundary
-
-- Location: src/next/boundaries/lib.mjs
-- Target: files: `src/**/*.{ts,tsx}` / ignores: `src/lib/**`, `src/proxy.ts`, `src/app/**/route.ts`, `src/features/**`
-- Enforces:
-  - lib/* can only be imported from queries (lib-boundary violation)
-  - Mapping functions are only allowed in services. Snake/camel conversion belongs at the service boundary.
-
-### imports/page-boundary
-
-- Location: src/next/boundaries/page.mjs
-- Target: files: `src/app/**/page.tsx`
-- Enforces:
-  - page.tsx can only import entries, not queries (page-boundary violation)
-  - page.tsx can only import entries, not services (page-boundary violation)
-  - lib/* can only be imported from queries (lib-boundary violation)
-  - Mapping functions are only allowed in services. Snake/camel conversion belongs at the service boundary.
-
-### imports/route-boundary
-
-- Location: src/next/boundaries/route.mjs
-- Target: files: `src/app/**/route.ts`
-- Enforces:
-  - route.ts can only import entries, not queries (route-boundary violation)
-  - route.ts can only import entries, not services (route-boundary violation)
-  - lib/* can only be imported from queries (lib-boundary violation)
-  - Mapping functions are only allowed in services. Snake/camel conversion belongs at the service boundary.
-
-### imports/sitemap-boundary
-
-- Location: src/next/boundaries/sitemap.mjs
-- Target: files: `src/app/sitemap.ts`, `src/app/**/sitemap.ts`
-- Enforces:
-  - sitemap.ts can only import entries, not queries (sitemap-boundary violation)
-  - sitemap.ts can only import entries, not services (sitemap-boundary violation)
-  - lib/* can only be imported from queries (lib-boundary violation)
-  - Mapping functions are only allowed in services. Snake/camel conversion belongs at the service boundary.
-
-### imports/hooks-boundary
-
-- Location: src/next/boundaries/hooks.mjs
-- Target: files: `src/features/**/hooks/*.ts`
-- Enforces:
-  - hooks can only import entries, not queries (hooks-boundary violation)
-  - hooks can only import entries, not services (hooks-boundary violation)
-  - lib/* can only be imported from queries (lib-boundary violation)
-  - Mapping functions are only allowed in services. Snake/camel conversion belongs at the service boundary.
-
-### imports/components-boundary
-
-- Location: src/next/boundaries/components.mjs
-- Target: files: `src/components/**/*.{ts,tsx}`
-- Enforces:
-  - components can only import entries or hooks, not queries (components-boundary violation)
-  - components can only import entries or hooks, not services (components-boundary violation)
-  - lib/* can only be imported from queries (lib-boundary violation)
-  - Mapping functions are only allowed in services. Snake/camel conversion belongs at the service boundary.
-
-### naming/hooks
-
-- Location: src/next/layers/hooks.mjs
-- Target: files: `src/features/**/hooks/*.ts`
-- Enforces:
-  - ファイル名を `use-+([a-z0-9])*(-+([a-z0-9]))` に強制 (適用: `**/*.ts`)
-
-### naming/hooks-export
-
-- Location: src/next/layers/hooks.mjs
-- Target: files: `src/features/**/hooks/*.ts`
-- Enforces:
-  - Exported functions in hooks must start with 'use' (e.g., useAuth).
-
-### naming/components-tsx-only
-
-- Location: src/next/layers/components.mjs
-- Target: files: `src/components/**/*.ts`
-- Enforces:
-  - components/ must only contain .tsx files. Logic belongs in src/features/.
-
-### naming/components-pascal-case
-
-- Location: src/next/layers/components.mjs
-- Target: files: `src/components/**/*.tsx` / ignores: `src/components/shared/ui/**`, `src/components/**/index.tsx`
-- Enforces:
-  - ファイル名を `PASCAL_CASE` に強制 (適用: `**/*.tsx`)
-
-### directives/server-entry
-
-- Location: src/next/directives.mjs
-- Target: files: `src/features/**/entries/server.ts`
-- Enforces:
-  - entries/server.ts must start with "use server" directive.
-
-### directives/admin-entry
-
-- Location: src/next/directives.mjs
-- Target: files: `src/features/**/entries/admin.ts`
-- Enforces:
-  - entries/admin.ts must start with "use server" directive.
-
-### directives/client-entry
-
-- Location: src/next/directives.mjs
-- Target: files: `src/features/**/entries/client.ts`
-- Enforces:
-  - entries/client.ts must NOT have "use server" directive. It uses @/lib/supabase/client.
-
-### directives/hooks
-
-- Location: src/next/directives.mjs
-- Target: files: `src/features/**/hooks/*.ts`
-- Enforces:
-  - Hooks must start with "use client" directive.
-
-### imports/path-style
-
-- Location: src/next/imports.mjs
-- Target: files: `src/features/**/*.ts`
-- Enforces:
-  - `local/import-path-style` (local plugin)
-
-### layouts/main-structural-only
-
-- Location: src/next/layers/layouts.mjs
-- Target: files: `src/app/**/layout.tsx`
-- Enforces:
-  - `local/layout-main-structural-only` (local plugin)
-
-### tailwindcss/rules
-
-- Location: src/next/tailwindcss.mjs
-- Target: files: `src/**/*.{ts,tsx}`
-- Enforces:
-  - Tailwind class 順を統一
-  - `!important` の位置を統一
-  - 競合する Tailwind class を禁止
-  - 非推奨 Tailwind class を禁止
-  - 重複した Tailwind class を禁止
-  - 禁止 Tailwind class を制限
-  - 不要な空白を禁止
-
-### entry-points/no-namespace-import
-
-- Location: src/common/boundaries/entry-point.mjs
-- Target: files: `src/app/**/*.ts`, `src/app/**/*.tsx`
-- Enforces:
-  - Entry points must use named imports instead of `import * as`. This makes dependencies explicit.
-
-## node (`src/node/index.mjs`)
-
-### rules/shared
-
-- Location: src/common/base/typescript.mjs
-- Target: (global)
-- Enforces:
-  - console 呼び出しを禁止
-  - 不正な空白文字を禁止
-  - import 文の整列を強制
-  - export 文の整列を強制
-  - 引用符スタイルを統一
-  - 到達不能コードを禁止
-  - 到達不能ループを禁止
-  - 無意味な return を禁止
-  - 定数条件を禁止
-  - 定数の二項演算を禁止
-  - else-if の重複条件を禁止
-  - 自己代入を禁止
-  - 自己比較を禁止
-  - 無意味な catch を禁止
-  - switch の fall-through を禁止
-
-### rules/typescript
-
-- Location: src/common/base/typescript.mjs
-- Target: files: `**/*.ts`, `**/*.tsx`
-- Enforces:
-  - 未使用変数を禁止
-  - type import を強制
-  - any 型の明示使用を禁止
-  - 不要な条件式を禁止
-  - 浮いた Promise (await 漏れ) を禁止
-  - 誤った文脈での Promise 利用を禁止
-  - await の対象が thenable であることを強制
-  - async 関数に await を必須化
-  - any からの代入を禁止
-  - any 値の関数呼び出しを禁止
-  - any 値へのメンバアクセスを禁止
-  - any 引数の受け渡しを禁止
-  - any 値の return を禁止
-
-### naming/feature-name
-
-- Location: src/common/cross-cutting/feature-name.mjs
-- Target: files: `scripts/features/**/*.ts`
-- Enforces:
-  - `local/feature-name` (local plugin)
-
-### naming/namespace-import-name
-
-- Location: src/common/cross-cutting/namespace-import.mjs
-- Target: files: `scripts/features/**/*.ts`
-- Enforces:
-  - `local/namespace-import-name` (local plugin)
-
-### naming/queries-namespace-import
-
-- Location: src/common/cross-cutting/namespace-import.mjs
-- Target: files: `scripts/features/**/*.ts`
-- Enforces:
-  - `local/queries-namespace-import` (local plugin)
-
-### naming/services
-
-- Location: src/common/layers/services.mjs
-- Target: files: `scripts/features/**/services/*.ts` / ignores: `scripts/features/shared/services/*.ts`
-- Enforces:
-  - ファイル名を `*` に強制 (適用: `**/*.ts`)
-
-### naming/services-shared
-
-- Location: src/common/layers/services.mjs
-- Target: files: `scripts/features/shared/services/*.ts`
-- Enforces:
-  - ファイル名を `shared` に強制 (適用: `**/*.ts`)
-
-### layers/services
-
-- Location: src/common/layers/services.mjs
-- Target: files: `scripts/features/**/services/*.ts`
-- Enforces:
-  - try-catch is not allowed in services. Error handling belongs in entries.
-  - throw is not allowed in services. Communicate failures via T | null / { data, error } / empty default. Native exceptions from libs auto-propagate to entry's catch.
-  - logger is not allowed outside entries. Logging belongs in entries.
-  - Dead fallback for error message. If you reached this branch the error is known — return the error directly. Unhandled exceptions belong in entries.
-  - Dead fallback for nullable error. Check `if (error)` and return the error directly. Unhandled exceptions belong in entries.
-  - Dynamic imports of `@/` aliased paths are not allowed in features layers. They bypass prefix-lib and lateral cardinality (e.g. `await import('@/lib/supabase/admin')` from queries/server.ts escapes the lib-boundary check). Create the correct queries/<prefix>.ts or services/<prefix>.ts file instead. External npm packages can still be lazy-loaded for cold-start optimization.
-
-### imports/services
-
-- Location: src/common/layers/services.mjs
-- Target: files: `scripts/features/**/services/*.ts`
-- Enforces:
-  - services cannot import entries (layer violation)
-  - services cannot import hooks (layer violation)
-  - services cannot import other feature's services (lateral violation)
-  - lib/* can only be imported from queries (lib-boundary violation)
-
-### naming/queries
-
-- Location: src/common/layers/queries.mjs
-- Target: files: `scripts/features/**/queries/*.ts` / ignores: `scripts/features/shared/queries/*.ts`
-- Enforces:
-  - ファイル名を `*` に強制 (適用: `**/*.ts`)
-
-### naming/queries-shared
-
-- Location: src/common/layers/queries.mjs
-- Target: files: `scripts/features/shared/queries/*.ts`
-- Enforces:
-  - ファイル名を `shared` に強制 (適用: `**/*.ts`)
-
-### naming/queries-export
-
-- Location: src/common/layers/queries.mjs
-- Target: files: `scripts/features/**/queries/*.ts`
-- Enforces:
-  - `local/queries-export` (local plugin)
-
-### naming/supabase-select
-
-- Location: src/common/layers/queries.mjs
-- Target: files: `scripts/features/**/queries/*.ts`
-- Enforces:
-  - `local/supabase-select-typed-columns` (local plugin)
-
-### layers/queries
-
-- Location: src/common/layers/queries.mjs
-- Target: files: `scripts/features/**/queries/*.ts`
-- Enforces:
-  - try-catch is not allowed in queries. Error handling belongs in entries.
-  - if statements are not allowed in queries. Conditional logic belongs in services.
-  - Loops are not allowed in queries. Queries should be thin CRUD wrappers — iteration belongs in services.
-  - Loops are not allowed in queries. Queries should be thin CRUD wrappers — iteration belongs in services.
-  - Loops are not allowed in queries. Queries should be thin CRUD wrappers — iteration belongs in services.
-  - Loops are not allowed in queries. Queries should be thin CRUD wrappers — iteration belongs in services.
-  - Loops are not allowed in queries. Queries should be thin CRUD wrappers — iteration belongs in services.
-  - throw is not allowed in queries. Queries must return Supabase's { data, error } shape as-is. Error handling belongs in entries.
-  - logger is not allowed outside entries. Logging belongs in entries.
-  - Dynamic imports of `@/` aliased paths are not allowed in features layers. They bypass prefix-lib and lateral cardinality (e.g. `await import('@/lib/supabase/admin')` from queries/server.ts escapes the lib-boundary check). Create the correct queries/<prefix>.ts or services/<prefix>.ts file instead. External npm packages can still be lazy-loaded for cold-start optimization.
-
-### imports/queries
-
-- Location: src/common/layers/queries.mjs
-- Target: files: `scripts/features/**/queries/*.ts`
-- Enforces:
-  - queries cannot import services (layer violation)
-  - queries cannot import entries (layer violation)
-  - queries cannot import hooks (layer violation)
-  - queries cannot import other feature's queries (lateral violation)
-  - Mapping functions are only allowed in services. Snake/camel conversion belongs at the service boundary.
-
-### naming/form-state
-
-- Location: src/common/cross-cutting/form-state.mjs
-- Target: files: `scripts/features/**/*.ts`
-- Enforces:
-  - `local/form-state-naming` (local plugin)
-  - `local/form-state-shape` (local plugin)
-
-### naming/supabase-columns-satisfies
-
-- Location: src/common/cross-cutting/supabase-columns-satisfies.mjs
-- Target: files: `scripts/features/**/queries/*.ts`, `scripts/features/**/constants/*.ts`
-- Enforces:
-  - `local/supabase-columns-satisfies` (local plugin)
-
-### naming/lib
-
-- Location: src/common/layers/lib.mjs
-- Target: files: `scripts/lib/**/*.ts`
-- Enforces:
-  - ファイル名を `*` に強制 (適用: `**/*.ts`)
-
-### naming/top-level-utils
-
-- Location: src/common/layers/top-level-utils.mjs
-- Target: files: `scripts/utils/**/*.ts`
-- Enforces:
-  - ファイル名を `*` に強制 (適用: `**/*.ts`)
-
-### naming/types
-
-- Location: src/common/layers/types.mjs
-- Target: files: `scripts/features/*/types/*.ts` / ignores: `scripts/features/shared/types/*.ts`
-- Enforces:
-  - ファイル名を `<1>` に強制 (適用: `**/*/types/*.ts`)
-
-### naming/types-shared
-
-- Location: src/common/layers/types.mjs
-- Target: files: `scripts/features/shared/types/*.ts`
-- Enforces:
-  - ファイル名を `shared` に強制 (適用: `**/*.ts`)
-
-### imports/feature-types
-
-- Location: src/common/layers/types.mjs
-- Target: files: `scripts/features/**/types/*.ts`
-- Enforces:
-  - Mapping functions are only allowed in services. Snake/camel conversion belongs at the service boundary.
-
-### naming/schemas
-
-- Location: src/common/layers/schemas.mjs
-- Target: files: `scripts/features/*/schemas/*.ts` / ignores: `scripts/features/shared/schemas/*.ts`
-- Enforces:
-  - ファイル名を `<1>` に強制 (適用: `**/*/schemas/*.ts`)
-
-### naming/schemas-shared
-
-- Location: src/common/layers/schemas.mjs
-- Target: files: `scripts/features/shared/schemas/*.ts`
-- Enforces:
-  - ファイル名を `shared` に強制 (適用: `**/*.ts`)
-
-### naming/schema-naming
-
-- Location: src/common/layers/schemas.mjs
-- Target: files: `scripts/features/**/schemas/*.ts`
-- Enforces:
-  - `local/schema-naming` (local plugin)
-
-### naming/utils
-
-- Location: src/common/layers/utils.mjs
-- Target: files: `scripts/features/*/utils/*.ts` / ignores: `scripts/features/shared/utils/*.ts`
-- Enforces:
-  - ファイル名を `<1>` に強制 (適用: `**/*/utils/*.ts`)
-
-### naming/utils-shared
-
-- Location: src/common/layers/utils.mjs
-- Target: files: `scripts/features/shared/utils/*.ts`
-- Enforces:
-  - ファイル名を `shared` に強制 (適用: `**/*.ts`)
-
-### imports/utils
-
-- Location: src/common/layers/utils.mjs
-- Target: files: `scripts/features/**/utils/*.ts`
-- Enforces:
-  - lib/* can only be imported from queries (lib-boundary violation)
-  - Mapping functions are only allowed in services. Snake/camel conversion belongs at the service boundary.
-
-### naming/constants
-
-- Location: src/common/layers/constants.mjs
-- Target: files: `scripts/features/*/constants/*.ts` / ignores: `scripts/features/shared/constants/*.ts`
-- Enforces:
-  - ファイル名を `<1>` に強制 (適用: `**/*/constants/*.ts`)
-
-### naming/constants-shared
-
-- Location: src/common/layers/constants.mjs
-- Target: files: `scripts/features/shared/constants/*.ts`
-- Enforces:
-  - ファイル名を `shared` に強制 (適用: `**/*.ts`)
-
-### naming/entries
-
-- Location: src/common/layers/entries.mjs
-- Target: files: `scripts/features/**/entries/*.ts` / ignores: `scripts/features/shared/entries/*.ts`
-- Enforces:
-  - ファイル名を `*` に強制 (適用: `**/*.ts`)
-
-### naming/entries-shared
-
-- Location: src/common/layers/entries.mjs
-- Target: files: `scripts/features/shared/entries/*.ts`
-- Enforces:
-  - ファイル名を `shared` に強制 (適用: `**/*.ts`)
-
-### naming/entry-template
-
-- Location: src/common/layers/entries.mjs
-- Target: files: `scripts/features/**/entries/*.ts`
-- Enforces:
-  - `local/entry-template` (local plugin)
-
-### naming/entry-single-service-call
-
-- Location: src/common/layers/entries.mjs
-- Target: files: `scripts/features/**/entries/*.ts`
-- Enforces:
-  - `local/entry-single-service-call` (local plugin)
-
-### layers/entries
-
-- Location: src/common/layers/entries.mjs
-- Target: files: `scripts/features/**/entries/*.ts`
-- Enforces:
-  - Dynamic imports of `@/` aliased paths are not allowed in features layers. They bypass prefix-lib and lateral cardinality (e.g. `await import('@/lib/supabase/admin')` from queries/server.ts escapes the lib-boundary check). Create the correct queries/<prefix>.ts or services/<prefix>.ts file instead. External npm packages can still be lazy-loaded for cold-start optimization.
-
-### imports/entries
-
-- Location: src/common/layers/entries.mjs
-- Target: files: `scripts/features/**/entries/*.ts`
-- Enforces:
-  - entries cannot import queries (layer violation)
-  - entries cannot import hooks (layer violation)
-  - entries cannot import other feature's entries (lateral violation)
-  - entries cannot import other feature's services. Use the same feature's service (1:1) or move orchestration into the service layer. `shared/services/*` is exempt for cross-cutting side effects (notifications etc.).
-  - lib/* can only be imported from queries (lib-boundary violation)
-  - Mapping functions are only allowed in services. Snake/camel conversion belongs at the service boundary.
-
-### imports/entries/server
-
-- Location: src/common/layers/entries.mjs
-- Target: files: `scripts/features/**/entries/server.ts`
-- Enforces:
-  - entries cannot import queries (layer violation)
-  - entries cannot import hooks (layer violation)
-  - entries cannot import other feature's entries (lateral violation)
-  - entries cannot import other feature's services. Use the same feature's service (1:1) or move orchestration into the service layer. `shared/services/*` is exempt for cross-cutting side effects (notifications etc.).
-  - server entry can only import server service (cardinality violation)
-  - lib/* can only be imported from queries (lib-boundary violation)
-  - Mapping functions are only allowed in services. Snake/camel conversion belongs at the service boundary.
-
-### imports/entries/client
-
-- Location: src/common/layers/entries.mjs
-- Target: files: `scripts/features/**/entries/client.ts`
-- Enforces:
-  - entries cannot import queries (layer violation)
-  - entries cannot import hooks (layer violation)
-  - entries cannot import other feature's entries (lateral violation)
-  - entries cannot import other feature's services. Use the same feature's service (1:1) or move orchestration into the service layer. `shared/services/*` is exempt for cross-cutting side effects (notifications etc.).
-  - client entry can only import client service (cardinality violation)
-  - lib/* can only be imported from queries (lib-boundary violation)
-  - Mapping functions are only allowed in services. Snake/camel conversion belongs at the service boundary.
-
-### imports/entries/admin
-
-- Location: src/common/layers/entries.mjs
-- Target: files: `scripts/features/**/entries/admin.ts`
-- Enforces:
-  - entries cannot import queries (layer violation)
-  - entries cannot import hooks (layer violation)
-  - entries cannot import other feature's entries (lateral violation)
-  - entries cannot import other feature's services. Use the same feature's service (1:1) or move orchestration into the service layer. `shared/services/*` is exempt for cross-cutting side effects (notifications etc.).
-  - admin entry can only import admin service (cardinality violation)
-  - lib/* can only be imported from queries (lib-boundary violation)
-  - Mapping functions are only allowed in services. Snake/camel conversion belongs at the service boundary.
-
-### naming/features-ts-only
-
-- Location: src/common/cross-cutting/features-ts-only.mjs
-- Target: files: `scripts/features/**/*.tsx`
-- Enforces:
-  - features/ must only contain .ts files. Components belong in src/components/.
-
-### layers/logger
-
-- Location: src/common/cross-cutting/logger.mjs
-- Target: files: `scripts/features/**/*.ts` / ignores: `scripts/features/**/entries/*.ts`
-- Enforces:
-  - console 呼び出しを禁止
-  - logger is not allowed outside entries. Logging belongs in entries.
-
-### layers/no-any-return
-
-- Location: src/common/cross-cutting/no-any-return.mjs
-- Target: files: `scripts/features/**/queries/*.ts`, `scripts/features/**/services/*.ts`
-- Enforces:
-  - `local/no-any-return` (local plugin)
-
-### imports/feature-other
-
-- Location: src/common/cross-cutting/feature-default-imports.mjs
-- Target: files: `scripts/features/**/*.ts` / ignores: `scripts/features/**/services/*.ts`, `scripts/features/**/queries/*.ts`, `scripts/features/**/entries/*.ts`, `scripts/features/**/utils/*.ts`, `scripts/features/**/types/*.ts`
-- Enforces:
-  - lib/* can only be imported from queries (lib-boundary violation)
-  - Mapping functions are only allowed in services. Snake/camel conversion belongs at the service boundary.
-
-### jsdoc
-
-- Location: src/common/cross-cutting/jsdoc.mjs
-- Target: files: `scripts/features/**/queries/*.ts`, `scripts/features/**/services*/*.ts`, `scripts/features/**/utils*/*.ts`
-- Enforces:
-  - JSDoc の付与を強制
-  - JSDoc に description を必須化
-
-### imports/ban-alias
-
-- Location: src/common/cross-cutting/ban-alias.mjs
-- Target: files: `scripts/features/**/*.ts`
-- Enforces:
-  - Alias imports (@/) are not available in this environment. Use relative paths.
-
-### entry-points/no-namespace-import
-
-- Location: src/common/boundaries/entry-point.mjs
-- Target: files: `scripts/commands/*.ts`
-- Enforces:
-  - Entry points must use named imports instead of `import * as`. This makes dependencies explicit.
-
-## deno (`src/deno/index.mjs`)
-
-### rules/shared
-
-- Location: src/common/base/typescript.mjs
-- Target: (global)
-- Enforces:
-  - console 呼び出しを禁止
-  - 不正な空白文字を禁止
-  - import 文の整列を強制
-  - export 文の整列を強制
-  - 引用符スタイルを統一
-  - 到達不能コードを禁止
-  - 到達不能ループを禁止
-  - 無意味な return を禁止
-  - 定数条件を禁止
-  - 定数の二項演算を禁止
-  - else-if の重複条件を禁止
-  - 自己代入を禁止
-  - 自己比較を禁止
-  - 無意味な catch を禁止
-  - switch の fall-through を禁止
-
-### rules/typescript
-
-- Location: src/common/base/typescript.mjs
-- Target: files: `supabase/functions/**/*.ts`
-- Enforces:
-  - 未使用変数を禁止
-  - type import を強制
-  - any 型の明示使用を禁止
-  - 不要な条件式を禁止
-  - 浮いた Promise (await 漏れ) を禁止
-  - 誤った文脈での Promise 利用を禁止
-  - await の対象が thenable であることを強制
-  - async 関数に await を必須化
-  - any からの代入を禁止
-  - any 値の関数呼び出しを禁止
-  - any 値へのメンバアクセスを禁止
-  - any 引数の受け渡しを禁止
-  - any 値の return を禁止
-
-### naming/feature-name
-
-- Location: src/common/cross-cutting/feature-name.mjs
-- Target: files: `supabase/functions/_features/**/*.ts`
-- Enforces:
-  - `local/feature-name` (local plugin)
-
-### naming/namespace-import-name
-
-- Location: src/common/cross-cutting/namespace-import.mjs
-- Target: files: `supabase/functions/_features/**/*.ts`
-- Enforces:
-  - `local/namespace-import-name` (local plugin)
-
-### naming/queries-namespace-import
-
-- Location: src/common/cross-cutting/namespace-import.mjs
-- Target: files: `supabase/functions/_features/**/*.ts`
-- Enforces:
-  - `local/queries-namespace-import` (local plugin)
-
-### naming/services
-
-- Location: src/common/layers/services.mjs
-- Target: files: `supabase/functions/_features/**/services/*.ts` / ignores: `supabase/functions/_features/shared/services/*.ts`
-- Enforces:
-  - ファイル名を `*` に強制 (適用: `**/*.ts`)
-
-### naming/services-shared
-
-- Location: src/common/layers/services.mjs
-- Target: files: `supabase/functions/_features/shared/services/*.ts`
-- Enforces:
-  - ファイル名を `shared` に強制 (適用: `**/*.ts`)
-
-### layers/services
-
-- Location: src/common/layers/services.mjs
-- Target: files: `supabase/functions/_features/**/services/*.ts`
-- Enforces:
-  - try-catch is not allowed in services. Error handling belongs in entries.
-  - throw is not allowed in services. Communicate failures via T | null / { data, error } / empty default. Native exceptions from libs auto-propagate to entry's catch.
-  - logger is not allowed outside entries. Logging belongs in entries.
-  - Dead fallback for error message. If you reached this branch the error is known — return the error directly. Unhandled exceptions belong in entries.
-  - Dead fallback for nullable error. Check `if (error)` and return the error directly. Unhandled exceptions belong in entries.
-  - Dynamic imports of `@/` aliased paths are not allowed in features layers. They bypass prefix-lib and lateral cardinality (e.g. `await import('@/lib/supabase/admin')` from queries/server.ts escapes the lib-boundary check). Create the correct queries/<prefix>.ts or services/<prefix>.ts file instead. External npm packages can still be lazy-loaded for cold-start optimization.
-
-### imports/services
-
-- Location: src/common/layers/services.mjs
-- Target: files: `supabase/functions/_features/**/services/*.ts`
-- Enforces:
-  - services cannot import entries (layer violation)
-  - services cannot import hooks (layer violation)
-  - services cannot import other feature's services (lateral violation)
-  - lib/* can only be imported from queries (lib-boundary violation)
-
-### naming/queries
-
-- Location: src/common/layers/queries.mjs
-- Target: files: `supabase/functions/_features/**/queries/*.ts` / ignores: `supabase/functions/_features/shared/queries/*.ts`
-- Enforces:
-  - ファイル名を `*` に強制 (適用: `**/*.ts`)
-
-### naming/queries-shared
-
-- Location: src/common/layers/queries.mjs
-- Target: files: `supabase/functions/_features/shared/queries/*.ts`
-- Enforces:
-  - ファイル名を `shared` に強制 (適用: `**/*.ts`)
-
-### naming/queries-export
-
-- Location: src/common/layers/queries.mjs
-- Target: files: `supabase/functions/_features/**/queries/*.ts`
-- Enforces:
-  - `local/queries-export` (local plugin)
-
-### naming/supabase-select
-
-- Location: src/common/layers/queries.mjs
-- Target: files: `supabase/functions/_features/**/queries/*.ts`
-- Enforces:
-  - `local/supabase-select-typed-columns` (local plugin)
-
-### layers/queries
-
-- Location: src/common/layers/queries.mjs
-- Target: files: `supabase/functions/_features/**/queries/*.ts`
-- Enforces:
-  - try-catch is not allowed in queries. Error handling belongs in entries.
-  - if statements are not allowed in queries. Conditional logic belongs in services.
-  - Loops are not allowed in queries. Queries should be thin CRUD wrappers — iteration belongs in services.
-  - Loops are not allowed in queries. Queries should be thin CRUD wrappers — iteration belongs in services.
-  - Loops are not allowed in queries. Queries should be thin CRUD wrappers — iteration belongs in services.
-  - Loops are not allowed in queries. Queries should be thin CRUD wrappers — iteration belongs in services.
-  - Loops are not allowed in queries. Queries should be thin CRUD wrappers — iteration belongs in services.
-  - throw is not allowed in queries. Queries must return Supabase's { data, error } shape as-is. Error handling belongs in entries.
-  - logger is not allowed outside entries. Logging belongs in entries.
-  - Dynamic imports of `@/` aliased paths are not allowed in features layers. They bypass prefix-lib and lateral cardinality (e.g. `await import('@/lib/supabase/admin')` from queries/server.ts escapes the lib-boundary check). Create the correct queries/<prefix>.ts or services/<prefix>.ts file instead. External npm packages can still be lazy-loaded for cold-start optimization.
-
-### imports/queries
-
-- Location: src/common/layers/queries.mjs
-- Target: files: `supabase/functions/_features/**/queries/*.ts`
-- Enforces:
-  - queries cannot import services (layer violation)
-  - queries cannot import entries (layer violation)
-  - queries cannot import hooks (layer violation)
-  - queries cannot import other feature's queries (lateral violation)
-  - Mapping functions are only allowed in services. Snake/camel conversion belongs at the service boundary.
-
-### naming/form-state
-
-- Location: src/common/cross-cutting/form-state.mjs
-- Target: files: `supabase/functions/_features/**/*.ts`
-- Enforces:
-  - `local/form-state-naming` (local plugin)
-  - `local/form-state-shape` (local plugin)
-
-### naming/supabase-columns-satisfies
-
-- Location: src/common/cross-cutting/supabase-columns-satisfies.mjs
-- Target: files: `supabase/functions/_features/**/queries/*.ts`, `supabase/functions/_features/**/constants/*.ts`
-- Enforces:
-  - `local/supabase-columns-satisfies` (local plugin)
-
-### naming/lib
-
-- Location: src/common/layers/lib.mjs
-- Target: files: `supabase/functions/_lib/**/*.ts`
-- Enforces:
-  - ファイル名を `*` に強制 (適用: `**/*.ts`)
-
-### naming/top-level-utils
-
-- Location: src/common/layers/top-level-utils.mjs
-- Target: files: `supabase/functions/_utils/**/*.ts`
-- Enforces:
-  - ファイル名を `*` に強制 (適用: `**/*.ts`)
-
-### naming/types
-
-- Location: src/common/layers/types.mjs
-- Target: files: `supabase/functions/_features/*/types/*.ts` / ignores: `supabase/functions/_features/shared/types/*.ts`
-- Enforces:
-  - ファイル名を `<1>` に強制 (適用: `**/*/types/*.ts`)
-
-### naming/types-shared
-
-- Location: src/common/layers/types.mjs
-- Target: files: `supabase/functions/_features/shared/types/*.ts`
-- Enforces:
-  - ファイル名を `shared` に強制 (適用: `**/*.ts`)
-
-### imports/feature-types
-
-- Location: src/common/layers/types.mjs
-- Target: files: `supabase/functions/_features/**/types/*.ts`
-- Enforces:
-  - Mapping functions are only allowed in services. Snake/camel conversion belongs at the service boundary.
-
-### naming/schemas
-
-- Location: src/common/layers/schemas.mjs
-- Target: files: `supabase/functions/_features/*/schemas/*.ts` / ignores: `supabase/functions/_features/shared/schemas/*.ts`
-- Enforces:
-  - ファイル名を `<1>` に強制 (適用: `**/*/schemas/*.ts`)
-
-### naming/schemas-shared
-
-- Location: src/common/layers/schemas.mjs
-- Target: files: `supabase/functions/_features/shared/schemas/*.ts`
-- Enforces:
-  - ファイル名を `shared` に強制 (適用: `**/*.ts`)
-
-### naming/schema-naming
-
-- Location: src/common/layers/schemas.mjs
-- Target: files: `supabase/functions/_features/**/schemas/*.ts`
-- Enforces:
-  - `local/schema-naming` (local plugin)
-
-### naming/utils
-
-- Location: src/common/layers/utils.mjs
-- Target: files: `supabase/functions/_features/*/utils/*.ts` / ignores: `supabase/functions/_features/shared/utils/*.ts`
-- Enforces:
-  - ファイル名を `<1>` に強制 (適用: `**/*/utils/*.ts`)
-
-### naming/utils-shared
-
-- Location: src/common/layers/utils.mjs
-- Target: files: `supabase/functions/_features/shared/utils/*.ts`
-- Enforces:
-  - ファイル名を `shared` に強制 (適用: `**/*.ts`)
-
-### imports/utils
-
-- Location: src/common/layers/utils.mjs
-- Target: files: `supabase/functions/_features/**/utils/*.ts`
-- Enforces:
-  - lib/* can only be imported from queries (lib-boundary violation)
-  - Mapping functions are only allowed in services. Snake/camel conversion belongs at the service boundary.
-
-### naming/constants
-
-- Location: src/common/layers/constants.mjs
-- Target: files: `supabase/functions/_features/*/constants/*.ts` / ignores: `supabase/functions/_features/shared/constants/*.ts`
-- Enforces:
-  - ファイル名を `<1>` に強制 (適用: `**/*/constants/*.ts`)
-
-### naming/constants-shared
-
-- Location: src/common/layers/constants.mjs
-- Target: files: `supabase/functions/_features/shared/constants/*.ts`
-- Enforces:
-  - ファイル名を `shared` に強制 (適用: `**/*.ts`)
-
-### naming/entries
-
-- Location: src/common/layers/entries.mjs
-- Target: files: `supabase/functions/_features/**/entries/*.ts` / ignores: `supabase/functions/_features/shared/entries/*.ts`
-- Enforces:
-  - ファイル名を `*` に強制 (適用: `**/*.ts`)
-
-### naming/entries-shared
-
-- Location: src/common/layers/entries.mjs
-- Target: files: `supabase/functions/_features/shared/entries/*.ts`
-- Enforces:
-  - ファイル名を `shared` に強制 (適用: `**/*.ts`)
-
-### naming/entry-template
-
-- Location: src/common/layers/entries.mjs
-- Target: files: `supabase/functions/_features/**/entries/*.ts`
-- Enforces:
-  - `local/entry-template` (local plugin)
-
-### naming/entry-single-service-call
-
-- Location: src/common/layers/entries.mjs
-- Target: files: `supabase/functions/_features/**/entries/*.ts`
-- Enforces:
-  - `local/entry-single-service-call` (local plugin)
-
-### layers/entries
-
-- Location: src/common/layers/entries.mjs
-- Target: files: `supabase/functions/_features/**/entries/*.ts`
-- Enforces:
-  - Dynamic imports of `@/` aliased paths are not allowed in features layers. They bypass prefix-lib and lateral cardinality (e.g. `await import('@/lib/supabase/admin')` from queries/server.ts escapes the lib-boundary check). Create the correct queries/<prefix>.ts or services/<prefix>.ts file instead. External npm packages can still be lazy-loaded for cold-start optimization.
-
-### imports/entries
-
-- Location: src/common/layers/entries.mjs
-- Target: files: `supabase/functions/_features/**/entries/*.ts`
-- Enforces:
-  - entries cannot import queries (layer violation)
-  - entries cannot import hooks (layer violation)
-  - entries cannot import other feature's entries (lateral violation)
-  - entries cannot import other feature's services. Use the same feature's service (1:1) or move orchestration into the service layer. `shared/services/*` is exempt for cross-cutting side effects (notifications etc.).
-  - lib/* can only be imported from queries (lib-boundary violation)
-  - Mapping functions are only allowed in services. Snake/camel conversion belongs at the service boundary.
-
-### imports/entries/server
-
-- Location: src/common/layers/entries.mjs
-- Target: files: `supabase/functions/_features/**/entries/server.ts`
-- Enforces:
-  - entries cannot import queries (layer violation)
-  - entries cannot import hooks (layer violation)
-  - entries cannot import other feature's entries (lateral violation)
-  - entries cannot import other feature's services. Use the same feature's service (1:1) or move orchestration into the service layer. `shared/services/*` is exempt for cross-cutting side effects (notifications etc.).
-  - server entry can only import server service (cardinality violation)
-  - lib/* can only be imported from queries (lib-boundary violation)
-  - Mapping functions are only allowed in services. Snake/camel conversion belongs at the service boundary.
-
-### imports/entries/client
-
-- Location: src/common/layers/entries.mjs
-- Target: files: `supabase/functions/_features/**/entries/client.ts`
-- Enforces:
-  - entries cannot import queries (layer violation)
-  - entries cannot import hooks (layer violation)
-  - entries cannot import other feature's entries (lateral violation)
-  - entries cannot import other feature's services. Use the same feature's service (1:1) or move orchestration into the service layer. `shared/services/*` is exempt for cross-cutting side effects (notifications etc.).
-  - client entry can only import client service (cardinality violation)
-  - lib/* can only be imported from queries (lib-boundary violation)
-  - Mapping functions are only allowed in services. Snake/camel conversion belongs at the service boundary.
-
-### imports/entries/admin
-
-- Location: src/common/layers/entries.mjs
-- Target: files: `supabase/functions/_features/**/entries/admin.ts`
-- Enforces:
-  - entries cannot import queries (layer violation)
-  - entries cannot import hooks (layer violation)
-  - entries cannot import other feature's entries (lateral violation)
-  - entries cannot import other feature's services. Use the same feature's service (1:1) or move orchestration into the service layer. `shared/services/*` is exempt for cross-cutting side effects (notifications etc.).
-  - admin entry can only import admin service (cardinality violation)
-  - lib/* can only be imported from queries (lib-boundary violation)
-  - Mapping functions are only allowed in services. Snake/camel conversion belongs at the service boundary.
-
-### naming/features-ts-only
-
-- Location: src/common/cross-cutting/features-ts-only.mjs
-- Target: files: `supabase/functions/_features/**/*.tsx`
-- Enforces:
-  - features/ must only contain .ts files. Components belong in src/components/.
-
-### layers/logger
-
-- Location: src/common/cross-cutting/logger.mjs
-- Target: files: `supabase/functions/_features/**/*.ts` / ignores: `supabase/functions/_features/**/entries/*.ts`
-- Enforces:
-  - console 呼び出しを禁止
-  - logger is not allowed outside entries. Logging belongs in entries.
-
-### imports/feature-other
-
-- Location: src/common/cross-cutting/feature-default-imports.mjs
-- Target: files: `supabase/functions/_features/**/*.ts` / ignores: `supabase/functions/_features/**/services/*.ts`, `supabase/functions/_features/**/queries/*.ts`, `supabase/functions/_features/**/entries/*.ts`, `supabase/functions/_features/**/utils/*.ts`, `supabase/functions/_features/**/types/*.ts`
-- Enforces:
-  - lib/* can only be imported from queries (lib-boundary violation)
-  - Mapping functions are only allowed in services. Snake/camel conversion belongs at the service boundary.
-
-### jsdoc
-
-- Location: src/common/cross-cutting/jsdoc.mjs
-- Target: files: `supabase/functions/_features/**/queries/*.ts`, `supabase/functions/_features/**/services*/*.ts`, `supabase/functions/_features/**/utils*/*.ts`
-- Enforces:
-  - JSDoc の付与を強制
-  - JSDoc に description を必須化
-
-### imports/ban-alias
-
-- Location: src/common/cross-cutting/ban-alias.mjs
-- Target: files: `supabase/functions/_features/**/*.ts`
-- Enforces:
-  - Alias imports (@/) are not available in this environment. Use relative paths.
-
-### deno/lib-boundary
+- ルールは原則 (P1〜P8) ごとに整理。人間はまず原則サマリを読む
+- 同一ルールが複数 entry で共通の場合は 1 度だけ掲載し scope で示す
+- 丸めの基準: 対象と意図の両方が既存原則の延長なら丸める
+- このファイルは `scripts/generate-rules-catalog.mjs` により自動生成し、手動編集禁止。
+- 再生成コマンド:
+
+  ```bash
+  npm run docs
+  ```
+
+## 原則サマリ
+
+| #     | 原則                     | ルール数 |
+| ----- | ------------------------ | -------- |
+| P1    | import 規律              | 15       |
+| P2    | boundary は entries 経由 | 6        |
+| P3    | ファイル名規則           | 19       |
+| P4    | 命名・型規約             | 4        |
+| P5    | entry / directive 構造   | 7        |
+| P6    | layer 内 syntax / 型制約 | 7        |
+| P7    | 環境 / ファイル種別制約  | 4        |
+| P8    | 汎用 TS / style / UI     | 5        |
+| OTHER | その他 (非ルール)        | 1        |
+
+## P1 import 規律
+
+依存は entries → services → queries → lib の単方向。cardinality (context 整合) と import 表記 (relative/alias, namespace/named) も含む。
+
+### deno/lib-boundary (deno)
 
 - Location: src/deno/boundaries/lib.mjs
 - Target: files: `supabase/functions/**/*.ts` / ignores: `supabase/functions/_lib/**`, `supabase/functions/_features/**/queries/**`, `supabase/functions/_features/**/types/**`
-- Enforces:
-  - _lib/ can only be imported from queries (lib-boundary violation)
+- Messages:
+  - \_lib/ は queries からのみ import 可。他層は queries 経由で使う。
 
-### deno/entry-point
-
-- Location: src/deno/boundaries/entry-point.mjs
-- Target: files: `supabase/functions/**/*.ts` / ignores: `supabase/functions/_*/**`
-- Enforces:
-  - Top-level files must not import services directly. Import from entries instead.
-  - Top-level files must not import queries directly. Import from entries instead.
-  - Top-level files must not import _lib/ directly. Import from entries instead.
-
-### deno/flat-entry-point
-
-- Location: src/deno/boundaries/entry-point.mjs
-- Target: files: `supabase/functions/**/*.ts` / ignores: `supabase/functions/_*/**`
-- Enforces:
-  - `deno-local/flat-entry-point` (local plugin)
-
-### deno/utils-boundary
+### deno/utils-boundary (deno)
 
 - Location: src/deno/boundaries/utils.mjs
 - Target: files: `supabase/functions/_utils/**/*.ts`
-- Enforces:
-  - _utils/ cannot import _features/
-  - _utils/ cannot import _lib/
+- Messages:
+  - \_utils/ は \_features/ を import 不可。依存方向を守る。
+  - \_utils/ は \_lib/ を import 不可。依存方向を守る。
 
-### entry-points/no-namespace-import
+### imports/entries (全 entry)
+
+- Location: src/common/layers/entries.mjs
+- Target: files: `src/features/**/entries/*.ts`
+- Messages:
+  - entries は queries を import 不可。queries は service 経由で使う。
+  - entries は hooks を import 不可。依存は単方向に保つ。
+  - 他 feature の entries は import 不可。feature を跨ぐ依存は禁止。
+  - 他 feature の services は import 不可:
+    - 同一 feature の service を 1:1 で使うか、orchestration を service 層へ移す
+    - `shared/services/*` は横断的な副作用 (通知等) のため例外
+  - lib/\* は queries からのみ import 可。他層は queries 経由で使う。
+  - mapping 関数は services のみ許可。snake/camel 変換は service 境界で行う。
+
+### imports/entries/admin (全 entry)
+
+- Location: src/common/layers/entries.mjs
+- Target: files: `src/features/**/entries/admin.ts`
+- Messages:
+  - entries は queries を import 不可。queries は service 経由で使う。
+  - entries は hooks を import 不可。依存は単方向に保つ。
+  - 他 feature の entries は import 不可。feature を跨ぐ依存は禁止。
+  - 他 feature の services は import 不可:
+    - 同一 feature の service を 1:1 で使うか、orchestration を service 層へ移す
+    - `shared/services/*` は横断的な副作用 (通知等) のため例外
+  - admin entry は admin service のみ import 可。context を跨ぐ呼び出しは禁止。
+  - lib/\* は queries からのみ import 可。他層は queries 経由で使う。
+  - mapping 関数は services のみ許可。snake/camel 変換は service 境界で行う。
+
+### imports/entries/client (全 entry)
+
+- Location: src/common/layers/entries.mjs
+- Target: files: `src/features/**/entries/client.ts`
+- Messages:
+  - entries は queries を import 不可。queries は service 経由で使う。
+  - entries は hooks を import 不可。依存は単方向に保つ。
+  - 他 feature の entries は import 不可。feature を跨ぐ依存は禁止。
+  - 他 feature の services は import 不可:
+    - 同一 feature の service を 1:1 で使うか、orchestration を service 層へ移す
+    - `shared/services/*` は横断的な副作用 (通知等) のため例外
+  - client entry は client service のみ import 可。context を跨ぐ呼び出しは禁止。
+  - lib/\* は queries からのみ import 可。他層は queries 経由で使う。
+  - mapping 関数は services のみ許可。snake/camel 変換は service 境界で行う。
+
+### imports/entries/server (全 entry)
+
+- Location: src/common/layers/entries.mjs
+- Target: files: `src/features/**/entries/server.ts`
+- Messages:
+  - entries は queries を import 不可。queries は service 経由で使う。
+  - entries は hooks を import 不可。依存は単方向に保つ。
+  - 他 feature の entries は import 不可。feature を跨ぐ依存は禁止。
+  - 他 feature の services は import 不可:
+    - 同一 feature の service を 1:1 で使うか、orchestration を service 層へ移す
+    - `shared/services/*` は横断的な副作用 (通知等) のため例外
+  - server entry は server service のみ import 可。context を跨ぐ呼び出しは禁止。
+  - lib/\* は queries からのみ import 可。他層は queries 経由で使う。
+  - mapping 関数は services のみ許可。snake/camel 変換は service 境界で行う。
+
+### imports/feature-other (全 entry)
+
+- Location: src/common/cross-cutting/feature-default-imports.mjs
+- Target: files: `src/features/**/*.ts` / ignores: `src/features/**/services/*.ts`, `src/features/**/queries/*.ts`, `src/features/**/entries/*.ts`, `src/features/**/utils/*.ts`, `src/features/**/types/*.ts`
+- Messages:
+  - lib/\* は queries からのみ import 可。他層は queries 経由で使う。
+  - mapping 関数は services のみ許可。snake/camel 変換は service 境界で行う。
+
+### imports/feature-types (全 entry)
+
+- Location: src/common/layers/types.mjs
+- Target: files: `src/features/**/types/*.ts`
+- Messages:
+  - mapping 関数は services のみ許可。snake/camel 変換は service 境界で行う。
+
+### imports/lib-boundary (next)
+
+- Location: src/next/boundaries/lib.mjs
+- Target: files: `src/**/*.{ts,tsx}` / ignores: `src/lib/**`, `src/proxy.ts`, `src/app/**/route.ts`, `src/features/**`
+- Messages:
+  - lib/\* は queries からのみ import 可。他層は queries 経由で使う。
+  - mapping 関数は services のみ許可。snake/camel 変換は service 境界で行う。
+
+### imports/path-style (next)
+
+- Location: src/next/imports.mjs
+- Target: files: `src/features/**/*.ts`
+- Messages:
+  - 同一 feature の import は相対パスにする ('{{ importPath }}' を使わない)。
+  - feature を跨ぐ import は '@/' にする (相対パス '{{ importPath }}' を使わない)。
+
+### imports/queries (全 entry)
+
+- Location: src/common/layers/queries.mjs
+- Target: files: `src/features/**/queries/*.ts`
+- Messages:
+  - queries は services を import 不可。ロジックは services へ。
+  - queries は entries を import 不可。依存は単方向に保つ。
+  - queries は hooks を import 不可。依存は単方向に保つ。
+  - 他 feature の queries は import 不可。feature を跨ぐ依存は禁止。
+  - mapping 関数は services のみ許可。snake/camel 変換は service 境界で行う。
+
+### imports/services (全 entry)
+
+- Location: src/common/layers/services.mjs
+- Target: files: `src/features/**/services/*.ts`
+- Messages:
+  - services は entries を import 不可。依存は単方向に保つ。
+  - services は hooks を import 不可。依存は単方向に保つ。
+  - 他 feature の services は import 不可。feature を跨ぐ依存は禁止。
+  - lib/\* は queries からのみ import 可。他層は queries 経由で使う。
+
+### imports/utils (全 entry)
+
+- Location: src/common/layers/utils.mjs
+- Target: files: `src/features/**/utils/*.ts`
+- Messages:
+  - lib/\* は queries からのみ import 可。他層は queries 経由で使う。
+  - mapping 関数は services のみ許可。snake/camel 変換は service 境界で行う。
+
+### naming/namespace-import-name (全 entry)
+
+- Location: src/common/cross-cutting/namespace-import.mjs
+- Target: files: `src/features/**/*.ts`
+- Messages:
+  - namespace import は '{{ expected }}' と命名する ('{{ actual }}' ではなく)。
+
+### naming/queries-namespace-import (全 entry)
+
+- Location: src/common/cross-cutting/namespace-import.mjs
+- Target: files: `src/features/**/*.ts`
+- Messages:
+  - queries 層は named import でなく `import * as xxxQuery from "{{ source }}"` を使う (`import type {}` は可)。
+
+## P2 boundary は entries 経由
+
+外界 surface (page / route / hooks / sitemap / components, deno top-level) は entries のみ import 可。
+
+### deno/entry-point (deno)
+
+- Location: src/deno/boundaries/entry-point.mjs
+- Target: files: `supabase/functions/**/*.ts` / ignores: `supabase/functions/_*/**`
+- Messages:
+  - top-level file は services を直接 import 不可。entries 経由で使う。
+  - top-level file は queries を直接 import 不可。entries 経由で使う。
+  - top-level file は \_lib/ を直接 import 不可。entries 経由で使う。
+
+### imports/components-boundary (next)
+
+- Location: src/next/boundaries/components.mjs
+- Target: files: `src/components/**/*.{ts,tsx}`
+- Messages:
+  - components は queries を直接 import 不可。entries か hooks 経由で使う。
+  - components は services を直接 import 不可。entries か hooks 経由で使う。
+  - lib/\* は queries からのみ import 可。他層は queries 経由で使う。
+  - mapping 関数は services のみ許可。snake/camel 変換は service 境界で行う。
+
+### imports/hooks-boundary (next)
+
+- Location: src/next/boundaries/hooks.mjs
+- Target: files: `src/features/**/hooks/*.ts`
+- Messages:
+  - hooks は queries を直接 import 不可。entries 経由で使う。
+  - hooks は services を直接 import 不可。entries 経由で使う。
+  - lib/\* は queries からのみ import 可。他層は queries 経由で使う。
+  - mapping 関数は services のみ許可。snake/camel 変換は service 境界で行う。
+
+### imports/page-boundary (next)
+
+- Location: src/next/boundaries/page.mjs
+- Target: files: `src/app/**/page.tsx`
+- Messages:
+  - page.tsx は queries を直接 import 不可。entries 経由で使う。
+  - page.tsx は services を直接 import 不可。entries 経由で使う。
+  - lib/\* は queries からのみ import 可。他層は queries 経由で使う。
+  - mapping 関数は services のみ許可。snake/camel 変換は service 境界で行う。
+
+### imports/route-boundary (next)
+
+- Location: src/next/boundaries/route.mjs
+- Target: files: `src/app/**/route.ts`
+- Messages:
+  - route.ts は queries を直接 import 不可。entries 経由で使う。
+  - route.ts は services を直接 import 不可。entries 経由で使う。
+  - lib/\* は queries からのみ import 可。他層は queries 経由で使う。
+  - mapping 関数は services のみ許可。snake/camel 変換は service 境界で行う。
+
+### imports/sitemap-boundary (next)
+
+- Location: src/next/boundaries/sitemap.mjs
+- Target: files: `src/app/sitemap.ts`, `src/app/**/sitemap.ts`
+- Messages:
+  - sitemap.ts は queries を直接 import 不可。entries 経由で使う。
+  - sitemap.ts は services を直接 import 不可。entries 経由で使う。
+  - lib/\* は queries からのみ import 可。他層は queries 経由で使う。
+  - mapping 関数は services のみ許可。snake/camel 変換は service 境界で行う。
+
+## P3 ファイル名規則
+
+layer ごとに prefix / case を強制する。
+
+### naming/components-pascal-case (next)
+
+- Location: src/next/layers/components.mjs
+- Target: files: `src/components/**/*.tsx` / ignores: `src/components/shared/ui/**`, `src/components/**/index.tsx`
+- Messages:
+  - ファイル名を `PASCAL_CASE` に強制 (適用: `**/*.tsx`)
+
+### naming/constants (全 entry)
+
+- Location: src/common/layers/constants.mjs
+- Target: files: `src/features/*/constants/*.ts` / ignores: `src/features/shared/constants/*.ts`
+- Messages:
+  - ファイル名を `<1>` に強制 (適用: `**/*/constants/*.ts`)
+
+### naming/constants-shared (全 entry)
+
+- Location: src/common/layers/constants.mjs
+- Target: files: `src/features/shared/constants/*.ts`
+- Messages:
+  - ファイル名を `shared` に強制 (適用: `**/*.ts`)
+
+### naming/entries (全 entry)
+
+- Location: src/common/layers/entries.mjs
+- Target: files: `src/features/**/entries/*.ts` / ignores: `src/features/shared/entries/*.ts`
+- Messages:
+  - ファイル名を `*` に強制 (適用: `**/*.ts`)
+
+### naming/entries-shared (全 entry)
+
+- Location: src/common/layers/entries.mjs
+- Target: files: `src/features/shared/entries/*.ts`
+- Messages:
+  - ファイル名を `shared` に強制 (適用: `**/*.ts`)
+
+### naming/feature-name (全 entry)
+
+- Location: src/common/cross-cutting/feature-name.mjs
+- Target: files: `src/features/**/*.ts`
+- Messages:
+  - feature directory '{{ name }}' は許可されない。許可: {{ allowed }}。
+
+### naming/hooks (next)
+
+- Location: src/next/layers/hooks.mjs
+- Target: files: `src/features/**/hooks/*.ts`
+- Messages:
+  - ファイル名を `use-+([a-z0-9])*(-+([a-z0-9]))` に強制 (適用: `**/*.ts`)
+
+### naming/lib (全 entry)
+
+- Location: src/common/layers/lib.mjs
+- Target: files: `src/lib/**/*.ts`
+- Messages:
+  - ファイル名を `*` に強制 (適用: `**/*.ts`)
+
+### naming/queries (全 entry)
+
+- Location: src/common/layers/queries.mjs
+- Target: files: `src/features/**/queries/*.ts` / ignores: `src/features/shared/queries/*.ts`
+- Messages:
+  - ファイル名を `*` に強制 (適用: `**/*.ts`)
+
+### naming/queries-shared (全 entry)
+
+- Location: src/common/layers/queries.mjs
+- Target: files: `src/features/shared/queries/*.ts`
+- Messages:
+  - ファイル名を `shared` に強制 (適用: `**/*.ts`)
+
+### naming/schemas (全 entry)
+
+- Location: src/common/layers/schemas.mjs
+- Target: files: `src/features/*/schemas/*.ts` / ignores: `src/features/shared/schemas/*.ts`
+- Messages:
+  - ファイル名を `<1>` に強制 (適用: `**/*/schemas/*.ts`)
+
+### naming/schemas-shared (全 entry)
+
+- Location: src/common/layers/schemas.mjs
+- Target: files: `src/features/shared/schemas/*.ts`
+- Messages:
+  - ファイル名を `shared` に強制 (適用: `**/*.ts`)
+
+### naming/services (全 entry)
+
+- Location: src/common/layers/services.mjs
+- Target: files: `src/features/**/services/*.ts` / ignores: `src/features/shared/services/*.ts`
+- Messages:
+  - ファイル名を `*` に強制 (適用: `**/*.ts`)
+
+### naming/services-shared (全 entry)
+
+- Location: src/common/layers/services.mjs
+- Target: files: `src/features/shared/services/*.ts`
+- Messages:
+  - ファイル名を `shared` に強制 (適用: `**/*.ts`)
+
+### naming/top-level-utils (全 entry)
+
+- Location: src/common/layers/top-level-utils.mjs
+- Target: files: `src/utils/**/*.ts`
+- Messages:
+  - ファイル名を `*` に強制 (適用: `**/*.ts`)
+
+### naming/types (全 entry)
+
+- Location: src/common/layers/types.mjs
+- Target: files: `src/features/*/types/*.ts` / ignores: `src/features/shared/types/*.ts`
+- Messages:
+  - ファイル名を `<1>` に強制 (適用: `**/*/types/*.ts`)
+
+### naming/types-shared (全 entry)
+
+- Location: src/common/layers/types.mjs
+- Target: files: `src/features/shared/types/*.ts`
+- Messages:
+  - ファイル名を `shared` に強制 (適用: `**/*.ts`)
+
+### naming/utils (全 entry)
+
+- Location: src/common/layers/utils.mjs
+- Target: files: `src/features/*/utils/*.ts` / ignores: `src/features/shared/utils/*.ts`
+- Messages:
+  - ファイル名を `<1>` に強制 (適用: `**/*/utils/*.ts`)
+
+### naming/utils-shared (全 entry)
+
+- Location: src/common/layers/utils.mjs
+- Target: files: `src/features/shared/utils/*.ts`
+- Messages:
+  - ファイル名を `shared` に強制 (適用: `**/*.ts`)
+
+## P4 命名・型規約
+
+layer ごとの export 名と FormState 型の命名・shape を強制する。
+
+### naming/form-state (全 entry)
+
+- Location: src/common/cross-cutting/form-state.mjs
+- Target: files: `src/features/**/*.ts`
+- Messages:
+  - FormState 型 '{{ name }}' は {Verb}{Subject}FormState 形式にする (例 CreateCommentFormState, SignInFormState)。PascalCase 2 語以上が必須。
+  - FormState '{{ name }}' に `data` プロパティが必須 (payload が無ければ `data: null`)。
+  - FormState '{{ name }}' の `data` は null 許容にする (例: `data: T | null` / `data: null`)。
+  - FormState '{{ name }}' に `error: { message: string } | null` プロパティが必須。
+  - FormState '{{ name }}' の `error` は nullable にする (`{ message: string } | null`)。
+  - FormState '{{ name }}' の `error` は厳密に `{ message: string } | null`。
+  - FormState '{{ name }}' の `error` は `message: string` のみ許可。禁止フィールド: '{{ field }}'。
+  - FormState '{{ name }}' は `data` と `error` のみ。禁止プロパティ: '{{ field }}'。
+  - FormState '{{ name }}' は単一の interface か type literal にする。discriminated union 不可。
+
+### naming/hooks-export (next)
+
+- Location: src/next/layers/hooks.mjs
+- Target: files: `src/features/**/hooks/*.ts`
+- Messages:
+  - hooks の export 関数は 'use' で始める (例: useAuth)。
+
+### naming/queries-export (全 entry)
+
+- Location: src/common/layers/queries.mjs
+- Target: files: `src/features/**/queries/*.ts`
+- Messages:
+  - queries の export '{{ name }}' は get, create, update, delete, signUp, signIn, signOut のいずれかで始める。
+
+### naming/schema-naming (全 entry)
+
+- Location: src/common/layers/schemas.mjs
+- Target: files: `src/features/**/schemas/*.ts`
+- Messages:
+  - schema file の export 変数 '{{ name }}' は 'Schema' で終える。
+  - export 変数 '{{ name }}' は camelCase にする (小文字始まり)。
+
+## P5 entry / directive 構造
+
+entry の try/catch + log 構造と use server / client directive を強制する。
+
+### directives/admin-entry (next)
+
+- Location: src/next/directives.mjs
+- Target: files: `src/features/**/entries/admin.ts`
+- Messages:
+  - entries/admin.ts は先頭に "use server" directive が必須。
+
+### directives/client-entry (next)
+
+- Location: src/next/directives.mjs
+- Target: files: `src/features/**/entries/client.ts`
+- Messages:
+  - entries/client.ts は "use server" 禁止。@/lib/supabase/client を使うため。
+
+### directives/hooks (next)
+
+- Location: src/next/directives.mjs
+- Target: files: `src/features/**/hooks/*.ts`
+- Messages:
+  - hooks は先頭に "use client" directive が必須。
+
+### directives/server-entry (next)
+
+- Location: src/next/directives.mjs
+- Target: files: `src/features/**/entries/server.ts`
+- Messages:
+  - entries/server.ts は先頭に "use server" directive が必須。
+
+### entry-points/no-namespace-import (全 entry)
 
 - Location: src/common/boundaries/entry-point.mjs
+- Target: files: `src/app/**/*.ts`, `src/app/**/*.tsx`
+- Messages:
+  - entry point は `import * as` 禁止。named import で依存を明示する。
+
+### naming/entry-single-service-call (全 entry)
+
+- Location: src/common/layers/entries.mjs
+- Target: files: `src/features/**/entries/*.ts`
+- Messages:
+  - entry '{{ funcName }}' が複数の feature service を呼んでいる ({{ count }} 件):
+    - entry は単一 service を呼ぶ薄いラッパー、orchestration は service 層へ移す
+    - `shared/services/*` (例 `sharedDiscordService`) は例外
+
+### naming/entry-template (全 entry)
+
+- Location: src/common/layers/entries.mjs
+- Target: files: `src/features/**/entries/*.ts`
+- Messages:
+  - entry '{{ funcName }}' の body は次のいずれか:
+    - 単一の try/catch (Pattern A)
+    - try/catch + 末尾の navigation 呼び出し `redirect(...)` / `notFound(...)` (Pattern B)
+  - entry '{{ funcName }}' の try block が空。
+  - entry '{{ funcName }}' の try block は `logger.info(<obj>, "Start {{ funcName }}")` で始める。
+  - entry '{{ funcName }}' の success return の直前に `logger.info(<obj>, "Success {{ funcName }}")` が必須。
+  - entry '{{ funcName }}' は success return `return { data, error: null }` が必須。
+  - entry '{{ funcName }}' の Failed 分岐は return 前に `logger.error(<obj>, "Failed {{ funcName }}")` を呼ぶ。
+  - entry '{{ funcName }}' の catch param は `error: unknown`。
+  - entry '{{ funcName }}' の catch block が空。
+  - entry '{{ funcName }}' の catch block は `logger.error(<obj>, "Unexpected error in {{ funcName }}")` で始める。
+  - entry '{{ funcName }}' の catch block は return 文で終える。
+  - entry '{{ funcName }}' の catch return の error.message はリテラル '{{ expected }}'。実際: '{{ actual }}'。
+  - '{{ funcName }}' の {{ where }} log は `logger.{{ expectedLevel }}(<obj>, "{{ expectedMessage }}")`。
+  - {{ where }} log message は '{{ expectedMessage }}'。実際: '{{ actual }}'。
+  - '{{ funcName }}' の {{ where }} log の第 1 引数は object literal にする。
+  - '{{ funcName }}' の {{ where }} log object は `err:` キーで始める。
+  - '{{ funcName }}' の {{ where }} log に入力引数 '{{ argName }}' が無い。全ての関数入力を log object に伝播する。
+
+## P6 layer 内 syntax / 型制約
+
+layer ごとに禁止構文 (try / throw / loop / logger 等) と Supabase 型安全を強制する。
+
+### layers/entries (全 entry)
+
+- Location: src/common/layers/entries.mjs
+- Target: files: `src/features/**/entries/*.ts`
+- Messages:
+  - features layers で `@/` パスの動的 import は禁止 (prefix-lib / lateral 制約を迂回する):
+    - 内部依存は queries/<prefix>.ts か services/<prefix>.ts を作る
+    - 外部 npm は cold-start 最適化の遅延 import なら可
+
+### layers/logger (全 entry)
+
+- Location: src/common/cross-cutting/logger.mjs
+- Target: files: `src/features/**/*.ts` / ignores: `src/features/**/entries/*.ts`
+- Messages:
+  - [`no-console`](https://eslint.org/docs/latest/rules/no-console)
+  - logger は entries 以外で禁止。ログ出力は entries に集約する。
+
+### layers/no-any-return (next, node)
+
+- Location: src/common/cross-cutting/no-any-return.mjs
+- Target: files: `src/features/**/queries/*.ts`, `src/features/**/services/*.ts`
+- Messages:
+  - export 関数の推論された返り値型に `any` が含まれる: {{ typeText }}。既知の型を注釈するか絞り込む (public な層の API は型を確定させる)。
+
+### layers/queries (全 entry)
+
+- Location: src/common/layers/queries.mjs
+- Target: files: `src/features/**/queries/*.ts`
+- Messages:
+  - queries では try-catch 禁止。エラーは `{ data, error }` で返す。
+  - queries で if 文は禁止。条件分岐は services に置く。
+  - queries でループは禁止。queries は薄い CRUD ラッパー、反復は services に置く。
+  - queries でループは禁止。queries は薄い CRUD ラッパー、反復は services に置く。
+  - queries でループは禁止。queries は薄い CRUD ラッパー、反復は services に置く。
+  - queries でループは禁止。queries は薄い CRUD ラッパー、反復は services に置く。
+  - queries でループは禁止。queries は薄い CRUD ラッパー、反復は services に置く。
+  - queries で throw は禁止。Supabase の `{ data, error }` をそのまま返す。
+  - logger は entries 以外で禁止。ログ出力は entries に集約する。
+  - features layers で `@/` パスの動的 import は禁止 (prefix-lib / lateral 制約を迂回する):
+    - 内部依存は queries/<prefix>.ts か services/<prefix>.ts を作る
+    - 外部 npm は cold-start 最適化の遅延 import なら可
+
+### layers/services (全 entry)
+
+- Location: src/common/layers/services.mjs
+- Target: files: `src/features/**/services/*.ts`
+- Messages:
+  - services で try-catch は禁止。エラー処理は entries に集約する。
+  - services で throw は禁止。失敗は値で返す:
+    - `T | null` / `{ data, error }` / 空デフォルトのいずれか
+    - lib の native 例外は entry の catch に自動伝播する
+  - logger は entries 以外で禁止。ログ出力は entries に集約する。
+  - error message の dead fallback。この分岐に来た時点で error は既知 — error をそのまま返す。
+  - nullable error の dead fallback。`if (error)` で判定し error をそのまま返す。
+  - features layers で `@/` パスの動的 import は禁止 (prefix-lib / lateral 制約を迂回する):
+    - 内部依存は queries/<prefix>.ts か services/<prefix>.ts を作る
+    - 外部 npm は cold-start 最適化の遅延 import なら可
+
+### naming/supabase-columns-satisfies (全 entry)
+
+- Location: src/common/cross-cutting/supabase-columns-satisfies.mjs
+- Target: files: `src/features/**/queries/*.ts`, `src/features/**/constants/*.ts`
+- Messages:
+  - column 定数 `{{ name }}` は `"<comma-separated columns>" as const` にする。`as const` を外すと Supabase の `.select()` 型推論が壊れる。配列 / template literal も不可。
+
+### naming/supabase-select (全 entry)
+
+- Location: src/common/layers/queries.mjs
+- Target: files: `src/features/**/queries/*.ts`
+- Messages:
+  - 空の `.select()` は全列を暗黙取得する。文字列リテラルか `*_COLUMNS` 定数を渡す。
+  - `.select("*")` はスキーマ拡張時に列を暗黙露出する。列を明示列挙する。
+  - `.select()` の template literal は型推論を壊す。文字列リテラルか `*_COLUMNS` 定数を使う。
+  - `.select()` の引数は文字列リテラルか `*_COLUMNS` 識別子にする。
+  - column 定数 `{{ name }}` は `_COLUMNS` で終わる UPPER_SNAKE_CASE にする (例 POST_DETAIL_COLUMNS)。
+
+## P7 環境 / ファイル種別制約
+
+実行環境と拡張子 (.ts / .tsx) の制約。
+
+### deno/flat-entry-point (deno)
+
+- Location: src/deno/boundaries/entry-point.mjs
 - Target: files: `supabase/functions/**/*.ts` / ignores: `supabase/functions/_*/**`
-- Enforces:
-  - Entry points must use named imports instead of `import * as`. This makes dependencies explicit.
+- Messages:
+  - Edge Function の entry point は supabase/functions/ 直下に置く。ネストした directory (例 commands/{{name}}) は Supabase CLI 非対応。
+
+### imports/ban-alias (node, deno)
+
+- Location: src/common/cross-cutting/ban-alias.mjs
+- Target: files: `scripts/features/**/*.ts`
+- Messages:
+  - この環境では alias import (@/) は使えない。相対パスを使う。
+
+### naming/components-tsx-only (next)
+
+- Location: src/next/layers/components.mjs
+- Target: files: `src/components/**/*.ts`
+- Messages:
+  - components/ は .tsx のみ。ロジックは src/features/ に置く。
+
+### naming/features-ts-only (全 entry)
+
+- Location: src/common/cross-cutting/features-ts-only.mjs
+- Target: files: `src/features/**/*.tsx`
+- Messages:
+  - features/ は .ts のみ。component は src/components/ に置く。
+
+## P8 汎用 TS / style / UI
+
+全ファイル共通の TypeScript / 整形 / Tailwind / layout 規律。
+
+### jsdoc (全 entry)
+
+- Location: src/common/cross-cutting/jsdoc.mjs
+- Target: files: `src/features/**/queries/*.ts`, `src/features/**/services*/*.ts`, `src/features/**/utils*/*.ts`
+- Messages:
+  - [`jsdoc/require-jsdoc`](https://github.com/gajus/eslint-plugin-jsdoc/blob/main/docs/rules/require-jsdoc.md)
+  - [`jsdoc/require-description`](https://github.com/gajus/eslint-plugin-jsdoc/blob/main/docs/rules/require-description.md)
+
+### layouts/main-structural-only (next)
+
+- Location: src/next/layers/layouts.mjs
+- Target: files: `src/app/**/layout.tsx`
+- Messages:
+  - layout.tsx の <main> は構造のみ。spacing/装飾 ({{ tokens }}) は page.tsx へ移す (例 <Container className="py-8">)。
+
+### rules/shared (全 entry)
+
+- Location: src/common/base/typescript.mjs
+- Target: (global)
+- Messages:
+  - [`no-console`](https://eslint.org/docs/latest/rules/no-console)
+  - [`no-irregular-whitespace`](https://eslint.org/docs/latest/rules/no-irregular-whitespace)
+  - [`simple-import-sort/imports`](https://github.com/lydell/eslint-plugin-simple-import-sort)
+  - [`simple-import-sort/exports`](https://github.com/lydell/eslint-plugin-simple-import-sort)
+  - [`@stylistic/quotes`](https://eslint.style/rules/quotes)
+  - [`no-unreachable`](https://eslint.org/docs/latest/rules/no-unreachable)
+  - [`no-unreachable-loop`](https://eslint.org/docs/latest/rules/no-unreachable-loop)
+  - [`no-useless-return`](https://eslint.org/docs/latest/rules/no-useless-return)
+  - [`no-constant-condition`](https://eslint.org/docs/latest/rules/no-constant-condition)
+  - [`no-constant-binary-expression`](https://eslint.org/docs/latest/rules/no-constant-binary-expression)
+  - [`no-dupe-else-if`](https://eslint.org/docs/latest/rules/no-dupe-else-if)
+  - [`no-self-assign`](https://eslint.org/docs/latest/rules/no-self-assign)
+  - [`no-self-compare`](https://eslint.org/docs/latest/rules/no-self-compare)
+  - [`no-useless-catch`](https://eslint.org/docs/latest/rules/no-useless-catch)
+  - [`no-fallthrough`](https://eslint.org/docs/latest/rules/no-fallthrough)
+
+### rules/typescript (全 entry)
+
+- Location: src/common/base/typescript.mjs
+- Target: files: `**/*.ts`, `**/*.tsx`
+- Messages:
+  - [`@typescript-eslint/no-unused-vars`](https://typescript-eslint.io/rules/no-unused-vars)
+  - [`@typescript-eslint/consistent-type-imports`](https://typescript-eslint.io/rules/consistent-type-imports)
+  - [`@typescript-eslint/no-explicit-any`](https://typescript-eslint.io/rules/no-explicit-any)
+  - [`@typescript-eslint/no-unnecessary-condition`](https://typescript-eslint.io/rules/no-unnecessary-condition)
+  - [`@typescript-eslint/no-floating-promises`](https://typescript-eslint.io/rules/no-floating-promises)
+  - [`@typescript-eslint/no-misused-promises`](https://typescript-eslint.io/rules/no-misused-promises)
+  - [`@typescript-eslint/await-thenable`](https://typescript-eslint.io/rules/await-thenable)
+  - [`@typescript-eslint/require-await`](https://typescript-eslint.io/rules/require-await)
+  - [`@typescript-eslint/no-unsafe-assignment`](https://typescript-eslint.io/rules/no-unsafe-assignment)
+  - [`@typescript-eslint/no-unsafe-call`](https://typescript-eslint.io/rules/no-unsafe-call)
+  - [`@typescript-eslint/no-unsafe-member-access`](https://typescript-eslint.io/rules/no-unsafe-member-access)
+  - [`@typescript-eslint/no-unsafe-argument`](https://typescript-eslint.io/rules/no-unsafe-argument)
+  - [`@typescript-eslint/no-unsafe-return`](https://typescript-eslint.io/rules/no-unsafe-return)
+
+### tailwindcss/rules (next)
+
+- Location: src/next/tailwindcss.mjs
+- Target: files: `src/**/*.{ts,tsx}`
+- Messages:
+  - [`better-tailwindcss/enforce-consistent-class-order`](https://github.com/schoero/eslint-plugin-better-tailwindcss/blob/main/docs/rules/enforce-consistent-class-order.md)
+  - [`better-tailwindcss/enforce-consistent-important-position`](https://github.com/schoero/eslint-plugin-better-tailwindcss/blob/main/docs/rules/enforce-consistent-important-position.md)
+  - [`better-tailwindcss/no-conflicting-classes`](https://github.com/schoero/eslint-plugin-better-tailwindcss/blob/main/docs/rules/no-conflicting-classes.md)
+  - [`better-tailwindcss/no-deprecated-classes`](https://github.com/schoero/eslint-plugin-better-tailwindcss/blob/main/docs/rules/no-deprecated-classes.md)
+  - [`better-tailwindcss/no-duplicate-classes`](https://github.com/schoero/eslint-plugin-better-tailwindcss/blob/main/docs/rules/no-duplicate-classes.md)
+  - margin を避け、padding/gap で間隔を制御する (例外: mx-auto, -mt-\*)
+  - space-x/space-y は避ける (内部で margin を使う)。flex/grid + gap を使う
+  - [`better-tailwindcss/no-unnecessary-whitespace`](https://github.com/schoero/eslint-plugin-better-tailwindcss/blob/main/docs/rules/no-unnecessary-whitespace.md)
+
+## OTHER その他 (非ルール)
+
+lint ルールではない除外設定など。原則に割り当てられないルールもここに集約される。
+
+### rules/ignore-shadcn-ui (next)
+
+- Location: (inline)
+- Target: ignores: `src/components/shared/ui/*.{ts,tsx}`
+- Messages: (none)
