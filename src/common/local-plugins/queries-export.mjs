@@ -29,7 +29,7 @@ export const queriesExportRule = {
     type: "problem",
     messages: {
       invalidName:
-        "queries export '{{ name }}' must start with one of: get, create, update, delete, signUp, signIn, signOut. (Rails 5 actions translated to TS idiom)",
+        "queries の export '{{ name }}' は get, create, update, delete, signUp, signIn, signOut のいずれかで始める。",
     },
     schema: [],
   },

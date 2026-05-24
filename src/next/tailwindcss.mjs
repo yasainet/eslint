@@ -42,12 +42,12 @@ export const tailwindcssConfigs = [
             {
               pattern: "^(?!mx-auto$)m[trblxy]?-(?!auto$)[^-\\s]+$",
               message:
-                "Avoid margin; control spacing with padding/gap (exceptions: mx-auto, -mt-*)",
+                "margin を避け、padding/gap で間隔を制御する (例外: mx-auto, -mt-*)",
             },
             {
               pattern: "^space-[xy]-[^-\\s]+$",
               message:
-                "Avoid space-x/space-y (uses margin internally); use flex/grid + gap",
+                "space-x/space-y は避ける (内部で margin を使う)。flex/grid + gap を使う",
             },
           ],
         },

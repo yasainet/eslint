@@ -7,12 +7,12 @@ const HOOKS_BOUNDARY_PATTERNS = [
   {
     group: ["**/queries/*", "**/queries"],
     message:
-      "hooks can only import entries, not queries (hooks-boundary violation)",
+      "hooks は queries を直接 import 不可。entries 経由で使う。",
   },
   {
     group: ["**/services/*", "**/services"],
     message:
-      "hooks can only import entries, not services (hooks-boundary violation)",
+      "hooks は services を直接 import 不可。entries 経由で使う。",
   },
 ];
 

@@ -11,7 +11,7 @@ export function createFeaturesTsOnlyConfigs({ featureRoot }) {
           {
             selector: "Program",
             message:
-              "features/ must only contain .ts files. Components belong in src/components/.",
+              "features/ は .ts のみ。component は src/components/ に置く。",
           },
         ],
       },

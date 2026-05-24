@@ -5,15 +5,15 @@ export const supabaseSelectTypedColumnsRule = {
     type: "problem",
     messages: {
       noArgs:
-        "Empty `.select()` returns all columns implicitly. Pass a string literal or a `*_COLUMNS` constant.",
+        "空の `.select()` は全列を暗黙取得する。文字列リテラルか `*_COLUMNS` 定数を渡す。",
       wildcard:
-        '`.select("*")` exposes new schema columns silently. Enumerate columns explicitly.',
+        '`.select("*")` はスキーマ拡張時に列を暗黙露出する。列を明示列挙する。',
       template:
-        "Template literal in `.select()` defeats type inference. Use a string literal or a `*_COLUMNS` constant.",
+        "`.select()` の template literal は型推論を壊す。文字列リテラルか `*_COLUMNS` 定数を使う。",
       shapeArg:
-        "`.select()` argument must be a string literal or a `*_COLUMNS` identifier.",
+        "`.select()` の引数は文字列リテラルか `*_COLUMNS` 識別子にする。",
       naming:
-        "Column constant `{{ name }}` must be UPPER_SNAKE_CASE ending with `_COLUMNS` (e.g. POST_DETAIL_COLUMNS).",
+        "column 定数 `{{ name }}` は `_COLUMNS` で終わる UPPER_SNAKE_CASE にする (例 POST_DETAIL_COLUMNS)。",
     },
     schema: [],
   },

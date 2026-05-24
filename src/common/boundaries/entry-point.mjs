@@ -10,7 +10,7 @@ export function createEntryPointConfigs(entryPointFiles, entryPointIgnores = [])
           {
             selector: "ImportDeclaration:has(ImportNamespaceSpecifier)",
             message:
-              "Entry points must use named imports instead of `import * as`. This makes dependencies explicit.",
+              "entry point は `import * as` 禁止。named import で依存を明示する。",
           },
         ],
       },

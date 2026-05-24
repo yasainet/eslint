@@ -11,11 +11,11 @@ export const denoUtilsBoundaryConfigs = [
           patterns: [
             {
               group: ["*/_features/*", "*/_features/**"],
-              message: "_utils/ cannot import _features/",
+              message: "_utils/ は _features/ を import 不可。依存方向を守る。",
             },
             {
               group: ["*/_lib/*", "*/_lib/**"],
-              message: "_utils/ cannot import _lib/",
+              message: "_utils/ は _lib/ を import 不可。依存方向を守る。",
             },
           ],
         },

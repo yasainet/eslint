@@ -39,7 +39,9 @@ export const entrySingleServiceCallRule = {
     },
     messages: {
       multipleServiceCalls:
-        "entry '{{ funcName }}' calls more than one feature service ({{ count }} total). entries must be a thin wrapper that calls a single service. Move orchestration into the service layer. `shared/services/*` (e.g. `sharedDiscordService`) is exempt.",
+        "entry '{{ funcName }}' が複数の feature service を呼んでいる ({{ count }} 件):\n" +
+        "- entry は単一 service を呼ぶ薄いラッパー、orchestration は service 層へ移す\n" +
+        "- `shared/services/*` (例 `sharedDiscordService`) は例外",
     },
     schema: [],
   },

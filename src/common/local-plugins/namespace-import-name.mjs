@@ -55,7 +55,7 @@ export const namespaceImportNameRule = {
     type: "suggestion",
     messages: {
       mismatch:
-        "Namespace import should be named '{{ expected }}' instead of '{{ actual }}'.",
+        "namespace import は '{{ expected }}' と命名する ('{{ actual }}' ではなく)。",
     },
     schema: [
       {

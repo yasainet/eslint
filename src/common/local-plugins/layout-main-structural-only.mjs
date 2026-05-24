@@ -47,7 +47,7 @@ export const layoutMainStructuralOnlyRule = {
     type: "problem",
     messages: {
       invalidToken:
-        "<main> in layout.tsx must be structural-only. Move spacing/decoration ({{ tokens }}) to page.tsx (e.g. <Container className=\"py-8\">).",
+        "layout.tsx の <main> は構造のみ。spacing/装飾 ({{ tokens }}) は page.tsx へ移す (例 <Container className=\"py-8\">)。",
     },
     schema: [],
   },

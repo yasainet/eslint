@@ -17,7 +17,7 @@ export const supabaseColumnsSatisfiesRule = {
     type: "problem",
     messages: {
       shape:
-        'Column constant `{{ name }}` must be `"<comma-separated columns>" as const`. `as const` を外すと Supabase の `.select()` 型推論が壊れる。配列 / template literal も不可。',
+        'column 定数 `{{ name }}` は `"<comma-separated columns>" as const` にする。`as const` を外すと Supabase の `.select()` 型推論が壊れる。配列 / template literal も不可。',
     },
     schema: [],
   },

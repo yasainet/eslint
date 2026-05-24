@@ -3,7 +3,7 @@ export const flatEntryPointRule = {
     type: "problem",
     messages: {
       nested:
-        "Edge Function entry points must be directly under supabase/functions/. Nested directories (e.g., commands/{{name}}) are not supported by Supabase CLI.",
+        "Edge Function の entry point は supabase/functions/ 直下に置く。ネストした directory (例 commands/{{name}}) は Supabase CLI 非対応。",
     },
     schema: [],
   },

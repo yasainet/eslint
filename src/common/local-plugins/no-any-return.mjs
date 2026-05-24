@@ -9,7 +9,7 @@ export const noAnyReturnRule = {
     },
     messages: {
       anyInReturn:
-        "Exported function's inferred return type contains `any`: {{ typeText }}. Annotate with a known type or narrow from the source — public layer APIs must have known shapes.",
+        "export 関数の推論された返り値型に `any` が含まれる: {{ typeText }}。既知の型を注釈するか絞り込む (public な層の API は型を確定させる)。",
     },
     schema: [],
   },

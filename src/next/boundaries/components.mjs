@@ -7,12 +7,12 @@ const COMPONENTS_BOUNDARY_PATTERNS = [
   {
     group: ["**/queries/*", "**/queries"],
     message:
-      "components can only import entries or hooks, not queries (components-boundary violation)",
+      "components は queries を直接 import 不可。entries か hooks 経由で使う。",
   },
   {
     group: ["**/services/*", "**/services"],
     message:
-      "components can only import entries or hooks, not services (components-boundary violation)",
+      "components は services を直接 import 不可。entries か hooks 経由で使う。",
   },
 ];
 

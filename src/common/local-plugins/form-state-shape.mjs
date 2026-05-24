@@ -134,21 +134,21 @@ export const formStateShapeRule = {
     },
     messages: {
       dataMissing:
-        "FormState '{{ name }}' must have a `data` property (use `data: null` if there is no payload).",
+        "FormState '{{ name }}' に `data` プロパティが必須 (payload が無ければ `data: null`)。",
       dataNotNullable:
-        "FormState '{{ name }}' `data` must allow null (e.g. `data: T | null` or `data: null`).",
+        "FormState '{{ name }}' の `data` は null 許容にする (例: `data: T | null` / `data: null`)。",
       errorMissing:
-        "FormState '{{ name }}' must have an `error: { message: string } | null` property.",
+        "FormState '{{ name }}' に `error: { message: string } | null` プロパティが必須。",
       errorNotNullable:
-        "FormState '{{ name }}' `error` must be nullable (`{ message: string } | null`).",
+        "FormState '{{ name }}' の `error` は nullable にする (`{ message: string } | null`)。",
       errorWrongShape:
-        "FormState '{{ name }}' `error` must be exactly `{ message: string } | null`.",
+        "FormState '{{ name }}' の `error` は厳密に `{ message: string } | null`。",
       errorExtraField:
-        "FormState '{{ name }}' `error` object must contain only `message: string`. Forbidden field: '{{ field }}'. See form-state-shape rule docstring for the rationale and the future opt-out plan for Stripe-like cases.",
+        "FormState '{{ name }}' の `error` は `message: string` のみ許可。禁止フィールド: '{{ field }}'。",
       extraProperty:
-        "FormState '{{ name }}' must contain only `data` and `error`. Forbidden property: '{{ field }}'.",
+        "FormState '{{ name }}' は `data` と `error` のみ。禁止プロパティ: '{{ field }}'。",
       discriminatedUnion:
-        "FormState '{{ name }}' must be a single interface or type literal, not a discriminated union.",
+        "FormState '{{ name }}' は単一の interface か type literal にする。discriminated union 不可。",
     },
     schema: [],
   },

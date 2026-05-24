@@ -66,7 +66,7 @@ export const featureNameRule = {
     type: "problem",
     messages: {
       invalidFeatureName:
-        "Feature directory '{{ name }}' is not allowed. Allowed: {{ allowed }}.",
+        "feature directory '{{ name }}' は許可されない。許可: {{ allowed }}。",
     },
     schema: [
       {

@@ -11,11 +11,11 @@ import {
 const LAYER_PATTERNS = [
   {
     group: ["**/entries/*", "**/entries"],
-    message: "services cannot import entries (layer violation)",
+    message: "services は entries を import 不可。依存は単方向に保つ。",
   },
   {
     group: ["**/hooks/*", "**/hooks"],
-    message: "services cannot import hooks (layer violation)",
+    message: "services は hooks を import 不可。依存は単方向に保つ。",
   },
 ];
 
@@ -23,7 +23,7 @@ const LATERAL_PATTERNS = [
   {
     group: ["@/features/*/services/*", "@/features/*/services"],
     message:
-      "services cannot import other feature's services (lateral violation)",
+      "他 feature の services は import 不可。feature を跨ぐ依存は禁止。",
   },
 ];
 
@@ -68,25 +68,27 @@ export function createServicesConfigs({ featureRoot, prefixLibMapping }) {
           {
             selector: "TryStatement",
             message:
-              "try-catch is not allowed in services. Error handling belongs in entries.",
+              "services で try-catch は禁止。エラー処理は entries に集約する。",
           },
           {
             selector: "ThrowStatement",
             message:
-              "throw is not allowed in services. Communicate failures via T | null / { data, error } / empty default. Native exceptions from libs auto-propagate to entry's catch.",
+              "services で throw は禁止。失敗は値で返す:\n" +
+              "- `T | null` / `{ data, error }` / 空デフォルトのいずれか\n" +
+              "- lib の native 例外は entry の catch に自動伝播する",
           },
           { selector: loggerSelector, message: loggerMessage },
           {
             selector:
               "LogicalExpression[operator='??'][left.type='ChainExpression'][left.expression.property.name='message'][right.type='Literal']",
             message:
-              "Dead fallback for error message. If you reached this branch the error is known — return the error directly. Unhandled exceptions belong in entries.",
+              "error message の dead fallback。この分岐に来た時点で error は既知 — error をそのまま返す。",
           },
           {
             selector:
               "LogicalExpression[operator='??'][left.type='MemberExpression'][left.property.name='error'][right.type='ObjectExpression']",
             message:
-              "Dead fallback for nullable error. Check `if (error)` and return the error directly. Unhandled exceptions belong in entries.",
+              "nullable error の dead fallback。`if (error)` で判定し error をそのまま返す。",
           },
           {
             selector: aliasDynamicImportSelector,

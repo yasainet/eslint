@@ -3,9 +3,9 @@ export const schemaNamingRule = {
     type: "problem",
     messages: {
       missingSuffix:
-        "Exported variable '{{ name }}' in a schema file must end with 'Schema'.",
+        "schema file の export 変数 '{{ name }}' は 'Schema' で終える。",
       invalidCasing:
-        "Exported variable '{{ name }}' must be camelCase (start with a lowercase letter).",
+        "export 変数 '{{ name }}' は camelCase にする (小文字始まり)。",
     },
     schema: [],
   },

@@ -13,19 +13,19 @@ import { localPlugin } from "../local-plugins/index.mjs";
 const LAYER_PATTERNS = [
   {
     group: ["**/queries/*", "**/queries"],
-    message: "entries cannot import queries (layer violation)",
+    message:
+      "entries は queries を import 不可。queries は service 経由で使う。",
   },
   {
     group: ["**/hooks/*", "**/hooks"],
-    message: "entries cannot import hooks (layer violation)",
+    message: "entries は hooks を import 不可。依存は単方向に保つ。",
   },
 ];
 
 const LATERAL_PATTERNS = [
   {
     group: ["@/features/*/entries/*", "@/features/*/entries"],
-    message:
-      "entries cannot import other feature's entries (lateral violation)",
+    message: "他 feature の entries は import 不可。feature を跨ぐ依存は禁止。",
   },
   {
     group: [
@@ -35,40 +35,32 @@ const LATERAL_PATTERNS = [
       "!@/features/shared/services",
     ],
     message:
-      "entries cannot import other feature's services. Use the same feature's service (1:1) or move orchestration into the service layer. `shared/services/*` is exempt for cross-cutting side effects (notifications etc.).",
+      "他 feature の services は import 不可:\n" +
+      "- 同一 feature の service を 1:1 で使うか、orchestration を service 層へ移す\n" +
+      "- `shared/services/*` は横断的な副作用 (通知等) のため例外",
   },
 ];
 
-/**
- * supabase の execution context を跨ぐ import を防ぐ cardinality 制約:
- *
- * - entries/<context>.ts は同名 services/<context> のみ呼べる
- * - 防ぐ runtime 問題:
- *   - entries/server.ts が services/client.ts を呼ぶ
- *   - server context で lib/supabase/client を呼ぶ
- * - server / client / admin は supabase 固有
- * - 他 lib (r2 / stripe 等) は対象外
- */
 const CARDINALITY_PATTERNS = {
   server: [
     {
       group: ["**/services/client", "**/services/admin"],
       message:
-        "server entry can only import server service (cardinality violation)",
+        "server entry は server service のみ import 可。context を跨ぐ呼び出しは禁止。",
     },
   ],
   client: [
     {
       group: ["**/services/server", "**/services/admin"],
       message:
-        "client entry can only import client service (cardinality violation)",
+        "client entry は client service のみ import 可。context を跨ぐ呼び出しは禁止。",
     },
   ],
   admin: [
     {
       group: ["**/services/server", "**/services/client"],
       message:
-        "admin entry can only import admin service (cardinality violation)",
+        "admin entry は admin service のみ import 可。context を跨ぐ呼び出しは禁止。",
     },
   ],
 };

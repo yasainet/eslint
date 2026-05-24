@@ -23,7 +23,7 @@ export const hooksLayerConfigs = [
           selector:
             "ExportNamedDeclaration > FunctionDeclaration[id.name!=/^use[A-Z]/]",
           message:
-            "Exported functions in hooks must start with 'use' (e.g., useAuth).",
+            "hooks の export 関数は 'use' で始める (例: useAuth)。",
         },
       ],
     },

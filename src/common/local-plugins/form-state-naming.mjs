@@ -16,7 +16,7 @@ export const formStateNamingRule = {
     type: "problem",
     messages: {
       invalidName:
-        "FormState type '{{ name }}' must follow {Verb}{Subject}FormState pattern (e.g. CreateCommentFormState, SignInFormState). At least two PascalCase words are required.",
+        "FormState 型 '{{ name }}' は {Verb}{Subject}FormState 形式にする (例 CreateCommentFormState, SignInFormState)。PascalCase 2 語以上が必須。",
     },
     schema: [],
   },

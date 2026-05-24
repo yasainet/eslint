@@ -15,17 +15,17 @@ export const denoEntryPointConfigs = [
             {
               group: ["**/services/*", "**/services"],
               message:
-                "Top-level files must not import services directly. Import from entries instead.",
+                "top-level file は services を直接 import 不可。entries 経由で使う。",
             },
             {
               group: ["**/queries/*", "**/queries"],
               message:
-                "Top-level files must not import queries directly. Import from entries instead.",
+                "top-level file は queries を直接 import 不可。entries 経由で使う。",
             },
             {
               group: ["*/_lib/*", "*/_lib/**"],
               message:
-                "Top-level files must not import _lib/ directly. Import from entries instead.",
+                "top-level file は _lib/ を直接 import 不可。entries 経由で使う。",
             },
           ],
         },

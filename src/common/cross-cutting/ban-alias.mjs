@@ -11,7 +11,7 @@ export function createBanAliasConfigs({ featureRoot }) {
               {
                 group: ["@/*", "@/**"],
                 message:
-                  "Alias imports (@/) are not available in this environment. Use relative paths.",
+                  "この環境では alias import (@/) は使えない。相対パスを使う。",
               },
             ],
           },

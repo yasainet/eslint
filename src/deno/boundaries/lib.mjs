@@ -18,7 +18,7 @@ export const denoLibBoundaryConfigs = [
             {
               group: ["*/_lib/*", "*/_lib/**"],
               message:
-                "_lib/ can only be imported from queries (lib-boundary violation)",
+                "_lib/ は queries からのみ import 可。他層は queries 経由で使う。",
             },
           ],
         },

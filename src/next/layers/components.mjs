@@ -10,7 +10,7 @@ export const componentsLayerConfigs = [
         {
           selector: "Program",
           message:
-            "components/ must only contain .tsx files. Logic belongs in src/features/.",
+            "components/ は .tsx のみ。ロジックは src/features/ に置く。",
         },
       ],
     },

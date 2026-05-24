@@ -12,15 +12,15 @@ import { localPlugin } from "../local-plugins/index.mjs";
 const LAYER_PATTERNS = [
   {
     group: ["**/services/*", "**/services"],
-    message: "queries cannot import services (layer violation)",
+    message: "queries は services を import 不可。ロジックは services へ。",
   },
   {
     group: ["**/entries/*", "**/entries"],
-    message: "queries cannot import entries (layer violation)",
+    message: "queries は entries を import 不可。依存は単方向に保つ。",
   },
   {
     group: ["**/hooks/*", "**/hooks"],
-    message: "queries cannot import hooks (layer violation)",
+    message: "queries は hooks を import 不可。依存は単方向に保つ。",
   },
 ];
 
@@ -28,7 +28,7 @@ const LATERAL_PATTERNS = [
   {
     group: ["@/features/*/queries/*", "@/features/*/queries"],
     message:
-      "queries cannot import other feature's queries (lateral violation)",
+      "他 feature の queries は import 不可。feature を跨ぐ依存は禁止。",
   },
 ];
 
@@ -39,7 +39,7 @@ function prefixLibPatterns(prefix, mapping) {
     .filter((p) => p !== prefix)
     .map((p) => ({
       group: [`**/lib/${mapping[p]}`, `**/lib/${mapping[p]}/*`],
-      message: `queries/${prefix}.ts can only import from lib/${allowedLib}. Use the correct query file for this lib.`,
+      message: `queries/${prefix}.ts は lib/${allowedLib} のみ import 可。lib ごとに対応する query file を使う。`,
     }));
 }
 
@@ -100,42 +100,42 @@ export function createQueriesConfigs({ featureRoot, prefixLibMapping }) {
           {
             selector: "TryStatement",
             message:
-              "try-catch is not allowed in queries. Error handling belongs in entries.",
+              "queries では try-catch 禁止。エラーは `{ data, error }` で返す。",
           },
           {
             selector: "IfStatement",
             message:
-              "if statements are not allowed in queries. Conditional logic belongs in services.",
+              "queries で if 文は禁止。条件分岐は services に置く。",
           },
           {
             selector: "ForStatement",
             message:
-              "Loops are not allowed in queries. Queries should be thin CRUD wrappers — iteration belongs in services.",
+              "queries でループは禁止。queries は薄い CRUD ラッパー、反復は services に置く。",
           },
           {
             selector: "ForOfStatement",
             message:
-              "Loops are not allowed in queries. Queries should be thin CRUD wrappers — iteration belongs in services.",
+              "queries でループは禁止。queries は薄い CRUD ラッパー、反復は services に置く。",
           },
           {
             selector: "ForInStatement",
             message:
-              "Loops are not allowed in queries. Queries should be thin CRUD wrappers — iteration belongs in services.",
+              "queries でループは禁止。queries は薄い CRUD ラッパー、反復は services に置く。",
           },
           {
             selector: "WhileStatement",
             message:
-              "Loops are not allowed in queries. Queries should be thin CRUD wrappers — iteration belongs in services.",
+              "queries でループは禁止。queries は薄い CRUD ラッパー、反復は services に置く。",
           },
           {
             selector: "DoWhileStatement",
             message:
-              "Loops are not allowed in queries. Queries should be thin CRUD wrappers — iteration belongs in services.",
+              "queries でループは禁止。queries は薄い CRUD ラッパー、反復は services に置く。",
           },
           {
             selector: "ThrowStatement",
             message:
-              "throw is not allowed in queries. Queries must return Supabase's { data, error } shape as-is. Error handling belongs in entries.",
+              "queries で throw は禁止。Supabase の `{ data, error }` をそのまま返す。",
           },
           { selector: loggerSelector, message: loggerMessage },
           {

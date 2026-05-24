@@ -5,9 +5,9 @@ export const importPathStyleRule = {
     type: "problem",
     messages: {
       useRelative:
-        "Same-feature import must use a relative path instead of '{{ importPath }}'.",
+        "同一 feature の import は相対パスにする ('{{ importPath }}' を使わない)。",
       useAlias:
-        "Cross-feature import must use '@/' instead of relative path '{{ importPath }}'.",
+        "feature を跨ぐ import は '@/' にする (相対パス '{{ importPath }}' を使わない)。",
     },
     schema: [
       {

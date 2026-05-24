@@ -5,7 +5,7 @@ export const queriesNamespaceImportRule = {
     type: "problem",
     messages: {
       useNamespace:
-        'Use `import * as xxxQuery from "{{ source }}"` instead of named imports for queries layer. Type-only imports (`import type {}`) are allowed.',
+        'queries 層は named import でなく `import * as xxxQuery from "{{ source }}"` を使う (`import type {}` は可)。',
     },
     schema: [],
   },

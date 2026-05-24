@@ -7,12 +7,12 @@ const ROUTE_BOUNDARY_PATTERNS = [
   {
     group: ["**/queries/*", "**/queries"],
     message:
-      "route.ts can only import entries, not queries (route-boundary violation)",
+      "route.ts は queries を直接 import 不可。entries 経由で使う。",
   },
   {
     group: ["**/services/*", "**/services"],
     message:
-      "route.ts can only import entries, not services (route-boundary violation)",
+      "route.ts は services を直接 import 不可。entries 経由で使う。",
   },
 ];
 

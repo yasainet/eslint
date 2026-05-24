@@ -9,7 +9,7 @@ export const directivesConfigs = [
           selector:
             "Program > :first-child:not(ExpressionStatement[expression.value='use server'])",
           message:
-            'entries/server.ts must start with "use server" directive.',
+            'entries/server.ts は先頭に "use server" directive が必須。',
         },
       ],
     },
@@ -24,7 +24,7 @@ export const directivesConfigs = [
           selector:
             "Program > :first-child:not(ExpressionStatement[expression.value='use server'])",
           message:
-            'entries/admin.ts must start with "use server" directive.',
+            'entries/admin.ts は先頭に "use server" directive が必須。',
         },
       ],
     },
@@ -38,7 +38,7 @@ export const directivesConfigs = [
         {
           selector: "ExpressionStatement[expression.value='use server']",
           message:
-            'entries/client.ts must NOT have "use server" directive. It uses @/lib/supabase/client.',
+            'entries/client.ts は "use server" 禁止。@/lib/supabase/client を使うため。',
         },
       ],
     },
@@ -52,7 +52,7 @@ export const directivesConfigs = [
         {
           selector:
             "Program > :first-child:not(ExpressionStatement[expression.value='use client'])",
-          message: 'Hooks must start with "use client" directive.',
+          message: 'hooks は先頭に "use client" directive が必須。',
         },
       ],
     },

@@ -485,35 +485,37 @@ export const entryTemplateRule = {
     },
     messages: {
       bodyNotTryCatch:
-        "entry '{{ funcName }}' body must be either a single try/catch (Pattern A) or a try/catch followed by a terminal navigation call such as `redirect(...)` / `notFound(...)` (Pattern B).",
-      tryEmpty: "entry '{{ funcName }}' try block is empty.",
+        "entry '{{ funcName }}' の body は次のいずれか:\n" +
+        "- 単一の try/catch (Pattern A)\n" +
+        "- try/catch + 末尾の navigation 呼び出し `redirect(...)` / `notFound(...)` (Pattern B)",
+      tryEmpty: "entry '{{ funcName }}' の try block が空。",
       tryMissingStartLog:
-        "entry '{{ funcName }}' try block must start with `logger.info(<obj>, \"Start {{ funcName }}\")`.",
+        "entry '{{ funcName }}' の try block は `logger.info(<obj>, \"Start {{ funcName }}\")` で始める。",
       trySuccessLogMissing:
-        "entry '{{ funcName }}' success return must be preceded by `logger.info(<obj>, \"Success {{ funcName }}\")`.",
+        "entry '{{ funcName }}' の success return の直前に `logger.info(<obj>, \"Success {{ funcName }}\")` が必須。",
       trySuccessReturnMissing:
-        "entry '{{ funcName }}' must contain a success return `return { data, error: null }`.",
+        "entry '{{ funcName }}' は success return `return { data, error: null }` が必須。",
       failedLogMissing:
-        "entry '{{ funcName }}' Failed branch must call `logger.error(<obj>, \"Failed {{ funcName }}\")` before return.",
+        "entry '{{ funcName }}' の Failed 分岐は return 前に `logger.error(<obj>, \"Failed {{ funcName }}\")` を呼ぶ。",
       catchParamWrongType:
-        "entry '{{ funcName }}' catch param must be `error: unknown`.",
-      catchEmpty: "entry '{{ funcName }}' catch block is empty.",
+        "entry '{{ funcName }}' の catch param は `error: unknown`。",
+      catchEmpty: "entry '{{ funcName }}' の catch block が空。",
       catchMissingErrorLog:
-        "entry '{{ funcName }}' catch block must start with `logger.error(<obj>, \"Unexpected error in {{ funcName }}\")`.",
+        "entry '{{ funcName }}' の catch block は `logger.error(<obj>, \"Unexpected error in {{ funcName }}\")` で始める。",
       catchLastNotReturn:
-        "entry '{{ funcName }}' catch block must end with a return statement.",
+        "entry '{{ funcName }}' の catch block は return 文で終える。",
       catchWrongReturnMessage:
-        "entry '{{ funcName }}' catch return error.message must be the literal '{{ expected }}'. Got: '{{ actual }}'.",
+        "entry '{{ funcName }}' の catch return の error.message はリテラル '{{ expected }}'。実際: '{{ actual }}'。",
       logWrongCallShape:
-        "{{ where }} log in '{{ funcName }}' must be `logger.{{ expectedLevel }}(<obj>, \"{{ expectedMessage }}\")`.",
+        "'{{ funcName }}' の {{ where }} log は `logger.{{ expectedLevel }}(<obj>, \"{{ expectedMessage }}\")`。",
       logWrongMessage:
-        "{{ where }} log message must be '{{ expectedMessage }}'. Got: '{{ actual }}'.",
+        "{{ where }} log message は '{{ expectedMessage }}'。実際: '{{ actual }}'。",
       logFirstArgNotObject:
-        "{{ where }} log in '{{ funcName }}' first argument must be an object literal.",
+        "'{{ funcName }}' の {{ where }} log の第1引数は object literal にする。",
       logErrKeyNotFirst:
-        "{{ where }} log in '{{ funcName }}' object must start with `err:` key.",
+        "'{{ funcName }}' の {{ where }} log object は `err:` キーで始める。",
       logMissingInputArg:
-        "{{ where }} log in '{{ funcName }}' is missing input arg '{{ argName }}'. All function inputs must propagate to log objects.",
+        "'{{ funcName }}' の {{ where }} log に入力引数 '{{ argName }}' が無い。全ての関数入力を log object に伝播する。",
     },
     schema: [],
   },
