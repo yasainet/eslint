@@ -22,14 +22,6 @@ const PROJECT_ROOT = findProjectRoot();
 
 const EXCLUDE_LIST = ["type.ts", "proxy.ts"];
 
-/**
- * lib/ をスキャンして prefix → lib path mapping を生成する:
- *
- * - single-client (index.ts あり): <dir> のみ prefix 登録
- *   - Why: SDK 内部実装 (sub-module) を feature 層に漏らさない
- * - multi-client (index.ts 不在): 各 <role>.ts を prefix 登録
- * - EXCLUDE_LIST (type.ts / proxy.ts) は role 名ではないため除外
- */
 export function generatePrefixLibMapping(featureRoot) {
   const libRoot = featureRoot.replace(/features$/, "lib");
   const libDir = path.join(PROJECT_ROOT, libRoot);
