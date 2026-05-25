@@ -55,6 +55,11 @@ const PRINCIPLES = [
     desc: "全ファイル共通の TypeScript / 整形 / Tailwind / layout 規律。",
   },
   {
+    id: "P9",
+    title: "test 粒度",
+    desc: "test の配置粒度を強制する。orchestration (services/queries/entries) は co-located test 禁止 (mock の echo になるため e2e に委ねる)。pure layer の unit presence は test-audit CLI が別途担保。",
+  },
+  {
     id: "OTHER",
     title: "その他 (非ルール)",
     desc: "lint ルールではない除外設定など。原則に割り当てられないルールもここに集約される。",
@@ -129,6 +134,7 @@ const RULE_PRINCIPLE = {
   jsdoc: "P8",
   "tailwindcss/rules": "P8",
   "layouts/main-structural-only": "P8",
+  "test/no-colocated-test": "P9",
   "rules/ignore-shadcn-ui": "OTHER",
 };
 
@@ -315,7 +321,7 @@ function renderMarkdown(aggregated) {
     "> 自前ルールは ESLint の実 message を転記。外部ルールは公式ドキュメントへリンク。",
     "",
     "> [!NOTE]",
-    "> ルールは原則 (P1〜P8) ごとに整理。人間はまず原則サマリを読む。",
+    "> ルールは原則 (P1〜P9) ごとに整理。人間はまず原則サマリを読む。",
     "> 同一ルールが複数 entry で共通の場合は 1 度だけ掲載し scope で示す。",
     "> 丸めの基準: 対象と意図の両方が既存原則の延長なら丸める。両方独立なら新設。",
     "",
