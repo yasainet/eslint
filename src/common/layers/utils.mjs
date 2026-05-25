@@ -16,7 +16,10 @@ export function createUtilsConfigs({ featureRoot, prefixLibMapping }) {
     {
       name: "naming/utils",
       files: featuresGlob(featureRoot, "*/utils/*.ts"),
-      ignores: featuresGlob(featureRoot, "shared/utils/*.ts"),
+      ignores: [
+        ...featuresGlob(featureRoot, "shared/utils/*.ts"),
+        "**/*.test.ts",
+      ],
       plugins: { "check-file": checkFile },
       rules: {
         "check-file/filename-naming-convention": [
@@ -28,6 +31,7 @@ export function createUtilsConfigs({ featureRoot, prefixLibMapping }) {
     {
       name: "naming/utils-shared",
       files: featuresGlob(featureRoot, "shared/utils/*.ts"),
+      ignores: ["**/*.test.ts"],
       plugins: { "check-file": checkFile },
       rules: {
         "check-file/filename-naming-convention": [

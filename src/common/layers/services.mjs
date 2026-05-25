@@ -39,7 +39,10 @@ export function createServicesConfigs({ featureRoot, prefixLibMapping }) {
     {
       name: "naming/services",
       files: featuresGlob(featureRoot, "**/services/*.ts"),
-      ignores: featuresGlob(featureRoot, "shared/services/*.ts"),
+      ignores: [
+        ...featuresGlob(featureRoot, "shared/services/*.ts"),
+        "**/*.test.ts",
+      ],
       plugins: { "check-file": checkFile },
       rules: {
         "check-file/filename-naming-convention": [
@@ -51,6 +54,7 @@ export function createServicesConfigs({ featureRoot, prefixLibMapping }) {
     {
       name: "naming/services-shared",
       files: featuresGlob(featureRoot, "shared/services/*.ts"),
+      ignores: ["**/*.test.ts"],
       plugins: { "check-file": checkFile },
       rules: {
         "check-file/filename-naming-convention": [

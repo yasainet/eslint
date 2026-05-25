@@ -13,7 +13,10 @@ export function createSchemasConfigs({ featureRoot, prefixLibMapping }) {
     {
       name: "naming/schemas",
       files: featuresGlob(featureRoot, "*/schemas/*.ts"),
-      ignores: featuresGlob(featureRoot, "shared/schemas/*.ts"),
+      ignores: [
+        ...featuresGlob(featureRoot, "shared/schemas/*.ts"),
+        "**/*.test.ts",
+      ],
       plugins: { "check-file": checkFile },
       rules: {
         "check-file/filename-naming-convention": [
@@ -25,6 +28,7 @@ export function createSchemasConfigs({ featureRoot, prefixLibMapping }) {
     {
       name: "naming/schemas-shared",
       files: featuresGlob(featureRoot, "shared/schemas/*.ts"),
+      ignores: ["**/*.test.ts"],
       plugins: { "check-file": checkFile },
       rules: {
         "check-file/filename-naming-convention": [
@@ -36,6 +40,7 @@ export function createSchemasConfigs({ featureRoot, prefixLibMapping }) {
     {
       name: "naming/schema-naming",
       files: featuresGlob(featureRoot, "**/schemas/*.ts"),
+      ignores: ["**/*.test.ts"],
       plugins: { local: localPlugin },
       rules: {
         "local/schema-naming": "error",

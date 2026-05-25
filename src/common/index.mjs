@@ -9,6 +9,7 @@ import { createJsdocConfigs } from "./cross-cutting/jsdoc.mjs";
 import { createLoggerConfigs } from "./cross-cutting/logger.mjs";
 import { createNamespaceImportConfigs } from "./cross-cutting/namespace-import.mjs";
 import { createNoAnyReturnConfigs } from "./cross-cutting/no-any-return.mjs";
+import { createNoColocatedTestConfigs } from "./cross-cutting/no-colocated-test.mjs";
 import { createSupabaseColumnsSatisfiesConfigs } from "./cross-cutting/supabase-columns-satisfies.mjs";
 import { createConstantsConfigs } from "./layers/constants.mjs";
 import { createEntriesConfigs } from "./layers/entries.mjs";
@@ -42,6 +43,7 @@ export function createCommonConfigs(
     ...createConstantsConfigs(ctx),
     ...createEntriesConfigs(ctx),
     ...createFeaturesTsOnlyConfigs(ctx),
+    ...createNoColocatedTestConfigs(ctx),
     ...createLoggerConfigs(ctx),
     ...createNoAnyReturnConfigs(ctx),
     ...createFeatureDefaultImportsConfigs(ctx),

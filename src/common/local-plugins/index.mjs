@@ -7,6 +7,7 @@ import { importPathStyleRule } from "./import-path-style.mjs";
 import { layoutMainStructuralOnlyRule } from "./layout-main-structural-only.mjs";
 import { namespaceImportNameRule } from "./namespace-import-name.mjs";
 import { noAnyReturnRule } from "./no-any-return.mjs";
+import { noColocatedTestRule } from "./no-colocated-test.mjs";
 import { queriesExportRule } from "./queries-export.mjs";
 import { queriesNamespaceImportRule } from "./queries-namespace-import.mjs";
 import { schemaNamingRule } from "./schema-naming.mjs";
@@ -24,6 +25,7 @@ export const localPlugin = {
     "layout-main-structural-only": layoutMainStructuralOnlyRule,
     "namespace-import-name": namespaceImportNameRule,
     "no-any-return": noAnyReturnRule,
+    "no-colocated-test": noColocatedTestRule,
     "queries-export": queriesExportRule,
     "queries-namespace-import": queriesNamespaceImportRule,
     "schema-naming": schemaNamingRule,

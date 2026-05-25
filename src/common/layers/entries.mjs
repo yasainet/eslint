@@ -77,7 +77,10 @@ export function createEntriesConfigs({ featureRoot, prefixLibMapping }) {
     {
       name: "naming/entries",
       files: featuresGlob(featureRoot, "**/entries/*.ts"),
-      ignores: featuresGlob(featureRoot, "shared/entries/*.ts"),
+      ignores: [
+        ...featuresGlob(featureRoot, "shared/entries/*.ts"),
+        "**/*.test.ts",
+      ],
       plugins: { "check-file": checkFile },
       rules: {
         "check-file/filename-naming-convention": [
@@ -89,6 +92,7 @@ export function createEntriesConfigs({ featureRoot, prefixLibMapping }) {
     {
       name: "naming/entries-shared",
       files: featuresGlob(featureRoot, "shared/entries/*.ts"),
+      ignores: ["**/*.test.ts"],
       plugins: { "check-file": checkFile },
       rules: {
         "check-file/filename-naming-convention": [

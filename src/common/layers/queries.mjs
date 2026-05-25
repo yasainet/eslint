@@ -55,7 +55,10 @@ export function createQueriesConfigs({ featureRoot, prefixLibMapping }) {
     {
       name: "naming/queries",
       files: featuresGlob(featureRoot, "**/queries/*.ts"),
-      ignores: featuresGlob(featureRoot, "shared/queries/*.ts"),
+      ignores: [
+        ...featuresGlob(featureRoot, "shared/queries/*.ts"),
+        "**/*.test.ts",
+      ],
       plugins: { "check-file": checkFile },
       rules: {
         "check-file/filename-naming-convention": [
@@ -67,6 +70,7 @@ export function createQueriesConfigs({ featureRoot, prefixLibMapping }) {
     {
       name: "naming/queries-shared",
       files: featuresGlob(featureRoot, "shared/queries/*.ts"),
+      ignores: ["**/*.test.ts"],
       plugins: { "check-file": checkFile },
       rules: {
         "check-file/filename-naming-convention": [
