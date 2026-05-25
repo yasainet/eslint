@@ -511,7 +511,7 @@ export const entryTemplateRule = {
       logWrongMessage:
         "{{ where }} log message は '{{ expectedMessage }}'。実際: '{{ actual }}'。",
       logFirstArgNotObject:
-        "'{{ funcName }}' の {{ where }} log の第1引数は object literal にする。",
+        "'{{ funcName }}' の {{ where }} log の第 1 引数は object literal にする。",
       logErrKeyNotFirst:
         "'{{ funcName }}' の {{ where }} log object は `err:` キーで始める。",
       logMissingInputArg:

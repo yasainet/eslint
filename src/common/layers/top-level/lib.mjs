@@ -1,10 +1,10 @@
-import { checkFile } from "../_internal/plugins.mjs";
+import { checkFile } from "../../_internal/plugins.mjs";
 
-export function createLibLayerConfigs({ featureRoot }) {
+export function createTopLevelLibConfigs({ featureRoot }) {
   const libRoot = featureRoot.replace(/features$/, "lib");
   return [
     {
-      name: "naming/lib",
+      name: "naming/top-level-lib",
       files: [`${libRoot}/**/*.ts`],
       plugins: { "check-file": checkFile },
       rules: {

@@ -1,4 +1,4 @@
-import { checkFile } from "../_internal/plugins.mjs";
+import { checkFile } from "../../_internal/plugins.mjs";
 
 export function createTopLevelUtilsConfigs({ featureRoot }) {
   const utilsRoot = featureRoot.replace(/features$/, "utils");

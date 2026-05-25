@@ -103,7 +103,7 @@ const RULE_PRINCIPLE = {
   "naming/utils": "P3",
   "naming/utils-shared": "P3",
   "naming/top-level-utils": "P3",
-  "naming/lib": "P3",
+  "naming/top-level-lib": "P3",
   "naming/hooks": "P3",
   "naming/components-pascal-case": "P3",
   "naming/feature-name": "P3",

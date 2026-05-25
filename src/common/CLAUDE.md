@@ -9,8 +9,10 @@
   - 例 (naming): feature-name / namespace-import / form-state
   - 例 (rule): logger / jsdoc / no-any-return / supabase-columns-satisfies
 - `layers/<layer>.mjs` — features 内部の階層単位
-  - 種類: queries / services / entries / utils / constants / schemas / types / lib / top-level-utils
+  - 種類: queries / services / entries / utils / constants / schemas / types
   - 1 layer の全制約 (naming + syntax + imports + local rules) を 1 file に集約
+- `layers/top-level/<layer>.mjs` — features と同階層 (top-level) のディレクトリ単位
+  - 種類: lib / utils
 - `local-plugins/` — ESLint local plugin の実装本体
 - `index.mjs` — common entry。上記 file を合成して export
 
