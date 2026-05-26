@@ -1,8 +1,8 @@
 export const LIB_BOUNDARY_PATTERNS = [
   {
-    group: ["@/lib/*", "@/lib/**"],
+    regex: "^@/lib/(?!.*/utils$).+",
     message:
-      "lib/* は queries からのみ import 可。他層は queries 経由で使う。",
+      "lib/* は queries からのみ import 可 (lib/**/utils.ts の純粋ヘルパーは全層から可)。他層は queries 経由で使う。",
   },
 ];
 

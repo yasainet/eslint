@@ -20,7 +20,7 @@ function findProjectRoot() {
 
 const PROJECT_ROOT = findProjectRoot();
 
-const EXCLUDE_LIST = ["type.ts", "proxy.ts"];
+const EXCLUDE_LIST = ["type.ts", "proxy.ts", "utils.ts"];
 
 export function generatePrefixLibMapping(featureRoot) {
   const libRoot = featureRoot.replace(/features$/, "lib");

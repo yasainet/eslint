@@ -52,7 +52,7 @@
   - 他 feature の services は import 不可:
     - 同一 feature の service を 1:1 で使うか、orchestration を service 層へ移す
     - `shared/services/*` は横断的な副作用 (通知等) のため例外
-  - lib/* は queries からのみ import 可。他層は queries 経由で使う。
+  - lib/* は queries からのみ import 可 (lib/**/utils.ts の純粋ヘルパーは全層から可)。他層は queries 経由で使う。
   - mapping 関数は services のみ許可。snake/camel 変換は service 境界で行う。
 
 ### imports/entries/admin (全 entry)
@@ -66,7 +66,7 @@
     - 同一 feature の service を 1:1 で使うか、orchestration を service 層へ移す
     - `shared/services/*` は横断的な副作用 (通知等) のため例外
   - admin entry は admin service のみ import 可。context を跨ぐ呼び出しは禁止。
-  - lib/* は queries からのみ import 可。他層は queries 経由で使う。
+  - lib/* は queries からのみ import 可 (lib/**/utils.ts の純粋ヘルパーは全層から可)。他層は queries 経由で使う。
   - mapping 関数は services のみ許可。snake/camel 変換は service 境界で行う。
 
 ### imports/entries/client (全 entry)
@@ -80,7 +80,7 @@
     - 同一 feature の service を 1:1 で使うか、orchestration を service 層へ移す
     - `shared/services/*` は横断的な副作用 (通知等) のため例外
   - client entry は client service のみ import 可。context を跨ぐ呼び出しは禁止。
-  - lib/* は queries からのみ import 可。他層は queries 経由で使う。
+  - lib/* は queries からのみ import 可 (lib/**/utils.ts の純粋ヘルパーは全層から可)。他層は queries 経由で使う。
   - mapping 関数は services のみ許可。snake/camel 変換は service 境界で行う。
 
 ### imports/entries/server (全 entry)
@@ -94,14 +94,14 @@
     - 同一 feature の service を 1:1 で使うか、orchestration を service 層へ移す
     - `shared/services/*` は横断的な副作用 (通知等) のため例外
   - server entry は server service のみ import 可。context を跨ぐ呼び出しは禁止。
-  - lib/* は queries からのみ import 可。他層は queries 経由で使う。
+  - lib/* は queries からのみ import 可 (lib/**/utils.ts の純粋ヘルパーは全層から可)。他層は queries 経由で使う。
   - mapping 関数は services のみ許可。snake/camel 変換は service 境界で行う。
 
 ### imports/feature-other (全 entry)
 
 - Target: files: `src/features/**/*.ts` / ignores: `src/features/**/services/*.ts`, `src/features/**/queries/*.ts`, `src/features/**/entries/*.ts`, `src/features/**/utils/*.ts`, `src/features/**/types/*.ts`
 - Messages:
-  - lib/* は queries からのみ import 可。他層は queries 経由で使う。
+  - lib/* は queries からのみ import 可 (lib/**/utils.ts の純粋ヘルパーは全層から可)。他層は queries 経由で使う。
   - mapping 関数は services のみ許可。snake/camel 変換は service 境界で行う。
 
 ### imports/feature-types (全 entry)
@@ -114,7 +114,7 @@
 
 - Target: files: `src/**/*.{ts,tsx}` / ignores: `src/lib/**`, `src/proxy.ts`, `src/app/**/route.ts`, `src/features/**`
 - Messages:
-  - lib/* は queries からのみ import 可。他層は queries 経由で使う。
+  - lib/* は queries からのみ import 可 (lib/**/utils.ts の純粋ヘルパーは全層から可)。他層は queries 経由で使う。
   - mapping 関数は services のみ許可。snake/camel 変換は service 境界で行う。
 
 ### imports/path-style (next)
@@ -141,13 +141,13 @@
   - services は entries を import 不可。依存は単方向に保つ。
   - services は hooks を import 不可。依存は単方向に保つ。
   - 他 feature の services は import 不可。feature を跨ぐ依存は禁止。
-  - lib/* は queries からのみ import 可。他層は queries 経由で使う。
+  - lib/* は queries からのみ import 可 (lib/**/utils.ts の純粋ヘルパーは全層から可)。他層は queries 経由で使う。
 
 ### imports/utils (全 entry)
 
 - Target: files: `src/features/**/utils/*.ts`
 - Messages:
-  - lib/* は queries からのみ import 可。他層は queries 経由で使う。
+  - lib/* は queries からのみ import 可 (lib/**/utils.ts の純粋ヘルパーは全層から可)。他層は queries 経由で使う。
   - mapping 関数は services のみ許可。snake/camel 変換は service 境界で行う。
 
 ### naming/namespace-import-name (全 entry)
@@ -180,7 +180,7 @@
 - Messages:
   - components は queries を直接 import 不可。entries か hooks 経由で使う。
   - components は services を直接 import 不可。entries か hooks 経由で使う。
-  - lib/* は queries からのみ import 可。他層は queries 経由で使う。
+  - lib/* は queries からのみ import 可 (lib/**/utils.ts の純粋ヘルパーは全層から可)。他層は queries 経由で使う。
   - mapping 関数は services のみ許可。snake/camel 変換は service 境界で行う。
 
 ### imports/hooks-boundary (next)
@@ -189,7 +189,7 @@
 - Messages:
   - hooks は queries を直接 import 不可。entries 経由で使う。
   - hooks は services を直接 import 不可。entries 経由で使う。
-  - lib/* は queries からのみ import 可。他層は queries 経由で使う。
+  - lib/* は queries からのみ import 可 (lib/**/utils.ts の純粋ヘルパーは全層から可)。他層は queries 経由で使う。
   - mapping 関数は services のみ許可。snake/camel 変換は service 境界で行う。
 
 ### imports/page-boundary (next)
@@ -198,7 +198,7 @@
 - Messages:
   - page.tsx は queries を直接 import 不可。entries 経由で使う。
   - page.tsx は services を直接 import 不可。entries 経由で使う。
-  - lib/* は queries からのみ import 可。他層は queries 経由で使う。
+  - lib/* は queries からのみ import 可 (lib/**/utils.ts の純粋ヘルパーは全層から可)。他層は queries 経由で使う。
   - mapping 関数は services のみ許可。snake/camel 変換は service 境界で行う。
 
 ### imports/route-boundary (next)
@@ -207,7 +207,7 @@
 - Messages:
   - route.ts は queries を直接 import 不可。entries 経由で使う。
   - route.ts は services を直接 import 不可。entries 経由で使う。
-  - lib/* は queries からのみ import 可。他層は queries 経由で使う。
+  - lib/* は queries からのみ import 可 (lib/**/utils.ts の純粋ヘルパーは全層から可)。他層は queries 経由で使う。
   - mapping 関数は services のみ許可。snake/camel 変換は service 境界で行う。
 
 ### imports/sitemap-boundary (next)
@@ -216,7 +216,7 @@
 - Messages:
   - sitemap.ts は queries を直接 import 不可。entries 経由で使う。
   - sitemap.ts は services を直接 import 不可。entries 経由で使う。
-  - lib/* は queries からのみ import 可。他層は queries 経由で使う。
+  - lib/* は queries からのみ import 可 (lib/**/utils.ts の純粋ヘルパーは全層から可)。他層は queries 経由で使う。
   - mapping 関数は services のみ許可。snake/camel 変換は service 境界で行う。
 
 ## P3 ファイル名規則
