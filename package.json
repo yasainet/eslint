@@ -36,7 +36,8 @@
     "access": "public"
   },
   "scripts": {
-    "docs": "node scripts/generate-rules-catalog.mjs"
+    "docs": "node scripts/generate-rules-catalog.mjs",
+    "check": "node scripts/check-layer-selectors.mjs"
   },
   "dependencies": {
     "@stylistic/eslint-plugin": "^5.9.0",
@@ -46,6 +47,10 @@
     "eslint-plugin-simple-import-sort": "^12.1.1"
   },
   "peerDependencies": {
+    "eslint": "^9",
+    "typescript-eslint": "^8"
+  },
+  "devDependencies": {
     "eslint": "^9",
     "typescript-eslint": "^8"
   }

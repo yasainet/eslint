@@ -18,6 +18,7 @@ ESLint flat config used across @yasainet's Next.js / Node.js / Supabase Edge Fun
 ## Commands
 
 - 依存インストール: `npm install`
+- Layer selector 回帰チェック: `npm run check` (queries/services の no-restricted-syntax が logger に上書きされていないか検証 / publish CI でも実行)
 - Rules catalog 再生成: `npm run docs` (`docs/rules.md` を上書き / 手動編集禁止)
 - Release (patch): `/bump` skill (patch tag を作成 → push → CI が npm publish)
 - Release (minor / major): 手動で tag 作成 (`git tag v1.1.0 && git push --tags`)

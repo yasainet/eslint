@@ -31,6 +31,9 @@ export function createCommonConfigs(
     ...createTypescriptConfigs({ typeAware, ...(rulesFiles && { files: rulesFiles }) }),
     ...createFeatureNameConfigs(ctx),
     ...createNamespaceImportConfigs(ctx),
+    // logger は features/**\/*.ts 全体に no-restricted-syntax を設定するため、
+    // 同 rule を持つ services/queries より前に置く (flat config は後勝ちで完全置換)。
+    ...createLoggerConfigs(ctx),
     ...createServicesConfigs(ctx),
     ...createQueriesConfigs(ctx),
     ...createFormStateConfigs(ctx),
@@ -44,7 +47,6 @@ export function createCommonConfigs(
     ...createEntriesConfigs(ctx),
     ...createFeaturesTsOnlyConfigs(ctx),
     ...createNoColocatedTestConfigs(ctx),
-    ...createLoggerConfigs(ctx),
     ...createNoAnyReturnConfigs(ctx),
     ...createFeatureDefaultImportsConfigs(ctx),
     ...createJsdocConfigs(ctx),
