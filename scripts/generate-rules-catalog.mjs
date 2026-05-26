@@ -74,6 +74,8 @@ const RULE_PRINCIPLE = {
   "imports/entries/client": "P1",
   "imports/entries/admin": "P1",
   "imports/lib-boundary": "P1",
+  "imports/top-level-lib": "P1",
+  "imports/top-level-lib-utils": "P1",
   "imports/utils": "P1",
   "imports/feature-other": "P1",
   "imports/feature-types": "P1",

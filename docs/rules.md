@@ -14,7 +14,7 @@
 
 | # | 原則 | ルール数 |
 | --- | --- | --- |
-| P1 | import 規律 | 15 |
+| P1 | import 規律 | 17 |
 | P2 | boundary は entries 経由 | 6 |
 | P3 | ファイル名規則 | 19 |
 | P4 | 命名・型規約 | 4 |
@@ -142,6 +142,19 @@
   - services は hooks を import 不可。依存は単方向に保つ。
   - 他 feature の services は import 不可。feature を跨ぐ依存は禁止。
   - lib/* は queries からのみ import 可 (lib/**/utils.ts の純粋ヘルパーは全層から可)。他層は queries 経由で使う。
+
+### imports/top-level-lib (全 entry)
+
+- Target: files: `src/lib/**/*.ts`
+- Messages:
+  - lib は app 内部 (@/features 等) を import 不可。lib は最下層の API 橋渡し。外部 SDK と @/lib/** のみ依存可。
+
+### imports/top-level-lib-utils (全 entry)
+
+- Target: files: `src/lib/**/utils.ts`
+- Messages:
+  - lib は app 内部 (@/features 等) を import 不可。lib は最下層の API 橋渡し。外部 SDK と @/lib/** のみ依存可。
+  - lib/**/utils.ts は純粋ヘルパー。client/index は import 不可、@/lib/**/types のみ可。
 
 ### imports/utils (全 entry)
 
