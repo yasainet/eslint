@@ -559,7 +559,7 @@ layer ごとに禁止構文 (try / throw / loop / logger 等) と Supabase 型�
 
 ### jsdoc (全 entry)
 
-- Target: files: `src/features/**/queries/*.ts`, `src/features/**/services*/*.ts`, `src/features/**/utils*/*.ts`
+- Target: files: `src/features/**/queries/*.ts`, `src/features/**/services*/*.ts`
 - Messages:
   - [`jsdoc/require-jsdoc`](https://github.com/gajus/eslint-plugin-jsdoc/blob/main/docs/rules/require-jsdoc.md)
   - [`jsdoc/require-description`](https://github.com/gajus/eslint-plugin-jsdoc/blob/main/docs/rules/require-description.md)
