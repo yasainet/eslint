@@ -137,6 +137,7 @@ const RULE_PRINCIPLE = {
   "tailwindcss/rules": "P8",
   "layouts/main-structural-only": "P8",
   "test/no-colocated-test": "P9",
+  "test/unit-no-wiring-import": "P9",
   "rules/ignore-shadcn-ui": "OTHER",
 };
 

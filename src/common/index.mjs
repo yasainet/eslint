@@ -11,6 +11,7 @@ import { createNamespaceImportConfigs } from "./cross-cutting/namespace-import.m
 import { createNoAnyReturnConfigs } from "./cross-cutting/no-any-return.mjs";
 import { createNoColocatedTestConfigs } from "./cross-cutting/no-colocated-test.mjs";
 import { createSupabaseColumnsSatisfiesConfigs } from "./cross-cutting/supabase-columns-satisfies.mjs";
+import { createTestsConfigs } from "./cross-cutting/tests.mjs";
 import { createConstantsConfigs } from "./layers/constants.mjs";
 import { createEntriesConfigs } from "./layers/entries.mjs";
 import { createTopLevelLibConfigs } from "./layers/top-level/lib.mjs";
@@ -47,6 +48,8 @@ export function createCommonConfigs(
     ...createEntriesConfigs(ctx),
     ...createFeaturesTsOnlyConfigs(ctx),
     ...createNoColocatedTestConfigs(ctx),
+    // createUtilsConfigs より後に置き、test.ts への配線 import 禁止を後勝ちにする。
+    ...createTestsConfigs(ctx),
     ...createNoAnyReturnConfigs(ctx),
     ...createFeatureDefaultImportsConfigs(ctx),
     ...createJsdocConfigs(ctx),
