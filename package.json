@@ -36,7 +36,6 @@
     "access": "public"
   },
   "scripts": {
-    "docs": "node scripts/generate-rules-catalog.mjs",
     "check": "node scripts/check-layer-selectors.mjs"
   },
   "dependencies": {
