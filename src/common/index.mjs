@@ -5,7 +5,6 @@ import { createFeatureDefaultImportsConfigs } from "./cross-cutting/feature-defa
 import { createFeatureNameConfigs } from "./cross-cutting/feature-name.mjs";
 import { createFeaturesTsOnlyConfigs } from "./cross-cutting/features-ts-only.mjs";
 import { createFormStateConfigs } from "./cross-cutting/form-state.mjs";
-import { createJsdocConfigs } from "./cross-cutting/jsdoc.mjs";
 import { createLoggerConfigs } from "./cross-cutting/logger.mjs";
 import { createNamespaceImportConfigs } from "./cross-cutting/namespace-import.mjs";
 import { createNoAnyReturnConfigs } from "./cross-cutting/no-any-return.mjs";
@@ -52,7 +51,6 @@ export function createCommonConfigs(
     ...createTestsConfigs(ctx),
     ...createNoAnyReturnConfigs(ctx),
     ...createFeatureDefaultImportsConfigs(ctx),
-    ...createJsdocConfigs(ctx),
     ...(banAliasImports ? createBanAliasConfigs(ctx) : []),
   ];
 }

@@ -7,7 +7,7 @@
 - `boundaries/<surface>.mjs` — 外界 → features の入口で enforce する契約
 - `cross-cutting/` — 複数 layer に跨る規約
   - 例 (naming): feature-name / namespace-import / form-state
-  - 例 (rule): logger / jsdoc / no-any-return / supabase-columns-satisfies
+  - 例 (rule): logger / no-any-return / supabase-columns-satisfies
 - `layers/<layer>.mjs` — features 内部の階層単位
   - 種類: queries / services / entries / utils / constants / schemas / types
   - 1 layer の全制約 (naming + syntax + imports + local rules) を 1 file に集約
