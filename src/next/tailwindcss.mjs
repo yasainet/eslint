@@ -40,9 +40,9 @@ export const tailwindcssConfigs = [
         {
           restrict: [
             {
-              pattern: "^(?!mx-auto$)m[trblxy]?-(?!auto$)[^-\\s]+$",
+              pattern: "^-?m[tby]?-(?!auto$)[^-\\s]+$",
               message:
-                "margin を避け、padding/gap で間隔を制御する (例外: mx-auto, -mt-*)",
+                "block 方向の margin (m-*, mt-*, mb-*, my-*) を避け、padding/gap で間隔を制御する (margin collapse 回避)。横方向 (mx-*, ml-*, mr-*) は許可",
             },
             {
               pattern: "^space-[xy]-[^-\\s]+$",
