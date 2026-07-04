@@ -1,25 +1,16 @@
 import { existsSync } from "node:fs";
-import { dirname, join, sep } from "node:path";
+import { join } from "node:path";
 
 import tseslint from "typescript-eslint";
 
+import { findUp } from "../_internal/find-up.mjs";
 import { simpleImportSortPlugin, stylistic } from "../_internal/plugins.mjs";
 
-const findProjectRoot = (start) => {
-  let dir = start;
-  while (dir !== dirname(dir)) {
-    if (
-      !dir.split(sep).includes("node_modules") &&
-      existsSync(join(dir, "tsconfig.json"))
-    ) {
-      return dir;
-    }
-    dir = dirname(dir);
-  }
-  return process.cwd();
-};
-
-const projectRoot = findProjectRoot(import.meta.dirname);
+const projectRoot = findUp(
+  import.meta.dirname,
+  (dir) => (existsSync(join(dir, "tsconfig.json")) ? dir : null),
+  process.cwd(),
+);
 
 const sharedRulesConfig = {
   name: "rules/shared",

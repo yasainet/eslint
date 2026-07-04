@@ -1,24 +1,13 @@
 import fs from "fs";
 import path from "path";
-import { fileURLToPath } from "url";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+import { findUp } from "./find-up.mjs";
 
-function findProjectRoot() {
-  let dir = __dirname;
-  while (dir !== path.dirname(dir)) {
-    if (
-      fs.existsSync(path.join(dir, "package.json")) &&
-      !dir.includes("/node_modules/")
-    ) {
-      return dir;
-    }
-    dir = path.dirname(dir);
-  }
-  return process.cwd();
-}
-
-const PROJECT_ROOT = findProjectRoot();
+const PROJECT_ROOT = findUp(
+  import.meta.dirname,
+  (dir) => (fs.existsSync(path.join(dir, "package.json")) ? dir : null),
+  process.cwd(),
+);
 
 const EXCLUDE_LIST = ["types.ts", "proxy.ts", "utils.ts"];
 

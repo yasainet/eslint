@@ -1,23 +1,18 @@
 import { existsSync } from "node:fs";
-import { dirname, join, sep } from "node:path";
+import { join } from "node:path";
 
 import betterTailwindcss from "eslint-plugin-better-tailwindcss";
 
-const findEntryPoint = (start) => {
-  let dir = start;
-  while (dir !== dirname(dir)) {
-    if (!dir.split(sep).includes("node_modules")) {
-      const candidate = join(dir, "src/app/globals.css");
-      if (existsSync(candidate)) {
-        return candidate;
-      }
-    }
-    dir = dirname(dir);
-  }
-  return "src/app/globals.css";
-};
+import { findUp } from "../common/_internal/find-up.mjs";
 
-const entryPoint = findEntryPoint(import.meta.dirname);
+const entryPoint = findUp(
+  import.meta.dirname,
+  (dir) => {
+    const candidate = join(dir, "src/app/globals.css");
+    return existsSync(candidate) ? candidate : null;
+  },
+  "src/app/globals.css",
+);
 
 export const tailwindcssConfigs = [
   {
