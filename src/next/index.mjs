@@ -1,12 +1,8 @@
 import { createEntryPointConfigs } from "../common/boundaries/entry-point.mjs";
 import { createCommonConfigs } from "../common/index.mjs";
 
-import { componentsBoundaryConfigs } from "./boundaries/components.mjs";
-import { hooksBoundaryConfigs } from "./boundaries/hooks.mjs";
+import { calleeBoundaryConfigs } from "./boundaries/callee-boundaries.mjs";
 import { libBoundaryConfigs } from "./boundaries/lib.mjs";
-import { pageBoundaryConfigs } from "./boundaries/page.mjs";
-import { routeBoundaryConfigs } from "./boundaries/route.mjs";
-import { sitemapBoundaryConfigs } from "./boundaries/sitemap.mjs";
 import { directivesConfigs } from "./directives.mjs";
 import { importPathStyleConfigs } from "./imports.mjs";
 import { componentsLayerConfigs } from "./layers/components.mjs";
@@ -25,11 +21,7 @@ export const eslintConfig = [
   },
   ...createCommonConfigs("src/features"),
   ...libBoundaryConfigs,
-  ...pageBoundaryConfigs,
-  ...routeBoundaryConfigs,
-  ...sitemapBoundaryConfigs,
-  ...hooksBoundaryConfigs,
-  ...componentsBoundaryConfigs,
+  ...calleeBoundaryConfigs,
   ...hooksLayerConfigs,
   ...componentsLayerConfigs,
   ...directivesConfigs,
