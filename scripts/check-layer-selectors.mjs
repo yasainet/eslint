@@ -41,7 +41,8 @@ const failures = [];
 async function selectorsFor(eslint, file) {
   const cfg = await eslint.calculateConfigForFile(file);
   const nrs = cfg.rules?.["no-restricted-syntax"];
-  return Array.isArray(nrs) ? nrs.slice(1).map((o) => o.selector) : [];
+  if (!Array.isArray(nrs)) return [];
+  return nrs.slice(1).flatMap((o) => o.selector.split(",").map((s) => s.trim()));
 }
 
 function expect(label, file, actual, required) {

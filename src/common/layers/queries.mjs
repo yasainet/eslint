@@ -112,27 +112,8 @@ export function createQueriesConfigs({ featureRoot, prefixLibMapping }) {
               "queries で if 文は禁止。条件分岐は services に置く。",
           },
           {
-            selector: "ForStatement",
-            message:
-              "queries でループは禁止。queries は薄い CRUD ラッパー、反復は services に置く。",
-          },
-          {
-            selector: "ForOfStatement",
-            message:
-              "queries でループは禁止。queries は薄い CRUD ラッパー、反復は services に置く。",
-          },
-          {
-            selector: "ForInStatement",
-            message:
-              "queries でループは禁止。queries は薄い CRUD ラッパー、反復は services に置く。",
-          },
-          {
-            selector: "WhileStatement",
-            message:
-              "queries でループは禁止。queries は薄い CRUD ラッパー、反復は services に置く。",
-          },
-          {
-            selector: "DoWhileStatement",
+            selector:
+              "ForStatement, ForOfStatement, ForInStatement, WhileStatement, DoWhileStatement",
             message:
               "queries でループは禁止。queries は薄い CRUD ラッパー、反復は services に置く。",
           },
