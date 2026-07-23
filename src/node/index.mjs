@@ -5,7 +5,9 @@ const nodeEntryPointConfigs = createEntryPointConfigs(
   ["scripts/commands/*.ts"],
 );
 
-export const eslintConfig = [
+const yasainetConfig = [
   ...createCommonConfigs("scripts/features", { banAliasImports: true }),
   ...nodeEntryPointConfigs,
 ];
+
+export default yasainetConfig;

@@ -8,9 +8,9 @@
  */
 import { ESLint } from "eslint";
 
-import { eslintConfig as denoConfig } from "../src/deno/index.mjs";
-import { eslintConfig as nextConfig } from "../src/next/index.mjs";
-import { eslintConfig as nodeConfig } from "../src/node/index.mjs";
+import denoConfig from "../src/deno/index.mjs";
+import nextConfig from "../src/next/index.mjs";
+import nodeConfig from "../src/node/index.mjs";
 
 const QUERIES_REQUIRED = [
   "TryStatement",

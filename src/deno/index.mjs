@@ -12,7 +12,7 @@ const denoNamespaceImportConfigs = createEntryPointConfigs(
   ["supabase/functions/_*/**"],
 );
 
-export const eslintConfig = [
+const yasainetConfig = [
   ...createCommonConfigs(FEATURE_ROOT, {
     banAliasImports: true,
     typeAware: false,
@@ -23,3 +23,5 @@ export const eslintConfig = [
   ...denoUtilsBoundaryConfigs,
   ...denoNamespaceImportConfigs,
 ];
+
+export default yasainetConfig;

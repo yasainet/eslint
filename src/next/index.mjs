@@ -14,7 +14,7 @@ const nextEntryPointConfigs = createEntryPointConfigs(
   ["src/app/**/*.ts", "src/app/**/*.tsx"],
 );
 
-export const eslintConfig = [
+const yasainetConfig = [
   {
     name: "rules/ignore-shadcn-ui",
     ignores: ["src/components/shared/ui/*.{ts,tsx}"],
@@ -30,3 +30,5 @@ export const eslintConfig = [
   ...tailwindcssConfigs,
   ...nextEntryPointConfigs,
 ];
+
+export default yasainetConfig;

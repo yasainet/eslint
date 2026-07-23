@@ -1,3 +1,5 @@
 import type { Linter } from "eslint";
 
-export declare const eslintConfig: Linter.Config[];
+declare const yasainetConfig: Linter.Config[];
+
+export default yasainetConfig;
