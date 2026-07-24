@@ -1,11 +1,18 @@
 /**
- * next/node の TypeScript 系 rule (no-console 等) が、entry root 外の
+ * next/node/deno の TypeScript 系 rule (no-console 等) が、entry root 外の
  * ファイルに適用されていないことを検証する回帰ガード。
  *
  * createCommonConfigs(featureRoot, { rulesFiles }) の rulesFiles を渡し忘れると、
  * createTypescriptConfigs() の files がデフォルト ["**\/*.ts", "**\/*.tsx"] のままになり、
  * リポジトリ全体の .ts/.tsx が対象になってしまう
  * (例: next 単体利用時に scripts/*.ts にも no-console が適用される)。
+ *
+ * rules/shared (no-console 等) 自体は files を持つが、consumer は実際には
+ * @yasainet/eslint を eslint-config-next 等の他 preset と同じ flat config 配列に
+ * 合成して使う (docs/setup.md 参照)。他 preset 側が repo 全体にマッチする
+ * files (例: eslint-config-next/typescript の "**\/*.ts" 相当) を持つ config object を
+ * 持ち込むと、rules/shared に files が無ければそちら側の scope に相乗りして
+ * 漏れが再現する。FOREIGN_BROAD_TS_CONFIG はその状況を模した synthetic object。
  */
 import { ESLint } from "eslint";
 
@@ -34,6 +41,14 @@ const entries = [
   },
 ];
 
+// eslint-config-next/typescript の typescript-eslint/eslint-recommended 相当
+// (repo 全体の .ts/.tsx にマッチする、consumer が持ち込む foreign preset の模擬)。
+const FOREIGN_BROAD_TS_CONFIG = {
+  name: "foreign/broad-ts",
+  files: ["**/*.ts", "**/*.tsx"],
+  rules: {},
+};
+
 const cwd = new URL("..", import.meta.url).pathname;
 const failures = [];
 
@@ -60,6 +75,23 @@ for (const { name, config, inScope, outOfScope } of entries) {
   if (outOfScopeRule !== undefined) {
     failures.push(
       `[${name}] ${outOfScope}\n  expected no-console to be unconfigured (outside rulesFiles scope), got: ${JSON.stringify(outOfScopeRule)}`,
+    );
+  }
+
+  // consumer が foreign preset (eslint-config-next 等) と合成しても、
+  // rules/shared が foreign 側の広域 files に相乗りしないことを確認する。
+  const combinedEslint = new ESLint({
+    cwd,
+    overrideConfigFile: true,
+    overrideConfig: [FOREIGN_BROAD_TS_CONFIG, ...config],
+  });
+  const combinedOutOfScopeRule = await noConsoleRuleFor(
+    combinedEslint,
+    outOfScope,
+  );
+  if (combinedOutOfScopeRule !== undefined) {
+    failures.push(
+      `[${name}+foreign] ${outOfScope}\n  expected no-console to be unconfigured even when combined with a foreign broad-ts config, got: ${JSON.stringify(combinedOutOfScopeRule)}`,
     );
   }
 }

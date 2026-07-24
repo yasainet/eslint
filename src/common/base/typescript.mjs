@@ -12,41 +12,44 @@ const projectRoot = findUp(
   process.cwd(),
 );
 
-const sharedRulesConfig = {
-  name: "rules/shared",
-  plugins: {
-    "@stylistic": stylistic,
-    "simple-import-sort": simpleImportSortPlugin,
-  },
-  rules: {
-    "no-console": "warn",
+function createSharedRulesConfig(files) {
+  return {
+    name: "rules/shared",
+    files,
+    plugins: {
+      "@stylistic": stylistic,
+      "simple-import-sort": simpleImportSortPlugin,
+    },
+    rules: {
+      "no-console": "warn",
 
-    "no-irregular-whitespace": [
-      "warn",
-      {
-        skipStrings: false,
-        skipComments: false,
-        skipRegExps: false,
-        skipTemplates: false,
-      },
-    ],
-    "no-unreachable": "error",
-    "no-constant-condition": "error",
-    "no-constant-binary-expression": "error",
-    "no-dupe-else-if": "error",
-    "no-self-assign": "error",
-    "no-useless-catch": "error",
-    "no-fallthrough": "error",
+      "no-irregular-whitespace": [
+        "warn",
+        {
+          skipStrings: false,
+          skipComments: false,
+          skipRegExps: false,
+          skipTemplates: false,
+        },
+      ],
+      "no-unreachable": "error",
+      "no-constant-condition": "error",
+      "no-constant-binary-expression": "error",
+      "no-dupe-else-if": "error",
+      "no-self-assign": "error",
+      "no-useless-catch": "error",
+      "no-fallthrough": "error",
 
-    "no-unreachable-loop": "error",
-    "no-useless-return": "error",
-    "no-self-compare": "error",
+      "no-unreachable-loop": "error",
+      "no-useless-return": "error",
+      "no-self-compare": "error",
 
-    "simple-import-sort/imports": "warn",
-    "simple-import-sort/exports": "warn",
-    "@stylistic/quotes": ["warn", "double", { avoidEscape: true }],
-  },
-};
+      "simple-import-sort/imports": "warn",
+      "simple-import-sort/exports": "warn",
+      "@stylistic/quotes": ["warn", "double", { avoidEscape: true }],
+    },
+  };
+}
 
 const syntacticTypeScriptRules = {
   "@typescript-eslint/no-unused-vars": [
@@ -86,7 +89,7 @@ export function createTypescriptConfigs({
   files = ["**/*.ts", "**/*.tsx"],
 } = {}) {
   return [
-    sharedRulesConfig,
+    createSharedRulesConfig(files),
     {
       name: "rules/typescript",
       files,
