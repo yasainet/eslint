@@ -36,7 +36,7 @@
     "access": "public"
   },
   "scripts": {
-    "check": "node scripts/check-layer-selectors.mjs"
+    "check": "node scripts/check-layer-selectors.mjs && node scripts/check-rule-scoping.mjs"
   },
   "dependencies": {
     "@stylistic/eslint-plugin": "^5.9.0",

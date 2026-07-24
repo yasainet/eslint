@@ -6,7 +6,10 @@ const nodeEntryPointConfigs = createEntryPointConfigs(
 );
 
 const yasainetConfig = [
-  ...createCommonConfigs("scripts/features", { banAliasImports: true }),
+  ...createCommonConfigs("scripts/features", {
+    banAliasImports: true,
+    rulesFiles: ["scripts/**/*.ts"],
+  }),
   ...nodeEntryPointConfigs,
 ];
 

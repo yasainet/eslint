@@ -19,7 +19,9 @@ const yasainetConfig = [
     name: "rules/ignore-shadcn-ui",
     ignores: ["src/components/shared/ui/*.{ts,tsx}"],
   },
-  ...createCommonConfigs("src/features"),
+  ...createCommonConfigs("src/features", {
+    rulesFiles: ["src/**/*.ts", "src/**/*.tsx"],
+  }),
   ...libBoundaryConfigs,
   ...calleeBoundaryConfigs,
   ...hooksLayerConfigs,
