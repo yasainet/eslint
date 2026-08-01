@@ -2,6 +2,10 @@
   "name": "@yasainet/eslint",
   "version": "0.0.0",
   "description": "ESLint",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yasainet/eslint.git"
+  },
   "type": "module",
   "exports": {
     "./next": {
