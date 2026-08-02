@@ -1,6 +1,39 @@
 const CATCH_RETURN_MESSAGE = "An unexpected error occurred";
 const TERMINAL_CALLEES = new Set(["redirect", "permanentRedirect", "notFound"]);
 
+/**
+ * log より前に置くことを許す文 (prologue)。
+ * どちらも framework の要請で log より前でなければ意味を成さない。
+ *
+ * - connection(): prerender と request 時の境界を宣言する。
+ *   logger が timestamp に Date.now() を使うため、これより後ろに置くと
+ *   Cache Components の prerender が "current time" として弾く
+ * - unstable_rethrow(): Next.js の内部例外 (redirect / notFound / dynamic 検出) を
+ *   素通しする。これより後ろに置くと制御用の例外を error として log してしまう
+ */
+const TRY_PROLOGUE_CALLEES = new Set(["connection"]);
+const CATCH_PROLOGUE_CALLEES = new Set(["unstable_rethrow"]);
+
+function isPrologueStatement(stmt, callees) {
+  if (stmt?.type !== "ExpressionStatement") return false;
+  const expr =
+    stmt.expression.type === "AwaitExpression"
+      ? stmt.expression.argument
+      : stmt.expression;
+  if (expr?.type !== "CallExpression") return false;
+  const callee = expr.callee;
+  return callee.type === "Identifier" && callees.has(callee.name);
+}
+
+/** prologue を読み飛ばし、log があるべき位置の index を返す。 */
+function firstNonPrologueIndex(body, callees) {
+  let index = 0;
+  while (index < body.length && isPrologueStatement(body[index], callees)) {
+    index++;
+  }
+  return index;
+}
+
 const REDACT_PARAM_NAMES = new Set([
   "password",
   "newPassword",
@@ -279,10 +312,11 @@ function checkTryBlock(context, tryBlock, funcName, inputArgNames, options) {
     return;
   }
 
-  const first = tryBlock.body[0];
+  const startIndex = firstNonPrologueIndex(tryBlock.body, TRY_PROLOGUE_CALLEES);
+  const first = tryBlock.body[startIndex];
   if (!isExpressionStatementWithLoggerCall(first, "info")) {
     context.report({
-      node: first,
+      node: first ?? tryBlock,
       messageId: "tryMissingStartLog",
       data: { funcName },
     });
@@ -432,10 +466,11 @@ function checkCatchClause(context, handler, funcName, inputArgNames) {
     });
     return;
   }
-  const first = block.body[0];
+  const startIndex = firstNonPrologueIndex(block.body, CATCH_PROLOGUE_CALLEES);
+  const first = block.body[startIndex];
   if (!isExpressionStatementWithLoggerCall(first, "error")) {
     context.report({
-      node: first,
+      node: first ?? block,
       messageId: "catchMissingErrorLog",
       data: { funcName },
     });
