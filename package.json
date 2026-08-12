@@ -13,9 +13,6 @@
       "default": "./src/next/index.mjs"
     }
   },
-  "bin": {
-    "test-audit": "./src/cli/test-audit.mjs"
-  },
   "files": [
     "src"
   ],

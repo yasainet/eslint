@@ -12,7 +12,6 @@ ESLint flat config used across @yasainet's Next.js projects.
 
 - ESLint 9 flat config / ESM only (`.mjs`) / no build step / no test framework
 - 検証は consuming project で `npm pack` して動作確認する (`npm link` 禁止)
-- 新規 rule の置き場所判断は `src/common/CLAUDE.md` / `src/next/CLAUDE.md` を参照
 - 規約の詳細 (命名 / import 制約等) は ESLint error message と各 rule file の JSDoc を一次ソースとする
 
 ## Commands
