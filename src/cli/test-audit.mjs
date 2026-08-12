@@ -2,15 +2,6 @@
 import fs from "node:fs";
 import path from "node:path";
 
-// pure layer (schemas / utils) の unit test presence と、entries を持つ feature の
-// e2e presence を機械チェックする:
-//
-// - unit: 各 source に 兄弟 *.test.ts が存在するか、`@unit-exempt:` marker を持つことを要求
-//   - schemas は定義上 pure。utils は impure 混在のため marker で opt-out できる
-// - e2e: entries/ を持つ feature ごとに tests/e2e/<feature>/*.spec.ts の存在を要求
-//   - 配線 (entries) は unit でなく e2e で疎通を担保する方針の存在チェック
-// - ESLint の per-file モデルと噛み合わない「存在強制」を全ツリー一括監査で担う
-
 const REQUIRE_DIRS = new Set(["schemas", "utils"]);
 const EXEMPT_RE = /@unit-exempt:/;
 const E2E_ROOT = "tests/e2e";
@@ -63,7 +54,6 @@ function auditUnit(projectRoot, featuresDir) {
   return violations.sort();
 }
 
-/** entries/ を持つ feature ごとに対応する e2e spec の不在を列挙する */
 function auditE2e(projectRoot, featureRoot, featuresDir) {
   if (!fs.existsSync(featuresDir)) {
     return [];
@@ -74,7 +64,9 @@ function auditE2e(projectRoot, featureRoot, featuresDir) {
       continue;
     }
     const feature = entry.name;
-    const hasEntries = fs.existsSync(path.join(featuresDir, feature, "entries"));
+    const hasEntries = fs.existsSync(
+      path.join(featuresDir, feature, "entries"),
+    );
     if (!hasEntries) {
       continue;
     }

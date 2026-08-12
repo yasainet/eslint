@@ -1,7 +1,6 @@
 import { localPlugin } from "../local-plugins/index.mjs";
 
-export function createNoAnyReturnConfigs({ featureRoot, typeAware }) {
-  if (!typeAware) return [];
+export function createNoAnyReturnConfigs({ featureRoot }) {
   return [
     {
       name: "layers/no-any-return",

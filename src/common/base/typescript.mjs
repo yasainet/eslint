@@ -80,31 +80,24 @@ const typeAwareTypeScriptRules = {
   "@typescript-eslint/no-unsafe-return": "error",
 };
 
-const typeAwareRulesOff = Object.fromEntries(
-  Object.keys(typeAwareTypeScriptRules).map((rule) => [rule, "off"]),
-);
+const FILES = ["src/**/*.ts", "src/**/*.tsx"];
 
-export function createTypescriptConfigs({
-  typeAware = true,
-  files = ["**/*.ts", "**/*.tsx"],
-} = {}) {
+export function createTypescriptConfigs() {
   return [
-    createSharedRulesConfig(files),
+    createSharedRulesConfig(FILES),
     {
       name: "rules/typescript",
-      files,
+      files: FILES,
       languageOptions: {
         parser: tseslint.parser,
-        parserOptions: typeAware
-          ? { projectService: true, tsconfigRootDir: projectRoot }
-          : { projectService: false, project: null },
+        parserOptions: { projectService: true, tsconfigRootDir: projectRoot },
       },
       plugins: {
         "@typescript-eslint": tseslint.plugin,
       },
       rules: {
         ...syntacticTypeScriptRules,
-        ...(typeAware ? typeAwareTypeScriptRules : typeAwareRulesOff),
+        ...typeAwareTypeScriptRules,
       },
     },
   ];

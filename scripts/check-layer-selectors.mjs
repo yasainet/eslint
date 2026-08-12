@@ -1,16 +1,6 @@
-/**
- * layers/queries・layers/services の no-restricted-syntax が
- * layers/logger に上書きされていないことを検証する回帰ガード。
- *
- * flat config は同一ファイルにマッチする同一 rule key を後勝ちで完全置換するため、
- * features/**\/*.ts 全体へ no-restricted-syntax を設定する config を
- * queries/services より後ろに足すと制約が消失する (要 logger より前に配置)。
- */
 import { ESLint } from "eslint";
 
-import denoConfig from "../src/deno/index.mjs";
 import nextConfig from "../src/next/index.mjs";
-import nodeConfig from "../src/node/index.mjs";
 
 const QUERIES_REQUIRED = [
   "TryStatement",
@@ -25,15 +15,7 @@ const QUERIES_REQUIRED = [
 const SERVICES_REQUIRED = ["TryStatement", "ThrowStatement"];
 const LOGGER_SELECTOR = "CallExpression[callee.object.name='logger']";
 
-const entries = [
-  { name: "next", config: nextConfig, root: "src/features" },
-  { name: "node", config: nodeConfig, root: "scripts/features" },
-  {
-    name: "deno",
-    config: denoConfig,
-    root: "supabase/functions/_features",
-  },
-];
+const entries = [{ name: "next", config: nextConfig, root: "src/features" }];
 
 const cwd = new URL("..", import.meta.url).pathname;
 const failures = [];
@@ -42,7 +24,9 @@ async function selectorsFor(eslint, file) {
   const cfg = await eslint.calculateConfigForFile(file);
   const nrs = cfg.rules?.["no-restricted-syntax"];
   if (!Array.isArray(nrs)) return [];
-  return nrs.slice(1).flatMap((o) => o.selector.split(",").map((s) => s.trim()));
+  return nrs
+    .slice(1)
+    .flatMap((o) => o.selector.split(",").map((s) => s.trim()));
 }
 
 function expect(label, file, actual, required) {
@@ -84,4 +68,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log("layer selector check passed (next / node / deno).");
+console.log("layer selector check passed (next).");
