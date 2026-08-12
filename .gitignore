@@ -4,6 +4,3 @@ node_modules/
 # Files
 *.local
 .DS_Store
-
-# git worktrees
-/.claude/worktrees

@@ -5,10 +5,6 @@ on:
     tags:
       - "v*"
 
-# Trusted Publishing (OIDC) で publish する。npm token は使わない。
-# id-token: write が OIDC token の発行を許す。これが無いと publish が落ちる。
-# 誰が publish できるかは npm 側の package settings で縛る
-# (repository と workflow filename の一致を見る)。
 permissions:
   id-token: write
   contents: read
@@ -24,8 +20,6 @@ jobs:
           node-version: 24
           registry-url: https://registry.npmjs.org
 
-      # OIDC は npm 11.5.1 以上でしか使えない。
-      # Node 24 に同梱の版が要件を満たすとは限らないので、明示的に上げる。
       - run: npm install -g npm@latest
 
       - run: npm ci
