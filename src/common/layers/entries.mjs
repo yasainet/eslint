@@ -41,32 +41,19 @@ const LATERAL_PATTERNS = [
   },
 ];
 
-const SHARED_SERVICES_NEGATIONS = [
-  "!@/features/shared/services/*",
-  "!@/features/shared/services",
-];
-
 const CARDINALITY_PATTERNS = {
   server: [
     {
-      group: [
-        "**/services/client",
-        "**/services/admin",
-        ...SHARED_SERVICES_NEGATIONS,
-      ],
+      group: ["**/services/client", "**/services/admin"],
       message:
-        "server entry は server service のみ import 可。context を跨ぐ呼び出しは禁止 (`shared/services/*` は例外)。",
+        "server entry は server service のみ import 可。context を跨ぐ呼び出しは禁止。",
     },
   ],
   client: [
     {
-      group: [
-        "**/services/server",
-        "**/services/admin",
-        ...SHARED_SERVICES_NEGATIONS,
-      ],
+      group: ["**/services/server", "**/services/admin"],
       message:
-        "client entry は client service のみ import 可。context を跨ぐ呼び出しは禁止 (`shared/services/*` は例外)。",
+        "client entry は client service のみ import 可。context を跨ぐ呼び出しは禁止。",
     },
   ],
   admin: [
@@ -74,10 +61,10 @@ const CARDINALITY_PATTERNS = {
       group: [
         "**/services/server",
         "**/services/client",
-        ...SHARED_SERVICES_NEGATIONS,
+        "!@/features/shared/services/server",
       ],
       message:
-        "admin entry は admin service のみ import 可。context を跨ぐ呼び出しは禁止 (`shared/services/*` は例外)。",
+        "admin entry は admin service のみ import 可。context を跨ぐ呼び出しは禁止 (認可のための `shared/services/server` は例外)。",
     },
   ],
 };
