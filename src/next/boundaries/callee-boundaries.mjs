@@ -36,6 +36,11 @@ export const calleeBoundaryConfigs = [
     files: ["src/app/**/page.tsx"],
   }),
   createCalleeBoundaryConfig({
+    name: "imports/layout-boundary",
+    surface: "layout.tsx",
+    files: ["src/app/**/layout.tsx"],
+  }),
+  createCalleeBoundaryConfig({
     name: "imports/route-boundary",
     surface: "route.ts",
     files: ["src/app/**/route.ts"],
