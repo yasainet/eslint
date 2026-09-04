@@ -58,13 +58,9 @@ const CARDINALITY_PATTERNS = {
   ],
   admin: [
     {
-      group: [
-        "**/services/server",
-        "**/services/client",
-        "!@/features/shared/services/server",
-      ],
+      group: ["**/services/server", "**/services/client"],
       message:
-        "admin entry は admin service のみ import 可。context を跨ぐ呼び出しは禁止 (認可のための `shared/services/server` は例外)。",
+        "admin entry は admin service のみ import 可。context を跨ぐ呼び出しは禁止。",
     },
   ],
 };
