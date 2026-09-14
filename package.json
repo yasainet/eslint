@@ -28,7 +28,8 @@
     "access": "public"
   },
   "scripts": {
-    "check": "node scripts/check-layer-selectors.mjs && node scripts/check-rule-scoping.mjs"
+    "check": "node scripts/check-layer-selectors.mjs && node scripts/check-rule-scoping.mjs",
+    "lint:md": "markdownlint-cli2 \"**/*.md\" && textlint \"**/*.md\""
   },
   "dependencies": {
     "@stylistic/eslint-plugin": "^5.9.0",
@@ -42,6 +43,10 @@
   },
   "devDependencies": {
     "eslint": "^9",
+    "markdownlint-cli2": "^0.23.2",
+    "textlint": "^15.8.0",
+    "textlint-rule-max-ten": "^5.0.0",
+    "textlint-rule-sentence-length": "^5.2.1",
     "typescript-eslint": "^8"
   }
 }

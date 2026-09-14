@@ -1,5 +1,6 @@
 # Directories
 node_modules/
+.claude/plans/
 
 # Files
 *.local

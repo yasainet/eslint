@@ -2,35 +2,20 @@
 
 ESLint flat config used across @yasainet's Next.js projects.
 
-## Summary
+## Philosophy
 
-- npm package `@yasainet/eslint` のソースコード (next entry を公開)
-- consuming project の Claude Code は ESLint error message から自己修正することを前提に設計
-- 規約の意図を理解したい場合は本ファイル / [docs/philosophy.md](./docs/philosophy.md) / 各 rule file の JSDoc を参照
+このプロジェクトは ESLint を Claude Code の羅針盤とするという思想で設計されている。
 
-## Constraints
+- 人間はファジーに指示する (厳密に指示できるならコードを書いた方が早い)
+- Claude Code はファジーな指示から既存コードベースを参照して実装する
+- しかし人間が意図しないアーキテクチャを採用することも日常茶飯事
+- ESLint で規約を機械的に enforce することで、Claude は error message から再帰的に自己修正する
+- ファジー入力 × 決定論的検証 = 再現性のあるアウトプット
 
-- ESLint 9 flat config / ESM only (`.mjs`) / no build step / no test framework
-- 検証は consuming project で `npm pack` して動作確認する (`npm link` 禁止)
-- 規約の詳細 (命名 / import 制約等) は ESLint error message と各 rule file の JSDoc を一次ソースとする
+人間はプログラミングをするべきではない、という根底思想がある。
+ただしこれは「読めない・書けない人間が LLM に丸投げする」という意味ではない。
 
-## Commands
-
-- 依存インストール: `npm install`
-- 回帰チェック: `npm run check` (queries/services の no-restricted-syntax が logger に上書きされていないか、TypeScript 系 rule が `src/` 外に漏れていないかを検証 / publish CI でも実行)
-- Release (patch): `/bump` skill (patch tag を作成 → push → CI が npm publish)
-- Release (minor / major): 手動で tag 作成 (`git tag v1.1.0 && git push --tags`)
-
-## Verification
-
-Module exports の sanity check:
-
-```bash
-node -e "import('./src/next/index.mjs').then(m => console.log('next:', Object.keys(m)))"
-```
-
-consuming project での動作確認:
-
-1. local pack: `cd ~/Projects/eslint && npm pack --pack-destination /tmp`
-2. tarball install: `cd ~/Projects/<project> && npm install /tmp/yasainet-eslint-*.tgz`
-3. lint 動作確認
+- 人間はコードを徹底的に読めねばならない (だからこそ、読まずに済む構造を設計できる)
+- 人間はコードを徹底的に書けねばならない (だからこそ、書かずに済む規約を enforce できる)
+- 読み書きの極致に至ることで、読まず・書かずを実現できる
+- 人間の仕事は、目的達成のための設計であり、LLM を工業的 / 自律的 / 再帰的に動かすことだ

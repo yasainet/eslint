@@ -1,0 +1,10 @@
+{
+  "rules": {
+    "sentence-length": {
+      "max": 80
+    },
+    "max-ten": {
+      "max": 2
+    }
+  }
+}
