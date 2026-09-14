@@ -36,9 +36,7 @@ export default eslintConfig;
 
 ```sh
 npm run lint:md
-npm run check
 
-# Module exports の sanity check
 node -e "import('./src/next/index.mjs').then(m => console.log('next:', Object.keys(m)))"
 ```
 
