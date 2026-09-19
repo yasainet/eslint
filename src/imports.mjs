@@ -137,4 +137,40 @@ export default [
       ],
     },
   },
+  {
+    name: "imports/schemas",
+    files: ["src/features/*/schemas/*.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              regex: "^@/",
+              message:
+                "schemas cannot import @/. schemas can import only external packages.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    name: "imports/types",
+    files: ["src/features/*/types/*.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              regex: "^@/",
+              message:
+                "types cannot import @/. types can import only external packages.",
+            },
+          ],
+        },
+      ],
+    },
+  },
 ];
