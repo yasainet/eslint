@@ -26,4 +26,15 @@ export default [
       ],
     },
   },
+  {
+    name: "directives/hooks",
+    files: ["src/features/*/hooks/*.ts"],
+    plugins: { yasainet: plugin },
+    rules: {
+      "yasainet/directive": [
+        "error",
+        { layer: "hooks", required: "use client" },
+      ],
+    },
+  },
 ];
