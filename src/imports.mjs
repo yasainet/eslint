@@ -19,9 +19,27 @@ export default [
         {
           patterns: [
             {
-              regex: "^@/(?!lib/|utils/)",
+              regex: "^@/(?!lib/)",
               message:
-                "lib can import only @/lib and @/utils. lib cannot import other layers.",
+                "lib can import only @/lib. lib cannot import other layers.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    name: "imports/queries",
+    files: ["src/features/*/queries/*.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              regex: "^@/(?!lib/)",
+              message:
+                "queries can import only @/lib. queries cannot import other layers.",
             },
           ],
         },
