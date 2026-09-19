@@ -1,0 +1,25 @@
+{
+  "name": "@yasainet/eslint",
+  "version": "0.0.1",
+  "description": "@yasainet/eslint",
+  "main": "src/index.mjs",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yasainet/eslint.git"
+  },
+  "keywords": [],
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/yasainet/eslint/issues"
+  },
+  "homepage": "https://github.com/yasainet/eslint#readme",
+  "dependencies": {
+    "eslint-plugin-check-file": "^3.3.2"
+  }
+}
