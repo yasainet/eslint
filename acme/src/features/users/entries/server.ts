@@ -2,9 +2,12 @@
 
 import { revalidatePath } from "next/cache";
 
-import { updateUsernameSchema } from "../schemas/users";
-import * as usersServerService from "../services/server";
-import type { UpdateUsernameFormState, User } from "../types/users";
+import { updateUsernameSchema } from "@/features/users/schemas/users";
+import * as usersServerService from "@/features/users/services/server";
+import type {
+  UpdateUsernameFormState,
+  User,
+} from "@/features/users/types/users";
 
 export async function getCurrentUser(): Promise<User | null> {
   return usersServerService.getCurrentUser();

@@ -4,8 +4,8 @@ import { useActionState } from "react";
 
 import { Button } from "@/components/ui/button";
 
-import { signIn } from "../entries/server";
-import type { AuthFormState } from "../types/auth";
+import { signIn } from "@/features/auth/entries/server";
+import type { AuthFormState } from "@/features/auth/types/auth";
 
 const initialState: AuthFormState = { error: null };
 
@@ -29,7 +29,9 @@ export function SignInForm() {
       <p aria-live="polite" className="text-sm text-red-600">
         {state.error?.message}
       </p>
-      <Button type="submit" disabled={pending}>Sign in</Button>
+      <Button type="submit" disabled={pending}>
+        Sign in
+      </Button>
     </form>
   );
 }

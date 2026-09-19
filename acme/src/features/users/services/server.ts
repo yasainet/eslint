@@ -1,7 +1,10 @@
 import * as authServerQuery from "@/features/auth/queries/server";
 
-import * as usersServerQuery from "../queries/server";
-import type { UpdateUsernameFormState, User } from "../types/users";
+import * as usersServerQuery from "@/features/users/queries/server";
+import type {
+  UpdateUsernameFormState,
+  User,
+} from "@/features/users/types/users";
 
 // Postgres の unique 制約違反
 const UNIQUE_VIOLATION = "23505";

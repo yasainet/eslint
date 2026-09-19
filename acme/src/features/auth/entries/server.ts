@@ -2,9 +2,9 @@
 
 import { redirect } from "next/navigation";
 
-import { signInSchema, signUpSchema } from "../schemas/auth";
-import * as authServerService from "../services/server";
-import type { AuthFormState, AuthUser } from "../types/auth";
+import { signInSchema, signUpSchema } from "@/features/auth/schemas/auth";
+import * as authServerService from "@/features/auth/services/server";
+import type { AuthFormState, AuthUser } from "@/features/auth/types/auth";
 
 export async function signUp(
   _prevState: AuthFormState,

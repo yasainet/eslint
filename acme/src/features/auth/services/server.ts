@@ -1,11 +1,13 @@
 import type { AuthError } from "@supabase/supabase-js";
 
-import * as authServerQuery from "../queries/server";
-import type { AuthFormState, AuthUser } from "../types/auth";
+import * as authServerQuery from "@/features/auth/queries/server";
+import type { AuthFormState, AuthUser } from "@/features/auth/types/auth";
 
 // 想定内の失敗: Supabase が 4xx で断った (登録済みの email、password 違い、未ログインなど)
 function isRejected(error: AuthError): boolean {
-  return error.status !== undefined && error.status >= 400 && error.status < 500;
+  return (
+    error.status !== undefined && error.status >= 400 && error.status < 500
+  );
 }
 
 export async function signUp(

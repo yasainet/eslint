@@ -4,8 +4,8 @@ import { useActionState } from "react";
 
 import { Button } from "@/components/ui/button";
 
-import { updateUsername } from "../entries/server";
-import type { UpdateUsernameFormState } from "../types/users";
+import { updateUsername } from "@/features/users/entries/server";
+import type { UpdateUsernameFormState } from "@/features/users/types/users";
 
 const initialState: UpdateUsernameFormState = { error: null };
 

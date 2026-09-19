@@ -1,4 +1,14 @@
+import plugin from "./plugin.mjs";
+
 export default [
+  {
+    name: "imports/path",
+    files: ["src/**/*.{ts,tsx}"],
+    plugins: { yasainet: plugin },
+    rules: {
+      "yasainet/no-parent-import": "error",
+    },
+  },
   {
     name: "imports/lib",
     files: ["src/lib/**/*.{ts,tsx}"],

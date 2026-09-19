@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 
-import { signOut } from "../entries/server";
+import { signOut } from "@/features/auth/entries/server";
 
 export function SignOutButton() {
   return (
