@@ -1,16 +1,11 @@
 "use client";
 
-import { useActionState } from "react";
-
 import { Button } from "@/components/ui/button";
 
-import { signIn } from "@/features/auth/entries/server";
-import type { AuthFormState } from "@/features/auth/types/auth";
-
-const initialState: AuthFormState = { error: null };
+import { useSignIn } from "@/features/auth/hooks/use-sign-in";
 
 export function SignInForm() {
-  const [state, formAction, pending] = useActionState(signIn, initialState);
+  const { state, formAction, pending } = useSignIn();
 
   return (
     <form action={formAction} className="flex w-80 flex-col gap-4">

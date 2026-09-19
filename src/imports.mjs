@@ -100,4 +100,22 @@ export default [
       ],
     },
   },
+  {
+    name: "imports/feature-components",
+    files: ["src/features/*/components/*.tsx"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              regex: "^@/(?!components/|features/[^/]+/hooks/)",
+              message:
+                "feature components can import only @/components and hooks. feature components cannot import other layers.",
+            },
+          ],
+        },
+      ],
+    },
+  },
 ];
