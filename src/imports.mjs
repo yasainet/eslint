@@ -118,4 +118,23 @@ export default [
       ],
     },
   },
+  {
+    name: "imports/app",
+    files: ["src/app/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              regex:
+                "^@/(?!components/|utils/|features/[^/]+/(?:components|entries)/)",
+              message:
+                "app can import only @/components, @/utils, feature components and entries. app cannot import other layers.",
+            },
+          ],
+        },
+      ],
+    },
+  },
 ];
