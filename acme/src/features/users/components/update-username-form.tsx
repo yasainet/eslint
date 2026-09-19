@@ -1,19 +1,11 @@
 "use client";
 
-import { useActionState } from "react";
-
 import { Button } from "@/components/ui/button";
 
-import { updateUsername } from "@/features/users/entries/server";
-import type { UpdateUsernameFormState } from "@/features/users/types/users";
-
-const initialState: UpdateUsernameFormState = { error: null };
+import { useUpdateUsername } from "@/features/users/hooks/use-update-username";
 
 export function UpdateUsernameForm({ username }: { username: string }) {
-  const [state, formAction, pending] = useActionState(
-    updateUsername,
-    initialState,
-  );
+  const { state, formAction, pending } = useUpdateUsername();
 
   return (
     <form action={formAction} className="flex w-80 flex-col gap-4">

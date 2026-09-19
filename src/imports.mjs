@@ -82,4 +82,22 @@ export default [
       ],
     },
   },
+  {
+    name: "imports/hooks",
+    files: ["src/features/*/hooks/*.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              regex: "^@/(?!features/[^/]+/entries/)",
+              message:
+                "hooks can import only entries. hooks cannot import other layers.",
+            },
+          ],
+        },
+      ],
+    },
+  },
 ];
