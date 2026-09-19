@@ -1,6 +1,6 @@
 import type { AuthError } from "@supabase/supabase-js";
 
-import * as authServerQuery from "@/features/auth/queries/server";
+import * as authQueriesServer from "@/features/auth/queries/server";
 import type { AuthFormState, AuthUser } from "@/features/auth/types/auth";
 
 // 想定内の失敗: Supabase が 4xx で断った (登録済みの email、password 違い、未ログインなど)
@@ -14,7 +14,7 @@ export async function signUp(
   email: string,
   password: string,
 ): Promise<AuthFormState> {
-  const { error } = await authServerQuery.signUp(email, password);
+  const { error } = await authQueriesServer.signUp(email, password);
 
   if (!error) {
     return { error: null };
@@ -31,7 +31,7 @@ export async function signIn(
   email: string,
   password: string,
 ): Promise<AuthFormState> {
-  const { error } = await authServerQuery.signIn(email, password);
+  const { error } = await authQueriesServer.signIn(email, password);
 
   if (!error) {
     return { error: null };
@@ -44,7 +44,7 @@ export async function signIn(
 }
 
 export async function signOut(): Promise<void> {
-  const { error } = await authServerQuery.signOut();
+  const { error } = await authQueriesServer.signOut();
 
   if (error) {
     throw error;
@@ -52,7 +52,7 @@ export async function signOut(): Promise<void> {
 }
 
 export async function getUser(): Promise<AuthUser | null> {
-  const { data, error } = await authServerQuery.getUser();
+  const { data, error } = await authQueriesServer.getUser();
 
   if (!error) {
     return { id: data.user.id, email: data.user.email ?? null };

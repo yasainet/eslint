@@ -1,6 +1,5 @@
-import * as authServerQuery from "@/features/auth/queries/server";
-
-import * as usersServerQuery from "@/features/users/queries/server";
+import * as authQueriesServer from "@/features/auth/queries/server";
+import * as usersQueriesServer from "@/features/users/queries/server";
 import type {
   UpdateUsernameFormState,
   User,
@@ -10,7 +9,7 @@ import type {
 const UNIQUE_VIOLATION = "23505";
 
 async function getAuthUserId(): Promise<string | null> {
-  const { data, error } = await authServerQuery.getUser();
+  const { data, error } = await authQueriesServer.getUser();
 
   if (!error) {
     return data.user.id;
@@ -29,7 +28,7 @@ export async function getCurrentUser(): Promise<User | null> {
     return null;
   }
 
-  const { data, error } = await usersServerQuery.getUser(id);
+  const { data, error } = await usersQueriesServer.getUser(id);
 
   if (error) {
     throw error;
@@ -46,7 +45,7 @@ export async function updateUsername(
     return { error: { message: "Sign in required" } };
   }
 
-  const { error } = await usersServerQuery.updateUsername(id, username);
+  const { error } = await usersQueriesServer.updateUsername(id, username);
 
   if (!error) {
     return { error: null };

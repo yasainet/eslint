@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 
 import { signInSchema, signUpSchema } from "@/features/auth/schemas/auth";
-import * as authServerService from "@/features/auth/services/server";
+import * as authServicesServer from "@/features/auth/services/server";
 import type { AuthFormState, AuthUser } from "@/features/auth/types/auth";
 
 export async function signUp(
@@ -19,7 +19,7 @@ export async function signUp(
     return { error: { message: parsed.error.issues[0].message } };
   }
 
-  const result = await authServerService.signUp(
+  const result = await authServicesServer.signUp(
     parsed.data.email,
     parsed.data.password,
   );
@@ -44,7 +44,7 @@ export async function signIn(
     return { error: { message: parsed.error.issues[0].message } };
   }
 
-  const result = await authServerService.signIn(
+  const result = await authServicesServer.signIn(
     parsed.data.email,
     parsed.data.password,
   );
@@ -57,11 +57,11 @@ export async function signIn(
 }
 
 export async function signOut(): Promise<void> {
-  await authServerService.signOut();
+  await authServicesServer.signOut();
 
   redirect("/sign-in");
 }
 
 export async function getUser(): Promise<AuthUser | null> {
-  return authServerService.getUser();
+  return authServicesServer.getUser();
 }

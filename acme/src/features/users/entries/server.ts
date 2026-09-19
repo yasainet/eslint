@@ -3,14 +3,14 @@
 import { revalidatePath } from "next/cache";
 
 import { updateUsernameSchema } from "@/features/users/schemas/users";
-import * as usersServerService from "@/features/users/services/server";
+import * as usersServicesServer from "@/features/users/services/server";
 import type {
   UpdateUsernameFormState,
   User,
 } from "@/features/users/types/users";
 
 export async function getCurrentUser(): Promise<User | null> {
-  return usersServerService.getCurrentUser();
+  return usersServicesServer.getCurrentUser();
 }
 
 export async function updateUsername(
@@ -25,7 +25,7 @@ export async function updateUsername(
     return { error: { message: parsed.error.issues[0].message } };
   }
 
-  const result = await usersServerService.updateUsername(parsed.data.username);
+  const result = await usersServicesServer.updateUsername(parsed.data.username);
 
   if (result.error) {
     return result;

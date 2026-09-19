@@ -7,6 +7,7 @@ export default [
     plugins: { yasainet: plugin },
     rules: {
       "yasainet/no-parent-import": "error",
+      "yasainet/namespace-import-name": "error",
     },
   },
   {
