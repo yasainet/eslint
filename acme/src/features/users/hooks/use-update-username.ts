@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 
-import { updateUsername } from "@/features/users/entries/server";
+import { updateUsername } from "@/features/users/actions/server";
 
 export function useUpdateUsername() {
   const [state, formAction, pending] = useActionState(updateUsername, {

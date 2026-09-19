@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { getUserList } from "@/features/users/entries/server";
+import { getUserList } from "@/features/users/loaders/server";
 
 export default async function UsersPage() {
   const users = await getUserList();

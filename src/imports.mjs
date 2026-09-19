@@ -65,8 +65,8 @@ export default [
     },
   },
   {
-    name: "imports/entries",
-    files: ["src/features/*/entries/*.ts"],
+    name: "imports/loaders",
+    files: ["src/features/*/loaders/*.ts"],
     rules: {
       "no-restricted-imports": [
         "error",
@@ -75,7 +75,25 @@ export default [
             {
               regex: "^@/(?!features/[^/]+/services/)",
               message:
-                "entries can import only services. entries cannot import other layers.",
+                "loaders can import only services. loaders cannot import other layers.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    name: "imports/actions",
+    files: ["src/features/*/actions/*.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              regex: "^@/(?!features/[^/]+/services/)",
+              message:
+                "actions can import only services. actions cannot import other layers.",
             },
           ],
         },
@@ -91,9 +109,9 @@ export default [
         {
           patterns: [
             {
-              regex: "^@/(?!features/[^/]+/entries/)",
+              regex: "^@/(?!features/[^/]+/actions/)",
               message:
-                "hooks can import only entries. hooks cannot import other layers.",
+                "hooks can import only actions. hooks cannot import other layers.",
             },
           ],
         },
@@ -128,9 +146,9 @@ export default [
           patterns: [
             {
               regex:
-                "^@/(?!components/|utils/|features/[^/]+/(?:components|entries)/)",
+                "^@/(?!components/|utils/|features/[^/]+/(?:components|loaders)/)",
               message:
-                "app can import only @/components, @/utils, feature components and entries. app cannot import other layers.",
+                "app can import only @/components, @/utils, feature components and loaders. app cannot import other layers.",
             },
           ],
         },

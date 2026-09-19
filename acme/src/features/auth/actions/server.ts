@@ -35,7 +35,3 @@ export async function signOut() {
 
   redirect("/sign-in");
 }
-
-export async function getUser() {
-  return authServicesServer.getUser();
-}

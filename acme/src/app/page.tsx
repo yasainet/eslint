@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { SignOutButton } from "@/features/auth/components/sign-out-button";
 import { UpdateUsernameForm } from "@/features/users/components/update-username-form";
-import { getCurrentUser } from "@/features/users/entries/server";
+import { getCurrentUser } from "@/features/users/loaders/server";
 
 export default async function HomePage() {
   const user = await getCurrentUser();

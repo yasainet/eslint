@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { getUser } from "@/features/users/entries/server";
+import { getUser } from "@/features/users/loaders/server";
 
 export default async function UserPage({
   params,

@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 
-import { signIn } from "@/features/auth/entries/server";
+import { signIn } from "@/features/auth/actions/server";
 
 export function useSignIn() {
   const [state, formAction, pending] = useActionState(signIn, { error: null });
