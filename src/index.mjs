@@ -13,4 +13,18 @@ export default [
       ],
     },
   },
+  {
+    name: "naming/folder",
+    files: ["src/**/*.{ts,tsx}"],
+    plugins: { "check-file": checkFile },
+    rules: {
+      "check-file/folder-naming-convention": [
+        "error",
+        {
+          "src/!(app)/**/": "KEBAB_CASE",
+          "src/app/**/": "NEXT_JS_APP_ROUTER_CASE",
+        },
+      ],
+    },
+  },
 ];
