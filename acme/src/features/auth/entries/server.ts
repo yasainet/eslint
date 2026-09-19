@@ -2,27 +2,13 @@
 
 import { redirect } from "next/navigation";
 
-import { signInSchema, signUpSchema } from "@/features/auth/schemas/auth";
 import * as authServicesServer from "@/features/auth/services/server";
-import type { AuthFormState, AuthUser } from "@/features/auth/types/auth";
 
-export async function signUp(
-  _prevState: AuthFormState,
-  formData: FormData,
-): Promise<AuthFormState> {
-  const parsed = signUpSchema.safeParse({
+export async function signUp(_prevState: unknown, formData: FormData) {
+  const result = await authServicesServer.signUp({
     email: formData.get("email"),
     password: formData.get("password"),
   });
-
-  if (!parsed.success) {
-    return { error: { message: parsed.error.issues[0].message } };
-  }
-
-  const result = await authServicesServer.signUp(
-    parsed.data.email,
-    parsed.data.password,
-  );
 
   if (result.error) {
     return result;
@@ -31,23 +17,11 @@ export async function signUp(
   redirect("/");
 }
 
-export async function signIn(
-  _prevState: AuthFormState,
-  formData: FormData,
-): Promise<AuthFormState> {
-  const parsed = signInSchema.safeParse({
+export async function signIn(_prevState: unknown, formData: FormData) {
+  const result = await authServicesServer.signIn({
     email: formData.get("email"),
     password: formData.get("password"),
   });
-
-  if (!parsed.success) {
-    return { error: { message: parsed.error.issues[0].message } };
-  }
-
-  const result = await authServicesServer.signIn(
-    parsed.data.email,
-    parsed.data.password,
-  );
 
   if (result.error) {
     return result;
@@ -56,12 +30,12 @@ export async function signIn(
   redirect("/");
 }
 
-export async function signOut(): Promise<void> {
+export async function signOut() {
   await authServicesServer.signOut();
 
   redirect("/sign-in");
 }
 
-export async function getUser(): Promise<AuthUser | null> {
+export async function getUser() {
   return authServicesServer.getUser();
 }

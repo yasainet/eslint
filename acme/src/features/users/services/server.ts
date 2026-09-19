@@ -1,5 +1,6 @@
 import * as authQueriesServer from "@/features/auth/queries/server";
 import * as usersQueriesServer from "@/features/users/queries/server";
+import { updateUsernameSchema } from "@/features/users/schemas/users";
 import type {
   UpdateUsernameFormState,
   User,
@@ -38,14 +39,23 @@ export async function getCurrentUser(): Promise<User | null> {
 }
 
 export async function updateUsername(
-  username: string,
+  input: unknown,
 ): Promise<UpdateUsernameFormState> {
+  // 想定内の失敗: 入力が不正
+  const parsed = updateUsernameSchema.safeParse(input);
+  if (!parsed.success) {
+    return { error: { message: parsed.error.issues[0].message } };
+  }
+
   const id = await getAuthUserId();
   if (!id) {
     return { error: { message: "Sign in required" } };
   }
 
-  const { error } = await usersQueriesServer.updateUsername(id, username);
+  const { error } = await usersQueriesServer.updateUsername(
+    id,
+    parsed.data.username,
+  );
 
   if (!error) {
     return { error: null };

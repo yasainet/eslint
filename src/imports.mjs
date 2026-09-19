@@ -55,9 +55,27 @@ export default [
         {
           patterns: [
             {
-              regex: "^@/(?!features/[^/]+/(queries|types)/)",
+              regex: "^@/(?!features/[^/]+/(queries|schemas|types)/)",
               message:
-                "services can import only queries and types. services cannot import other layers.",
+                "services can import only queries, schemas and types. services cannot import other layers.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    name: "imports/entries",
+    files: ["src/features/*/entries/*.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              regex: "^@/(?!features/[^/]+/services/)",
+              message:
+                "entries can import only services. entries cannot import other layers.",
             },
           ],
         },

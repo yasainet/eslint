@@ -1,6 +1,7 @@
 import type { AuthError } from "@supabase/supabase-js";
 
 import * as authQueriesServer from "@/features/auth/queries/server";
+import { signInSchema, signUpSchema } from "@/features/auth/schemas/auth";
 import type { AuthFormState, AuthUser } from "@/features/auth/types/auth";
 
 // 想定内の失敗: Supabase が 4xx で断った (登録済みの email、password 違い、未ログインなど)
@@ -10,11 +11,17 @@ function isRejected(error: AuthError): boolean {
   );
 }
 
-export async function signUp(
-  email: string,
-  password: string,
-): Promise<AuthFormState> {
-  const { error } = await authQueriesServer.signUp(email, password);
+export async function signUp(input: unknown): Promise<AuthFormState> {
+  // 想定内の失敗: 入力が不正
+  const parsed = signUpSchema.safeParse(input);
+  if (!parsed.success) {
+    return { error: { message: parsed.error.issues[0].message } };
+  }
+
+  const { error } = await authQueriesServer.signUp(
+    parsed.data.email,
+    parsed.data.password,
+  );
 
   if (!error) {
     return { error: null };
@@ -27,11 +34,17 @@ export async function signUp(
   throw error;
 }
 
-export async function signIn(
-  email: string,
-  password: string,
-): Promise<AuthFormState> {
-  const { error } = await authQueriesServer.signIn(email, password);
+export async function signIn(input: unknown): Promise<AuthFormState> {
+  // 想定内の失敗: 入力が不正
+  const parsed = signInSchema.safeParse(input);
+  if (!parsed.success) {
+    return { error: { message: parsed.error.issues[0].message } };
+  }
+
+  const { error } = await authQueriesServer.signIn(
+    parsed.data.email,
+    parsed.data.password,
+  );
 
   if (!error) {
     return { error: null };
