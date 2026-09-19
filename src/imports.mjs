@@ -46,4 +46,22 @@ export default [
       ],
     },
   },
+  {
+    name: "imports/services",
+    files: ["src/features/*/services/*.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              regex: "^@/(?!features/[^/]+/(queries|types)/)",
+              message:
+                "services can import only queries and types. services cannot import other layers.",
+            },
+          ],
+        },
+      ],
+    },
+  },
 ];
