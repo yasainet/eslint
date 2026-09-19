@@ -34,9 +34,9 @@ create trigger on_auth_user_created after insert on auth.users for each row exec
 alter table public.users enable row level security;
 
 -- RLS for anon
-create policy "Anon cannot select users" on public.users
+create policy "Anon can select users" on public.users
   for select to anon
-  using (false);
+  using (deleted_at is null);
 
 create policy "Anon cannot insert users" on public.users
   for insert to anon
@@ -51,9 +51,9 @@ create policy "Anon cannot delete users" on public.users
   using (false);
 
 -- RLS for authenticated
-create policy "Authenticated can select own users" on public.users
+create policy "Authenticated can select users" on public.users
   for select to authenticated
-  using ((select auth.uid()) = id and deleted_at is null);
+  using (deleted_at is null);
 
 create policy "Authenticated cannot insert users" on public.users
   for insert to authenticated
@@ -71,5 +71,6 @@ create policy "Authenticated cannot delete users" on public.users
 -- GRANT
 revoke all on table public.users from anon, authenticated;
 revoke execute on function public.handle_new_user() from public, anon, authenticated;
+grant select on table public.users to anon;
 grant select, update on table public.users to authenticated;
 grant all on table public.users to service_role;

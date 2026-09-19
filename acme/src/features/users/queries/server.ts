@@ -15,3 +15,12 @@ export async function updateUsername(id: string, username: string) {
 
   return supabase.from("users").update({ username }).eq("id", id);
 }
+
+export async function getUserList() {
+  const supabase = await createClient();
+
+  return supabase
+    .from("users")
+    .select("id, username")
+    .order("created_at", { ascending: false });
+}

@@ -1,6 +1,9 @@
 import * as authQueriesServer from "@/features/auth/queries/server";
 import * as usersQueriesServer from "@/features/users/queries/server";
-import { updateUsernameSchema } from "@/features/users/schemas/users";
+import {
+  updateUsernameSchema,
+  userIdSchema,
+} from "@/features/users/schemas/users";
 import type {
   UpdateUsernameFormState,
   User,
@@ -30,6 +33,32 @@ export async function getCurrentUser(): Promise<User | null> {
   }
 
   const { data, error } = await usersQueriesServer.getUser(id);
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+}
+
+export async function getUserList(): Promise<User[]> {
+  const { data, error } = await usersQueriesServer.getUserList();
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+}
+
+export async function getUser(input: unknown): Promise<User | null> {
+  // 想定内の失敗: id の形が不正 (URL を手で書き換えたなど)。見つからない扱いにする
+  const parsed = userIdSchema.safeParse(input);
+  if (!parsed.success) {
+    return null;
+  }
+
+  const { data, error } = await usersQueriesServer.getUser(parsed.data);
 
   if (error) {
     throw error;

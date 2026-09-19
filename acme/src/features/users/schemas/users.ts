@@ -5,3 +5,5 @@ export const updateUsernameSchema = z.object({
     .string()
     .regex(/^[a-z0-9_]{3,24}$/, "Use 3-24 characters: a-z, 0-9, _"),
 });
+
+export const userIdSchema = z.uuid();
