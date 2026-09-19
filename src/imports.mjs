@@ -12,16 +12,16 @@ export default [
   },
   {
     name: "imports/lib",
-    files: ["src/lib/**/*.{ts,tsx}"],
+    files: ["src/lib/**/*.ts"],
     rules: {
       "no-restricted-imports": [
         "error",
         {
           patterns: [
             {
-              regex: "^@/(?!lib/)",
+              regex: "^@/",
               message:
-                "lib can import only @/lib. lib cannot import other layers.",
+                "lib can import only ./ (same folder). lib cannot import @/.",
             },
           ],
         },
