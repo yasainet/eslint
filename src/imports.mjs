@@ -55,9 +55,10 @@ export default [
         {
           patterns: [
             {
-              regex: "^@/(?!features/[^/]+/(queries|schemas|types)/)",
+              regex:
+                "^@/(?!features/[^/]+/(queries|schemas|types)/|utils/mapping$)",
               message:
-                "services can import only queries, schemas and types. services cannot import other layers.",
+                "services can import only queries, schemas, types and @/utils/mapping. services cannot import other layers.",
             },
           ],
         },
@@ -182,9 +183,9 @@ export default [
         {
           patterns: [
             {
-              regex: "^@/",
+              regex: "^@/(?!lib/[^/]+/types$|utils/mapping$)",
               message:
-                "types cannot import @/. types can import only external packages.",
+                "types can import only @/lib/*/types and @/utils/mapping.",
             },
           ],
         },
