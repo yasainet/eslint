@@ -49,7 +49,9 @@ export default [
   {
     name: "imports/queries",
     files: ["src/features/*/queries/*.ts"],
+    plugins: { yasainet: plugin },
     rules: {
+      "yasainet/queries-lib": "error",
       "no-restricted-imports": [
         "error",
         {

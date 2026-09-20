@@ -3,6 +3,7 @@ import featureName from "./rules/feature-name.mjs";
 import namespaceImportName from "./rules/namespace-import-name.mjs";
 import noParentImport from "./rules/no-parent-import.mjs";
 import noTryCatch from "./rules/no-try-catch.mjs";
+import queriesLib from "./rules/queries-lib.mjs";
 
 export default {
   rules: {
@@ -11,5 +12,6 @@ export default {
     "namespace-import-name": namespaceImportName,
     "no-parent-import": noParentImport,
     "no-try-catch": noTryCatch,
+    "queries-lib": queriesLib,
   },
 };
