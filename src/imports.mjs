@@ -29,6 +29,24 @@ export default [
     },
   },
   {
+    name: "imports/utils",
+    files: ["src/utils/*.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              regex: "^@/",
+              message:
+                "utils can import only ./ (same folder). utils cannot import @/.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
     name: "imports/queries",
     files: ["src/features/*/queries/*.ts"],
     rules: {
