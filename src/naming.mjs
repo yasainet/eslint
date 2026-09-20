@@ -37,4 +37,12 @@ export default [
       "yasainet/feature-name": "error",
     },
   },
+  {
+    name: "naming/feature-file",
+    files: ["src/features/*/{schemas,types,utils}/*.ts"],
+    plugins: { yasainet: plugin },
+    rules: {
+      "yasainet/feature-file-name": "error",
+    },
+  },
 ];
