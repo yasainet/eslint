@@ -7,3 +7,13 @@ export const updateUsernameSchema = z.object({
 });
 
 export const userIdSchema = z.uuid();
+
+const AVATAR_MAX_BYTES = 512 * 1024;
+
+export const updateAvatarSchema = z.object({
+  avatar: z
+    .file()
+    .min(1, "Choose an image")
+    .max(AVATAR_MAX_BYTES, "Image can be up to 512 KB")
+    .mime(["image/png", "image/jpeg", "image/webp"], "Use PNG, JPEG or WebP"),
+});

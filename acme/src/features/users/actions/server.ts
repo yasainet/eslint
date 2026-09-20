@@ -16,3 +16,16 @@ export async function updateUsername(_prevState: unknown, formData: FormData) {
   revalidatePath("/");
   return result;
 }
+
+export async function updateAvatar(_prevState: unknown, formData: FormData) {
+  const result = await usersServicesServer.updateAvatar({
+    avatar: formData.get("avatar"),
+  });
+
+  if (result.error) {
+    return result;
+  }
+
+  revalidatePath("/");
+  return result;
+}

@@ -1,16 +1,37 @@
 import * as authQueriesServer from "@/features/auth/queries/server";
+import * as usersQueriesGarage from "@/features/users/queries/garage";
 import * as usersQueriesServer from "@/features/users/queries/server";
 import {
+  updateAvatarSchema,
   updateUsernameSchema,
   userIdSchema,
 } from "@/features/users/schemas/users";
 import type {
+  UpdateAvatarFormState,
   UpdateUsernameFormState,
   User,
 } from "@/features/users/types/users";
 
 // Postgres の unique 制約違反
 const UNIQUE_VIOLATION = "23505";
+
+const AVATAR_EXTENSIONS: Record<string, string> = {
+  "image/png": "png",
+  "image/jpeg": "jpg",
+  "image/webp": "webp",
+};
+
+type UserRow = { id: string; username: string; avatar_path: string | null };
+
+function toUser(row: UserRow): User {
+  return {
+    id: row.id,
+    username: row.username,
+    avatarUrl: row.avatar_path
+      ? `${process.env.AVATARS_BASE_URL}/${row.avatar_path}`
+      : null,
+  };
+}
 
 async function getAuthUserId(): Promise<string | null> {
   const { data, error } = await authQueriesServer.getUser();
@@ -38,7 +59,7 @@ export async function getCurrentUser(): Promise<User | null> {
     throw error;
   }
 
-  return data;
+  return data ? toUser(data) : null;
 }
 
 export async function getUserList(): Promise<User[]> {
@@ -48,7 +69,7 @@ export async function getUserList(): Promise<User[]> {
     throw error;
   }
 
-  return data;
+  return data.map(toUser);
 }
 
 export async function getUser(input: unknown): Promise<User | null> {
@@ -64,7 +85,7 @@ export async function getUser(input: unknown): Promise<User | null> {
     throw error;
   }
 
-  return data;
+  return data ? toUser(data) : null;
 }
 
 export async function updateUsername(
@@ -95,4 +116,37 @@ export async function updateUsername(
   }
 
   throw error;
+}
+
+export async function updateAvatar(
+  input: unknown,
+): Promise<UpdateAvatarFormState> {
+  // 想定内の失敗: 入力が不正
+  const parsed = updateAvatarSchema.safeParse(input);
+  if (!parsed.success) {
+    return { error: { message: parsed.error.issues[0].message } };
+  }
+
+  const id = await getAuthUserId();
+  if (!id) {
+    return { error: { message: "Sign in required" } };
+  }
+
+  const { avatar } = parsed.data;
+  const avatarPath = `${id}/${crypto.randomUUID()}.${AVATAR_EXTENSIONS[avatar.type]}`;
+
+  // Garage (S3 SDK) は失敗すると throw する。想定内の失敗は無いので、そのまま上に流す
+  await usersQueriesGarage.uploadAvatar(
+    avatarPath,
+    new Uint8Array(await avatar.arrayBuffer()),
+    avatar.type,
+  );
+
+  const { error } = await usersQueriesServer.updateAvatarPath(id, avatarPath);
+
+  if (error) {
+    throw error;
+  }
+
+  return { error: null };
 }
