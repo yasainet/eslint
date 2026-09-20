@@ -10,7 +10,10 @@ export default [
     rules: {
       "check-file/filename-naming-convention": [
         "error",
-        { "src/**/*.{ts,tsx}": "KEBAB_CASE" },
+        {
+          "src/**/*.{ts,tsx}": "KEBAB_CASE",
+          "src/features/*/hooks/*.ts": "use-+([a-z0-9-])",
+        },
         { ignoreMiddleExtensions: true },
       ],
     },
