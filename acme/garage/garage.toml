@@ -1,0 +1,26 @@
+# https://garagehq.deuxfleurs.fr/documentation/quick-start/
+
+metadata_dir = "/var/lib/garage/meta"
+data_dir = "/var/lib/garage/data"
+db_engine = "sqlite"
+
+replication_factor = 1
+
+rpc_bind_addr = "[::]:3901"
+rpc_public_addr = "127.0.0.1:3901"
+rpc_secret = "fea259c1816aa7820ad023b72873088718e03235f0db3dcfeb0456f201c39108"
+
+[s3_api]
+s3_region = "garage"
+api_bind_addr = "[::]:3900"
+root_domain = ".s3.garage.localhost"
+
+[s3_web]
+bind_addr = "[::]:3902"
+root_domain = ".web.garage.localhost"
+index = "index.html"
+
+[admin]
+api_bind_addr = "[::]:3903"
+admin_token = "S0GnBvKFVvIOXJvkdqirlzmuXY4rXXLVyL2xw9zK/yo="
+metrics_token = "FDrq3ejq2aLjxidFsl+v4rBodZZRaBMc1j8bdhJSl7s="
