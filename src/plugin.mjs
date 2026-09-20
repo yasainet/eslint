@@ -4,6 +4,7 @@ import namespaceImportName from "./rules/namespace-import-name.mjs";
 import noParentImport from "./rules/no-parent-import.mjs";
 import noTryCatch from "./rules/no-try-catch.mjs";
 import queriesLib from "./rules/queries-lib.mjs";
+import scope from "./rules/scope.mjs";
 
 export default {
   rules: {
@@ -13,5 +14,6 @@ export default {
     "no-parent-import": noParentImport,
     "no-try-catch": noTryCatch,
     "queries-lib": queriesLib,
+    scope,
   },
 };

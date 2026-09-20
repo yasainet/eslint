@@ -1,0 +1,72 @@
+const FILE_PATTERN =
+  /\/src\/features\/[^/]+\/(services|loaders|actions|hooks)\/([^/]+)\.ts$/;
+const IMPORT_PATTERN =
+  /^@\/features\/[^/]+\/(queries|services|loaders|actions)\/([^/]+)$/;
+const SCOPES = ["server", "client", "admin"];
+
+function toScope(name) {
+  return name === "client" || name === "admin" ? name : "server";
+}
+
+export default {
+  meta: {
+    type: "problem",
+    messages: {
+      invalidFileName:
+        "{{ layer }} cannot use the file name '{{ name }}'. It can use only server, client or admin.",
+      mixed:
+        "{{ importer }} cannot import '{{ importPath }}'. A browser file (client) and a server file cannot be mixed.",
+      adminOnly:
+        "{{ importer }} cannot import '{{ importPath }}'. Only admin.ts can import admin.",
+    },
+    schema: [],
+  },
+  create(context) {
+    const fileMatch = FILE_PATTERN.exec(context.filename);
+    if (!fileMatch) return {};
+
+    const [, layer, name] = fileMatch;
+    const isHooks = layer === "hooks";
+    const importer = isHooks ? "hooks" : `${layer}/${name}.ts`;
+
+    if (!isHooks && !SCOPES.includes(name)) {
+      return {
+        Program: (node) =>
+          context.report({
+            node,
+            messageId: "invalidFileName",
+            data: { layer, name },
+          }),
+      };
+    }
+
+    const scope = isHooks ? "client" : name;
+
+    function check(source) {
+      if (!source || typeof source.value !== "string") return;
+      const importPath = source.value;
+
+      const importMatch = IMPORT_PATTERN.exec(importPath);
+      if (!importMatch) return;
+
+      const [, importedLayer, importedName] = importMatch;
+      if (isHooks && importedLayer === "actions") return;
+
+      const importedScope = toScope(importedName);
+      const data = { importer, importPath };
+
+      if ((scope === "client") !== (importedScope === "client")) {
+        context.report({ node: source, messageId: "mixed", data });
+      } else if (scope === "server" && importedScope === "admin") {
+        context.report({ node: source, messageId: "adminOnly", data });
+      }
+    }
+
+    return {
+      ImportDeclaration: (node) => check(node.source),
+      ExportNamedDeclaration: (node) => check(node.source),
+      ExportAllDeclaration: (node) => check(node.source),
+      ImportExpression: (node) => check(node.source),
+    };
+  },
+};
