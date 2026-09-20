@@ -143,11 +143,12 @@ export default [
           patterns: [
             {
               regex: allow(
+                "components/ui/",
                 "configs/",
                 feature("actions", "loaders", "types", "configs", "utils"),
               ),
               message:
-                "hooks can import only actions, loaders, types, configs and feature utils. hooks cannot import other layers.",
+                "hooks can import only @/components/ui, actions, loaders, types, configs and feature utils. hooks cannot import other layers.",
             },
           ],
         },
@@ -208,9 +209,9 @@ export default [
         {
           patterns: [
             {
-              regex: "^@/",
+              regex: allow(feature("types")),
               message:
-                "configs cannot import @/. configs can import only external packages.",
+                "configs can import only types. configs cannot import other layers.",
             },
           ],
         },
@@ -267,13 +268,13 @@ export default [
           patterns: [
             {
               regex: allow(
-                "lib/[^/]+/types$",
+                "lib/[^/]+/(?:types|database)$",
                 "utils/mapping$",
                 "configs/",
                 feature("configs", "types"),
               ),
               message:
-                "types can import only @/lib/*/types, @/utils/mapping, configs and types.",
+                "types can import only @/lib/*/types, @/lib/*/database, @/utils/mapping, configs and types.",
             },
           ],
         },
