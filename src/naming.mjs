@@ -42,7 +42,7 @@ export default [
   },
   {
     name: "naming/feature-file",
-    files: ["src/features/*/{schemas,types,utils}/*.ts"],
+    files: ["src/features/*/{configs,schemas,types,utils}/*.ts"],
     plugins: { yasainet: plugin },
     rules: {
       "yasainet/feature-file-name": "error",

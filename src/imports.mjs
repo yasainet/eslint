@@ -1,5 +1,8 @@
 import plugin from "./plugin.mjs";
 
+const feature = (...layers) => `features/[^/]+/(?:${layers.join("|")})/`;
+const allow = (...paths) => `^@/(?!${paths.join("|")})`;
+
 export default [
   {
     name: "imports/path",
@@ -19,9 +22,9 @@ export default [
         {
           patterns: [
             {
-              regex: "^@/",
+              regex: allow("configs/", feature("configs")),
               message:
-                "lib can import only ./ (same folder). lib cannot import @/.",
+                "lib can import only ./ (same folder) and configs. lib cannot import other @/.",
             },
           ],
         },
@@ -37,9 +40,9 @@ export default [
         {
           patterns: [
             {
-              regex: "^@/",
+              regex: allow("configs/", feature("configs")),
               message:
-                "utils can import only ./ (same folder). utils cannot import @/.",
+                "utils can import only ./ (same folder) and configs. utils cannot import other @/.",
             },
           ],
         },
@@ -57,9 +60,9 @@ export default [
         {
           patterns: [
             {
-              regex: "^@/(?!lib/)",
+              regex: allow("lib/", feature("types")),
               message:
-                "queries can import only @/lib. queries cannot import other layers.",
+                "queries can import only @/lib and types. queries cannot import other layers. services pass values such as configs to queries as arguments.",
             },
           ],
         },
@@ -75,10 +78,13 @@ export default [
         {
           patterns: [
             {
-              regex:
-                "^@/(?!features/[^/]+/(queries|schemas|types)/|utils/mapping$)",
+              regex: allow(
+                "utils/",
+                "configs/",
+                feature("queries", "schemas", "types", "configs", "utils"),
+              ),
               message:
-                "services can import only queries, schemas, types and @/utils/mapping. services cannot import other layers.",
+                "services can import only queries, schemas, types, @/utils, configs and feature utils. services cannot import other layers.",
             },
           ],
         },
@@ -94,9 +100,12 @@ export default [
         {
           patterns: [
             {
-              regex: "^@/(?!features/[^/]+/services/)",
+              regex: allow(
+                "configs/",
+                feature("services", "configs", "types", "utils"),
+              ),
               message:
-                "loaders can import only services. loaders cannot import other layers.",
+                "loaders can import only services, configs, types and feature utils. loaders cannot import other layers.",
             },
           ],
         },
@@ -112,9 +121,12 @@ export default [
         {
           patterns: [
             {
-              regex: "^@/(?!features/[^/]+/services/)",
+              regex: allow(
+                "configs/",
+                feature("services", "configs", "types", "utils"),
+              ),
               message:
-                "actions can import only services. actions cannot import other layers.",
+                "actions can import only services, configs, types and feature utils. actions cannot import other layers.",
             },
           ],
         },
@@ -130,9 +142,12 @@ export default [
         {
           patterns: [
             {
-              regex: "^@/(?!features/[^/]+/(actions|loaders|types)/)",
+              regex: allow(
+                "configs/",
+                feature("actions", "loaders", "types", "configs", "utils"),
+              ),
               message:
-                "hooks can import only actions, loaders and types. hooks cannot import other layers.",
+                "hooks can import only actions, loaders, types, configs and feature utils. hooks cannot import other layers.",
             },
           ],
         },
@@ -148,9 +163,13 @@ export default [
         {
           patterns: [
             {
-              regex: "^@/(?!components/|features/[^/]+/hooks/)",
+              regex: allow(
+                "components/",
+                "configs/",
+                feature("hooks", "configs", "types", "utils"),
+              ),
               message:
-                "feature components can import only @/components and hooks. feature components cannot import other layers.",
+                "feature components can import only @/components, hooks, configs, types and feature utils. feature components cannot import other layers.",
             },
           ],
         },
@@ -166,10 +185,32 @@ export default [
         {
           patterns: [
             {
-              regex:
-                "^@/(?!components/|utils/|features/[^/]+/(?:components|loaders)/)",
+              regex: allow(
+                "components/",
+                "utils/",
+                "configs/",
+                feature("components", "loaders", "configs", "types", "utils"),
+              ),
               message:
-                "app can import only @/components, @/utils, feature components and loaders. app cannot import other layers.",
+                "app can import only @/components, @/utils, feature components, loaders, configs, types and feature utils. app cannot import other layers.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    name: "imports/configs",
+    files: ["src/configs/*.ts", "src/features/*/configs/*.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              regex: "^@/",
+              message:
+                "configs cannot import @/. configs can import only external packages.",
             },
           ],
         },
@@ -185,9 +226,31 @@ export default [
         {
           patterns: [
             {
-              regex: "^@/",
+              regex: allow("configs/", feature("configs")),
               message:
-                "schemas cannot import @/. schemas can import only external packages.",
+                "schemas can import only external packages and configs. schemas cannot import other @/.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    name: "imports/feature-utils",
+    files: ["src/features/*/utils/*.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              regex: allow(
+                "utils/",
+                "configs/",
+                feature("configs", "types", "utils"),
+              ),
+              message:
+                "feature utils can import only @/utils, configs, types and feature utils. feature utils cannot import other layers.",
             },
           ],
         },
@@ -203,9 +266,14 @@ export default [
         {
           patterns: [
             {
-              regex: "^@/(?!lib/[^/]+/types$|utils/mapping$)",
+              regex: allow(
+                "lib/[^/]+/types$",
+                "utils/mapping$",
+                "configs/",
+                feature("configs", "types"),
+              ),
               message:
-                "types can import only @/lib/*/types and @/utils/mapping.",
+                "types can import only @/lib/*/types, @/utils/mapping, configs and types.",
             },
           ],
         },

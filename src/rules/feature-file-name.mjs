@@ -1,5 +1,5 @@
 const FILE_PATTERN =
-  /\/src\/features\/([^/]+)\/(schemas|types|utils)\/([^/.]+)\.[^/]+$/;
+  /\/src\/features\/([^/]+)\/(configs|schemas|types|utils)\/([^/.]+)\.[^/]+$/;
 
 export default {
   meta: {
