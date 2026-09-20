@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { SignOutButton } from "@/features/auth/components/sign-out-button";
+import { DeleteUserButton } from "@/features/users/components/delete-user-button";
 import { UpdateAvatarForm } from "@/features/users/components/update-avatar-form";
 import { UpdateUsernameForm } from "@/features/users/components/update-username-form";
 import { getCurrentUser } from "@/features/users/loaders/server";
@@ -27,6 +28,7 @@ export default async function HomePage() {
           <UpdateAvatarForm />
           <UpdateUsernameForm username={user.username} />
           <SignOutButton />
+          <DeleteUserButton />
         </>
       ) : (
         <>
