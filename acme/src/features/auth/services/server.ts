@@ -4,7 +4,11 @@ import * as authQueriesServer from "@/features/auth/queries/server";
 import { signInSchema, signUpSchema } from "@/features/auth/schemas/auth";
 import type { AuthFormState, AuthUser } from "@/features/auth/types/auth";
 
-// 想定内の失敗: Supabase が 4xx で断った (登録済みの email、password 違い、未ログインなど)
+// Supabase Auth の error code
+const USER_ALREADY_EXISTS = "user_already_exists";
+const INVALID_CREDENTIALS = "invalid_credentials";
+
+// 想定内の失敗: Supabase が 4xx で断った (未ログイン)
 function isRejected(error: AuthError): boolean {
   return (
     error.status !== undefined && error.status >= 400 && error.status < 500
@@ -26,8 +30,9 @@ export async function signUp(input: unknown): Promise<AuthFormState> {
   if (!error) {
     return { error: null };
   }
-  if (isRejected(error)) {
-    return { error: { message: error.message } };
+  // 想定内の失敗: 登録済みの email
+  if (error.code === USER_ALREADY_EXISTS) {
+    return { error: { message: "Email is already registered" } };
   }
 
   // 想定外の失敗: 通信断など。throw して error.tsx に任せる
@@ -49,8 +54,9 @@ export async function signIn(input: unknown): Promise<AuthFormState> {
   if (!error) {
     return { error: null };
   }
-  if (isRejected(error)) {
-    return { error: { message: error.message } };
+  // 想定内の失敗: email か password が違う
+  if (error.code === INVALID_CREDENTIALS) {
+    return { error: { message: "Email or password is incorrect" } };
   }
 
   throw error;
