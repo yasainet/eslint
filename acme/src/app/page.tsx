@@ -14,9 +14,9 @@ export default async function HomePage() {
     <main className="flex flex-1 flex-col items-center justify-center gap-4">
       {user ? (
         <>
-          {user.avatarUrl && (
+          {user.avatarPath && (
             <Image
-              src={user.avatarUrl}
+              src={`${process.env.AVATARS_BASE_URL}/${user.avatarPath}`}
               alt={user.username}
               width={96}
               height={96}

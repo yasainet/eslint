@@ -13,6 +13,7 @@ import type {
   UpdateUsernameFormState,
   User,
 } from "@/features/users/types/users";
+import { mapSnakeToCamel } from "@/utils/mapping";
 
 // Postgres の unique 制約違反
 const UNIQUE_VIOLATION = "23505";
@@ -22,18 +23,6 @@ const AVATAR_EXTENSIONS: Record<string, string> = {
   "image/jpeg": "jpg",
   "image/webp": "webp",
 };
-
-type UserRow = { id: string; username: string; avatar_path: string | null };
-
-function toUser(row: UserRow): User {
-  return {
-    id: row.id,
-    username: row.username,
-    avatarUrl: row.avatar_path
-      ? `${process.env.AVATARS_BASE_URL}/${row.avatar_path}`
-      : null,
-  };
-}
 
 async function getAuthUserId(): Promise<string | null> {
   const { data, error } = await authQueriesServer.getUser();
@@ -61,7 +50,7 @@ export async function getCurrentUser(): Promise<User | null> {
     throw error;
   }
 
-  return data ? toUser(data) : null;
+  return mapSnakeToCamel<User | null>(data);
 }
 
 export async function getUserList(): Promise<User[]> {
@@ -71,7 +60,7 @@ export async function getUserList(): Promise<User[]> {
     throw error;
   }
 
-  return data.map(toUser);
+  return mapSnakeToCamel<User[]>(data);
 }
 
 export async function getUser(input: unknown): Promise<User | null> {
@@ -87,7 +76,7 @@ export async function getUser(input: unknown): Promise<User | null> {
     throw error;
   }
 
-  return data ? toUser(data) : null;
+  return mapSnakeToCamel<User | null>(data);
 }
 
 export async function updateUsername(
