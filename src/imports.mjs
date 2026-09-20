@@ -130,9 +130,9 @@ export default [
         {
           patterns: [
             {
-              regex: "^@/(?!features/[^/]+/actions/)",
+              regex: "^@/(?!features/[^/]+/(actions|loaders|types)/)",
               message:
-                "hooks can import only actions. hooks cannot import other layers.",
+                "hooks can import only actions, loaders and types. hooks cannot import other layers.",
             },
           ],
         },
